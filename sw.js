@@ -1,7 +1,7 @@
 // ===== SERVICE WORKER — CatatDuit v2 =====
 // Cache-first strategy for all local assets + CDN dependencies
 
-const CACHE_NAME = "catatduit-v2-cache-v2";
+const CACHE_NAME = "catatduit-v2-cache-v3";
 
 const ASSETS_TO_CACHE = [
   "/",
