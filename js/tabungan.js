@@ -12,7 +12,6 @@ function renderTabungan() {
   });
 
   renderTabunganContent();
-  if (window.lucide) lucide.createIcons();
 }
 
 function renderTabunganContent() {
@@ -119,6 +118,7 @@ function renderTabunganTab(container) {
   goalsCard.querySelectorAll('[data-action="hapus-goal"]').forEach(btn => {
     btn.addEventListener('click', () => handleHapusGoal(parseInt(btn.dataset.idx)));
   });
+  if (window.lucide) lucide.createIcons();
 }
 
 function handleTambahGoal() {
@@ -236,6 +236,7 @@ function renderTagihanTab(container) {
   tagihanCard.querySelectorAll('[data-action="hapus-tagihan"]').forEach(btn => {
     btn.addEventListener('click', () => handleHapusTagihan(btn.dataset.id));
   });
+  if (window.lucide) lucide.createIcons();
 }
 
 function handleTambahTagihan() {
