@@ -1018,3 +1018,42 @@ input, select, textarea { font-family: inherit; }
   font-size: 12px;
   color: var(--gray-500);
 }
+
+/* ===== UANG BEBAS BREAKDOWN ===== */
+.uang-bebas-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+.uang-bebas-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 13px;
+  color: var(--gray-700);
+}
+.uang-bebas-row--minus {
+  color: var(--gray-500);
+}
+.uang-bebas-row--result {
+  font-weight: 600;
+  color: var(--gray-900);
+  font-size: 14px;
+}
+.uang-bebas-row--final {
+  font-size: 15px;
+}
+.uang-bebas-row .minus {
+  color: var(--red);
+  font-weight: 500;
+}
+.uang-bebas-divider {
+  border-top: 1px solid var(--gray-200);
+  margin: 2px 0;
+}
+.tagihan-names {
+  font-size: 11px;
+  color: var(--gray-400);
+  font-weight: 400;
+}

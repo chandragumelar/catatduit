@@ -210,12 +210,35 @@ function renderDashboard() {
       <button class="btn-secondary" id="btn-goto-tagihan">Tambah Tagihan</button>`;
   } else {
     const namaTagihan = tagihanBulanIni.map(t => `· ${escHtml(t.nama)}`).join('  ');
-    const uangBebasSetelahNabung = uangBebas - totalNabung;
+    const setelahTagihan = uangBebas;
+    const bebasDipakai = uangBebas - totalNabung;
     uangBebasCard.innerHTML = `
       <p class="summary-label">UANG BEBAS BULAN INI</p>
-      <p class="summary-value ${uangBebas >= 0 ? 'income' : 'expense'} summary-value--large">${formatRupiah(uangBebas)}</p>
-      <p class="summary-sub-label">Tagihan bulan ini: ${formatRupiah(totalTagihanBulanIni)}${namaTagihan ? `  ${namaTagihan}` : ''}</p>
-      ${totalNabung > 0 ? `<p class="summary-sub-label" style="margin-top:4px;">Sudah nabung ${formatRupiah(totalNabung)} — sisa uang bebas: ${formatRupiah(uangBebasSetelahNabung)}</p>` : ''}`;
+      <div class="uang-bebas-breakdown">
+        <div class="uang-bebas-row">
+          <span>Total uang kamu sekarang</span>
+          <span>${formatRupiah(estimasiSaldo)}</span>
+        </div>
+        <div class="uang-bebas-row uang-bebas-row--minus">
+          <span>Tagihan bulan ini${namaTagihan ? `<br><small class="tagihan-names">${namaTagihan}</small>` : ''}</span>
+          <span class="minus">− ${formatRupiah(totalTagihanBulanIni)}</span>
+        </div>
+        <div class="uang-bebas-divider"></div>
+        <div class="uang-bebas-row uang-bebas-row--result">
+          <span>Setelah tagihan</span>
+          <span class="${setelahTagihan >= 0 ? 'income' : 'expense'}">${formatRupiah(setelahTagihan)}</span>
+        </div>
+        ${totalNabung > 0 ? `
+        <div class="uang-bebas-row uang-bebas-row--minus">
+          <span>Nabung bulan ini</span>
+          <span class="minus">− ${formatRupiah(totalNabung)}</span>
+        </div>
+        <div class="uang-bebas-divider"></div>
+        <div class="uang-bebas-row uang-bebas-row--result uang-bebas-row--final">
+          <span>Bebas dipakai</span>
+          <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
+        </div>` : ''}
+      </div>`;
   }
   container.appendChild(uangBebasCard);
   document.getElementById('btn-goto-tagihan')?.addEventListener('click', () => {
