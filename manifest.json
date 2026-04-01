@@ -2,7 +2,7 @@
   "name": "CatatDuit",
   "short_name": "CatatDuit",
   "description": "Catat pengeluaran, kenali keuanganmu.",
-  "start_url": "/",
+  "start_url": "/catatduit/",
   "display": "standalone",
   "background_color": "#F9FAFB",
   "theme_color": "#0D9488",
