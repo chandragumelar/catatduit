@@ -43,9 +43,7 @@ function renderKategoriContent() {
     item.innerHTML = `
       <span class="kategori-item-icon">${k.icon}</span>
       <span class="kategori-item-name">${escHtml(k.nama)}</span>
-      <button class="btn-icon-sm danger" data-action="hapus" data-id="${k.id}" title="Hapus">
-        <i data-lucide="trash-2"></i>
-      </button>`;
+      <button class="btn-icon-sm danger" data-action="hapus" data-id="${k.id}" title="Hapus">🗑️</button>`;
     card.appendChild(item);
   });
 
