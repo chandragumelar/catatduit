@@ -47,6 +47,7 @@ function renderDashboard() {
   const totalMasukAllTime = txList.filter(tx => tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0);
   const totalKeluarAllTime = txList.filter(tx => tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0);
   const estimasiSaldo = saldoAwal + totalMasukAllTime - totalKeluarAllTime;
+  const totalNabungAllTime = txList.filter(tx => tx.jenis === 'nabung').reduce((s, tx) => s + tx.nominal, 0);
 
   const prevDate = new Date(year, month - 1, 1);
   const prevYear = prevDate.getFullYear(), prevMonth = prevDate.getMonth();
@@ -238,7 +239,9 @@ function renderDashboard() {
           <span>Bebas dipakai</span>
           <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
         </div>` : ''}
-      </div>`;
+      </div>
+      ${totalKeluar > (estimasiSaldo - totalNabungAllTime) ? `
+        <div class="uang-bebas-warning">⚠️ Pengeluaran bulan ini mulai mendekati uang tabungan kamu.</div>` : ''}`;
   }
   container.appendChild(uangBebasCard);
   document.getElementById('btn-goto-tagihan')?.addEventListener('click', () => {

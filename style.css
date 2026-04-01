@@ -801,11 +801,11 @@ input, select, textarea { font-family: inherit; }
 .kategori-item-icon { font-size: 20px; flex-shrink: 0; }
 .kategori-item-name { flex: 1; font-size: 15px; color: var(--gray-900); }
 
-.btn-icon-sm { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); color: var(--gray-500); transition: background 0.15s; }
+.btn-icon-sm { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); background: var(--gray-100); border: none; cursor: pointer; color: var(--gray-500); transition: background 0.15s; flex-shrink: 0; }
 .btn-icon-sm:active { background: var(--gray-100); }
 .btn-icon-sm svg { width: 16px; height: 16px; }
-.btn-icon-sm.danger { color: var(--red); }
-.btn-icon-sm.danger:active { background: var(--red-light); }
+.btn-icon-sm.danger { color: var(--red); background: #FEE2E2; }
+.btn-icon-sm.danger:active { background: #FECACA; }
 
 .btn-add-kategori { display: flex; align-items: center; gap: 8px; padding: 14px 0; font-size: 15px; font-weight: 600; color: var(--teal); width: 100%; }
 .btn-add-kategori svg { width: 18px; height: 18px; }
