@@ -209,12 +209,13 @@ function renderDashboard() {
       <p class="uang-bebas-prompt">Tambah cicilan dan subscription rutinmu — biar kelihatan berapa uang yang bebas kamu pakai bulan ini.</p>
       <button class="btn-secondary" id="btn-goto-tagihan">Tambah Tagihan</button>`;
   } else {
-    const namaTagihan = tagihanBulanIni.map(t => `<span class="tagihan-nama-chip">· ${escHtml(t.nama)}</span>`).join('');
+    const namaTagihan = tagihanBulanIni.map(t => `· ${escHtml(t.nama)}`).join('  ');
+    const uangBebasSetelahNabung = uangBebas - totalNabung;
     uangBebasCard.innerHTML = `
       <p class="summary-label">UANG BEBAS BULAN INI</p>
       <p class="summary-value ${uangBebas >= 0 ? 'income' : 'expense'} summary-value--large">${formatRupiah(uangBebas)}</p>
-      <p class="summary-sub-label">Tagihan bulan ini: ${formatRupiah(totalTagihanBulanIni)}</p>
-      <div class="tagihan-nama-list">${namaTagihan}</div>`;
+      <p class="summary-sub-label">Tagihan bulan ini: ${formatRupiah(totalTagihanBulanIni)}${namaTagihan ? `  ${namaTagihan}` : ''}</p>
+      ${totalNabung > 0 ? `<p class="summary-sub-label" style="margin-top:4px;">Sudah nabung ${formatRupiah(totalNabung)} — sisa uang bebas: ${formatRupiah(uangBebasSetelahNabung)}</p>` : ''}`;
   }
   container.appendChild(uangBebasCard);
   document.getElementById('btn-goto-tagihan')?.addEventListener('click', () => {
