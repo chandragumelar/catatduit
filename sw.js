@@ -1,5 +1,5 @@
 // ===== SERVICE WORKER — CatatDuit v2 =====
-const CACHE_NAME = "catatduit-v2-cache-v14";
+const CACHE_NAME = "catatduit-v2-cache-v16";
 
 const ASSETS_TO_CACHE = [
   "/catatduit/",

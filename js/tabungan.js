@@ -336,7 +336,7 @@ function handleSudahBayar(id) {
   });
 }
 
-function showTagihanBottomSheet({ title, nama = '', nominal = '', jatuhTempo = '', isRecurring = true, onConfirm }) {
+function showTagihanBottomSheet({ title, confirmText = 'Simpan', nama = '', nominal = '', jatuhTempo = '', isRecurring = true, onConfirm }) {
   const existing = document.getElementById('bottom-sheet-overlay');
   if (existing) existing.remove();
 
@@ -358,7 +358,7 @@ function showTagihanBottomSheet({ title, nama = '', nominal = '', jatuhTempo = '
         <label class="input-label">Nominal</label>
         <div class="nominal-wrap">
           <span class="nominal-prefix">Rp</span>
-          <input type="text" id="bs-nominal" class="input-nominal" placeholder="0" value="${nominalFormatted}" inputmode="numeric" />
+          <input type="text" id="bs-nominal" class="input-nominal" placeholder="" value="${nominalFormatted}" inputmode="numeric" />
         </div>
       </div>
       <div class="bottom-sheet-field">
@@ -367,7 +367,8 @@ function showTagihanBottomSheet({ title, nama = '', nominal = '', jatuhTempo = '
       </div>
       <div class="bottom-sheet-field">
         <label class="input-label">Tagihan ini muncul setiap bulan?</label>
-        <div class="jenis-toggle" style="margin-top:6px;">
+        <p class="bottom-sheet-hint" style="margin-bottom:8px;">Contoh rutin: Netflix, listrik. Contoh sekali: hutang ke teman.</p>
+        <div class="jenis-toggle" style="margin-top:0;">
           <button type="button" class="jenis-btn ${isRecurring ? 'active' : ''}" id="bs-recurring-ya">Ya</button>
           <button type="button" class="jenis-btn ${!isRecurring ? 'active' : ''}" id="bs-recurring-tidak">Tidak</button>
         </div>
@@ -375,7 +376,7 @@ function showTagihanBottomSheet({ title, nama = '', nominal = '', jatuhTempo = '
       <p class="bottom-sheet-hint" id="bs-error" style="color:var(--red);min-height:16px;"></p>
       <div class="bottom-sheet-actions">
         <button class="btn-secondary" id="bs-cancel">Batal</button>
-        <button class="btn-primary" id="bs-confirm">Simpan</button>
+        <button class="btn-primary" id="bs-confirm">${escHtml(confirmText)}</button>
       </div>
     </div>`;
 
@@ -429,6 +430,7 @@ function showTagihanBottomSheet({ title, nama = '', nominal = '', jatuhTempo = '
 function handleTambahTagihan() {
   showTagihanBottomSheet({
     title: 'Tambah Tagihan',
+    confirmText: 'Tambah Tagihan',
     onConfirm: ({ nama, nominal, jatuhTempo, isRecurring }) => {
       const tagihan = getTagihan();
       tagihan.push({ id: generateId(), nama, nominal, jatuhTempo, isRecurring, paidMonths: [] });
