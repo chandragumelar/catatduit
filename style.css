@@ -603,6 +603,7 @@ input, select, textarea { font-family: inherit; }
 .jenis-btn.active[data-jenis="keluar"] { background: var(--red-light); color: var(--red); }
 .jenis-btn.active[data-jenis="masuk"] { background: var(--green-light); color: var(--green); }
 .jenis-btn.active[data-jenis="nabung"] { background: var(--teal-light); color: var(--teal); }
+.jenis-btn.active:not([data-jenis]) { background: var(--teal-light); color: var(--teal); font-weight: 600; }
 
 .nominal-wrap {
   display: flex; align-items: center; background: var(--white);
