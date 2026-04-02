@@ -173,18 +173,12 @@ function renderTagihanTab(container) {
   const tagihan = getTagihan();
   const { year, month } = getCurrentMonthYear();
 
-  const tagihanBulanIni = tagihan.filter(t => {
-    if (!t.jatuhTempo) return false;
-    const d = new Date(t.jatuhTempo + 'T00:00:00');
-    return d.getFullYear() === year && d.getMonth() === month;
-  });
-
   // Disclaimer
   const disclaimerEl = document.createElement('div');
   disclaimerEl.className = 'tagihan-disclaimer';
   disclaimerEl.innerHTML = `
     <span>⚠️</span>
-    <span>Daftar ini hanya <strong>pengingat</strong> — bukan bukti pembayaran. Tagihan dianggap lunas hanya jika kamu sudah mencatatnya sebagai <strong>Uang Keluar</strong>.</span>`;
+    <span>Daftar ini hanya <strong>pengingat</strong> — bukan bukti pembayaran. Kecuali kamu tap <strong>Sudah Bayar</strong>, tagihan tidak otomatis tercatat sebagai pengeluaran.</span>`;
   container.appendChild(disclaimerEl);
 
   const tagihanCard = document.createElement('div');
@@ -207,18 +201,28 @@ function renderTagihanTab(container) {
   } else {
     sortedTagihan.forEach((t) => {
       const jatuhTempoFormatted = t.jatuhTempo ? formatDate(t.jatuhTempo) : '-';
-      const isThisMonth = tagihanBulanIni.some(x => x.id === t.id);
+      const isPaid = isTagihanPaidThisMonth(t, year, month);
+      const isThisMonth = (() => {
+        if (!t.jatuhTempo) return false;
+        const d = new Date(t.jatuhTempo + 'T00:00:00');
+        return d.getFullYear() === year && d.getMonth() === month;
+      })();
 
       const item = document.createElement('div');
       item.className = `tagihan-item ${isThisMonth ? 'tagihan-item--this-month' : ''}`;
       item.innerHTML = `
         <div class="tagihan-info">
           <div class="tagihan-nama">${escHtml(t.nama)}</div>
-          <div class="tagihan-detail">Jatuh tempo: ${jatuhTempoFormatted}</div>
+          <div class="tagihan-detail">Jatuh tempo: ${jatuhTempoFormatted}${t.isRecurring === false ? ' · Sekali bayar' : ''}</div>
         </div>
         <div class="tagihan-right">
           <div class="tagihan-nominal">${formatRupiah(t.nominal)}</div>
           <div class="tagihan-actions">
+            ${isThisMonth
+              ? isPaid
+                ? `<span class="tagihan-lunas-badge">✓ Lunas</span>`
+                : `<button class="btn-sudah-bayar" data-id="${t.id}">Sudah Bayar</button>`
+              : ''}
             <button class="btn-icon-sm" data-action="edit-tagihan" data-id="${t.id}" title="Edit">✏️</button>
             <button class="btn-icon-sm danger" data-action="hapus-tagihan" data-id="${t.id}" title="Hapus">🗑️</button>
           </div>
@@ -236,7 +240,100 @@ function renderTagihanTab(container) {
   tagihanCard.querySelectorAll('[data-action="hapus-tagihan"]').forEach(btn => {
     btn.addEventListener('click', () => handleHapusTagihan(btn.dataset.id));
   });
+  tagihanCard.querySelectorAll('.btn-sudah-bayar').forEach(btn => {
+    btn.addEventListener('click', () => handleSudahBayar(btn.dataset.id));
+  });
   if (window.lucide) lucide.createIcons();
+}
+
+function handleSudahBayar(id) {
+  const tagihan = getTagihan();
+  const t = tagihan.find(x => x.id === id);
+  if (!t) return;
+  const { year, month } = getCurrentMonthYear();
+
+  // Buat bottom sheet
+  const existing = document.getElementById('bottom-sheet-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'bottom-sheet-overlay';
+  overlay.className = 'bottom-sheet-overlay';
+
+  const nominalFormatted = t.nominal.toLocaleString('id-ID');
+
+  overlay.innerHTML = `
+    <div class="bottom-sheet" id="bottom-sheet">
+      <div class="bottom-sheet-handle"></div>
+      <h3 class="bottom-sheet-title">Konfirmasi pembayaran</h3>
+      <p class="bottom-sheet-subtitle">${escHtml(t.nama)}</p>
+      <div class="bottom-sheet-field">
+        <label class="input-label">Nominal</label>
+        <div class="nominal-wrap">
+          <span class="nominal-prefix">Rp</span>
+          <input type="text" id="bs-nominal" class="input-nominal" value="${nominalFormatted}" inputmode="numeric" />
+        </div>
+        <p class="bottom-sheet-hint">Sesuaikan kalau nominalnya berbeda dari biasanya.</p>
+      </div>
+      <div class="bottom-sheet-field">
+        <label class="input-label">Tanggal bayar</label>
+        <input type="date" id="bs-tanggal" class="input-field" value="${getTodayStr()}" max="${getTodayStr()}" />
+      </div>
+      <div class="bottom-sheet-actions">
+        <button class="btn-secondary" id="bs-cancel">Batal</button>
+        <button class="btn-primary" id="bs-confirm">Bayar &amp; Catat</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('show'));
+
+  // Format nominal on input
+  const nominalInput = document.getElementById('bs-nominal');
+  nominalInput.addEventListener('input', () => {
+    const raw = nominalInput.value.replace(/\D/g, '');
+    nominalInput.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+  });
+
+  const close = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 300);
+  };
+
+  document.getElementById('bs-cancel').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  document.getElementById('bs-confirm').addEventListener('click', () => {
+    const nominal = parseNominal(nominalInput.value);
+    if (!nominal || nominal <= 0) { showToast('Nominal tidak valid.'); return; }
+    const tanggal = document.getElementById('bs-tanggal').value || getTodayStr();
+
+    // Buat transaksi keluar otomatis
+    const txList = getTransaksi();
+    txList.push({
+      id: generateId(),
+      jenis: 'keluar',
+      nominal,
+      kategori: 'lainnya_keluar',
+      tanggal,
+      catatan: t.nama,
+    });
+    saveTransaksi(txList);
+    invalidateTransaksiCache();
+
+    // Mark paid
+    markTagihanPaid(id, year, month);
+
+    // Kalau sekali bayar, hapus dari list
+    if (t.isRecurring === false) {
+      const updated = getTagihan().filter(x => x.id !== id);
+      saveTagihan(updated);
+    }
+
+    close();
+    showToast(`${t.nama} tercatat sebagai pengeluaran ✓`);
+    renderTabunganContent();
+  });
 }
 
 function handleTambahTagihan() {
@@ -249,9 +346,11 @@ function handleTambahTagihan() {
   if (jatuhTempo && !/^\d{4}-\d{2}-\d{2}$/.test(jatuhTempo.trim())) {
     showToast('Format tanggal tidak valid. Gunakan YYYY-MM-DD'); return;
   }
+  const isRecurringStr = window.prompt('Tagihan ini muncul setiap bulan? (y/n, default: y)') || 'y';
+  const isRecurring = isRecurringStr.trim().toLowerCase() !== 'n';
 
   const tagihan = getTagihan();
-  tagihan.push({ id: generateId(), nama: nama.trim(), nominal, jatuhTempo: jatuhTempo ? jatuhTempo.trim() : null });
+  tagihan.push({ id: generateId(), nama: nama.trim(), nominal, jatuhTempo: jatuhTempo ? jatuhTempo.trim() : null, isRecurring, paidMonths: [] });
   saveTagihan(tagihan);
   showToast('Tagihan ditambahkan!');
   renderTabunganContent();

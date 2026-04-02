@@ -49,8 +49,36 @@ function getNama() { return getData(STORAGE_KEYS.NAMA, ''); }
 function getSaldoAwal() { return getData(STORAGE_KEYS.SALDO_AWAL, 0) || 0; }
 function saveSaldoAwal(val) { return setData(STORAGE_KEYS.SALDO_AWAL, val); }
 
-function getTagihan() { return getData(STORAGE_KEYS.TAGIHAN, []); }
+function getTagihan() {
+  const list = getData(STORAGE_KEYS.TAGIHAN, []);
+  // Migration: pastikan semua item punya field isRecurring dan paidMonths
+  let needsSave = false;
+  list.forEach(t => {
+    if (t.isRecurring === undefined) { t.isRecurring = true; needsSave = true; }
+    if (!Array.isArray(t.paidMonths)) { t.paidMonths = []; needsSave = true; }
+  });
+  if (needsSave) setData(STORAGE_KEYS.TAGIHAN, list);
+  return list;
+}
 function saveTagihan(data) { return setData(STORAGE_KEYS.TAGIHAN, data); }
+
+// Helper: cek apakah tagihan sudah dibayar bulan ini
+function isTagihanPaidThisMonth(tagihan, year, month) {
+  const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+  return (tagihan.paidMonths || []).includes(key);
+}
+
+// Helper: mark tagihan sebagai paid bulan ini
+function markTagihanPaid(tagihanId, year, month) {
+  const list = getTagihan();
+  const idx = list.findIndex(t => t.id === tagihanId);
+  if (idx === -1) return false;
+  const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+  if (!list[idx].paidMonths.includes(key)) {
+    list[idx].paidMonths.push(key);
+  }
+  return saveTagihan(list);
+}
 
 function getGoals() { return getData(STORAGE_KEYS.GOALS, []); }
 function saveGoals(data) { return setData(STORAGE_KEYS.GOALS, data); }

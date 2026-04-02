@@ -199,8 +199,10 @@ function renderDashboard() {
     const d = new Date(t.jatuhTempo + 'T00:00:00');
     return d.getFullYear() === year && d.getMonth() === month;
   });
-  const totalTagihanBulanIni = tagihanBulanIni.reduce((s, t) => s + (t.nominal || 0), 0);
-  const uangBebas = estimasiSaldo - totalTagihanBulanIni;
+  const tagihanBelumBayar = tagihanBulanIni.filter(t => !isTagihanPaidThisMonth(t, year, month));
+  const tagihanSudahBayar = tagihanBulanIni.filter(t => isTagihanPaidThisMonth(t, year, month));
+  const totalTagihanBelumBayar = tagihanBelumBayar.reduce((s, t) => s + (t.nominal || 0), 0);
+  const uangBebas = estimasiSaldo - totalTagihanBelumBayar;
 
   const uangBebasCard = document.createElement('div');
   uangBebasCard.className = 'card';
@@ -210,9 +212,11 @@ function renderDashboard() {
       <p class="uang-bebas-prompt">Tambah cicilan dan subscription rutinmu — biar kelihatan berapa uang yang bebas kamu pakai bulan ini.</p>
       <button class="btn-secondary" id="btn-goto-tagihan">Tambah Tagihan</button>`;
   } else {
-    const namaTagihan = tagihanBulanIni.map(t => `· ${escHtml(t.nama)}`).join('  ');
+    const namaBelumBayar = tagihanBelumBayar.map(t => `· ${escHtml(t.nama)}`).join('  ');
     const setelahTagihan = uangBebas;
     const bebasDipakai = uangBebas - totalNabung;
+    const paidCount = tagihanSudahBayar.length;
+    const totalCount = tagihanBulanIni.length;
     uangBebasCard.innerHTML = `
       <p class="summary-label">UANG BEBAS BULAN INI</p>
       <div class="uang-bebas-breakdown">
@@ -220,10 +224,11 @@ function renderDashboard() {
           <span>Total uang kamu sekarang</span>
           <span>${formatRupiah(estimasiSaldo)}</span>
         </div>
+        ${totalTagihanBelumBayar > 0 ? `
         <div class="uang-bebas-row uang-bebas-row--minus">
-          <span>Tagihan bulan ini${namaTagihan ? `<br><small class="tagihan-names">${namaTagihan}</small>` : ''}</span>
-          <span class="minus">− ${formatRupiah(totalTagihanBulanIni)}</span>
-        </div>
+          <span>Tagihan belum dibayar${namaBelumBayar ? `<br><small class="tagihan-names">${namaBelumBayar}</small>` : ''}</span>
+          <span class="minus">− ${formatRupiah(totalTagihanBelumBayar)}</span>
+        </div>` : ''}
         <div class="uang-bebas-divider"></div>
         <div class="uang-bebas-row uang-bebas-row--result">
           <span>Setelah tagihan</span>
@@ -240,6 +245,7 @@ function renderDashboard() {
           <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
         </div>` : ''}
       </div>
+      ${totalCount > 0 ? `<p class="tagihan-paid-status">${paidCount} dari ${totalCount} tagihan bulan ini sudah terbayar</p>` : ''}
       ${totalKeluar > (estimasiSaldo - totalNabungAllTime) ? `
         <div class="uang-bebas-warning">⚠️ Pengeluaran bulan ini mulai mendekati uang tabungan kamu.</div>` : ''}`;
   }
