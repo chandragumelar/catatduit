@@ -200,7 +200,20 @@ function renderTagihanTab(container) {
     tagihanCard.innerHTML += `<div class="empty-state" style="padding:16px 0"><div class="empty-icon">📋</div><p class="empty-desc">Belum ada tagihan. Tambah reminder tagihan rutinmu!</p></div>`;
   } else {
     sortedTagihan.forEach((t) => {
-      const jatuhTempoFormatted = t.jatuhTempo ? formatDate(t.jatuhTempo) : '-';
+      const jatuhTempoFormatted = (() => {
+        if (!t.jatuhTempo) return '-';
+        const d = new Date(t.jatuhTempo + 'T00:00:00');
+        const day = d.getDate();
+        if (t.isRecurring !== false) {
+          // Tampilkan hari ke-X di bulan ini
+          const { year, month } = getCurrentMonthYear();
+          const maxDay = new Date(year, month + 1, 0).getDate();
+          const effectiveDay = Math.min(day, maxDay);
+          const thisMonthDate = new Date(year, month, effectiveDay);
+          return thisMonthDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        return formatDate(t.jatuhTempo);
+      })();
       const isPaid = isTagihanPaidThisMonth(t, year, month);
       const isThisMonth = (() => {
         if (!t.jatuhTempo) return false;
