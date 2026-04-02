@@ -336,24 +336,107 @@ function handleSudahBayar(id) {
   });
 }
 
-function handleTambahTagihan() {
-  const nama = window.prompt('Nama tagihan (contoh: Netflix, BPJS, Cicilan HP):');
-  if (!nama || !nama.trim()) return;
-  const nominalStr = window.prompt('Nominal tagihan:');
-  const nominal = parseInt((nominalStr || '').replace(/\D/g, ''), 10);
-  if (!nominal || nominal <= 0) { showToast('Nominal tidak valid.'); return; }
-  const jatuhTempo = window.prompt('Tanggal jatuh tempo (YYYY-MM-DD, contoh: 2026-04-25):');
-  if (jatuhTempo && !/^\d{4}-\d{2}-\d{2}$/.test(jatuhTempo.trim())) {
-    showToast('Format tanggal tidak valid. Gunakan YYYY-MM-DD'); return;
-  }
-  const isRecurringStr = window.prompt('Tagihan ini muncul setiap bulan? (y/n, default: y)') || 'y';
-  const isRecurring = isRecurringStr.trim().toLowerCase() !== 'n';
+function showTagihanBottomSheet({ title, nama = '', nominal = '', jatuhTempo = '', isRecurring = true, onConfirm }) {
+  const existing = document.getElementById('bottom-sheet-overlay');
+  if (existing) existing.remove();
 
-  const tagihan = getTagihan();
-  tagihan.push({ id: generateId(), nama: nama.trim(), nominal, jatuhTempo: jatuhTempo ? jatuhTempo.trim() : null, isRecurring, paidMonths: [] });
-  saveTagihan(tagihan);
-  showToast('Tagihan ditambahkan!');
-  renderTabunganContent();
+  const overlay = document.createElement('div');
+  overlay.id = 'bottom-sheet-overlay';
+  overlay.className = 'bottom-sheet-overlay';
+
+  const nominalFormatted = nominal ? Number(nominal).toLocaleString('id-ID') : '';
+
+  overlay.innerHTML = `
+    <div class="bottom-sheet" id="bottom-sheet">
+      <div class="bottom-sheet-handle"></div>
+      <h3 class="bottom-sheet-title">${escHtml(title)}</h3>
+      <div class="bottom-sheet-field">
+        <label class="input-label">Nama tagihan</label>
+        <input type="text" id="bs-nama" class="input-field" placeholder="contoh: Netflix, BPJS, Cicilan HP" value="${escHtml(nama)}" maxlength="50" />
+      </div>
+      <div class="bottom-sheet-field">
+        <label class="input-label">Nominal</label>
+        <div class="nominal-wrap">
+          <span class="nominal-prefix">Rp</span>
+          <input type="text" id="bs-nominal" class="input-nominal" placeholder="0" value="${nominalFormatted}" inputmode="numeric" />
+        </div>
+      </div>
+      <div class="bottom-sheet-field">
+        <label class="input-label">Tanggal jatuh tempo</label>
+        <input type="date" id="bs-jatuh-tempo" class="input-field" value="${jatuhTempo}" />
+      </div>
+      <div class="bottom-sheet-field">
+        <label class="input-label">Tagihan ini muncul setiap bulan?</label>
+        <div class="jenis-toggle" style="margin-top:6px;">
+          <button type="button" class="jenis-btn ${isRecurring ? 'active' : ''}" id="bs-recurring-ya">Ya</button>
+          <button type="button" class="jenis-btn ${!isRecurring ? 'active' : ''}" id="bs-recurring-tidak">Tidak</button>
+        </div>
+      </div>
+      <p class="bottom-sheet-hint" id="bs-error" style="color:var(--red);min-height:16px;"></p>
+      <div class="bottom-sheet-actions">
+        <button class="btn-secondary" id="bs-cancel">Batal</button>
+        <button class="btn-primary" id="bs-confirm">Simpan</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('show'));
+
+  // Format nominal
+  const nominalInput = document.getElementById('bs-nominal');
+  nominalInput.addEventListener('input', () => {
+    const raw = nominalInput.value.replace(/\D/g, '');
+    nominalInput.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+  });
+
+  // Toggle recurring
+  let recurringVal = isRecurring;
+  document.getElementById('bs-recurring-ya').addEventListener('click', () => {
+    recurringVal = true;
+    document.getElementById('bs-recurring-ya').classList.add('active');
+    document.getElementById('bs-recurring-tidak').classList.remove('active');
+  });
+  document.getElementById('bs-recurring-tidak').addEventListener('click', () => {
+    recurringVal = false;
+    document.getElementById('bs-recurring-tidak').classList.add('active');
+    document.getElementById('bs-recurring-ya').classList.remove('active');
+  });
+
+  const close = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 300);
+  };
+
+  document.getElementById('bs-cancel').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  document.getElementById('bs-confirm').addEventListener('click', () => {
+    const namaVal = document.getElementById('bs-nama').value.trim();
+    const nominalVal = parseNominal(nominalInput.value);
+    const jatuhTempoVal = document.getElementById('bs-jatuh-tempo').value || null;
+    const errorEl = document.getElementById('bs-error');
+
+    if (!namaVal) { errorEl.textContent = 'Nama tidak boleh kosong.'; return; }
+    if (!nominalVal || nominalVal <= 0) { errorEl.textContent = 'Nominal tidak valid.'; return; }
+
+    onConfirm({ nama: namaVal, nominal: nominalVal, jatuhTempo: jatuhTempoVal, isRecurring: recurringVal });
+    close();
+  });
+
+  setTimeout(() => document.getElementById('bs-nama')?.focus(), 300);
+}
+
+function handleTambahTagihan() {
+  showTagihanBottomSheet({
+    title: 'Tambah Tagihan',
+    onConfirm: ({ nama, nominal, jatuhTempo, isRecurring }) => {
+      const tagihan = getTagihan();
+      tagihan.push({ id: generateId(), nama, nominal, jatuhTempo, isRecurring, paidMonths: [] });
+      saveTagihan(tagihan);
+      showToast('Tagihan ditambahkan!');
+      renderTabunganContent();
+    },
+  });
 }
 
 function handleEditTagihan(id) {
@@ -361,25 +444,20 @@ function handleEditTagihan(id) {
   const t = tagihan.find(x => x.id === id);
   if (!t) return;
 
-  const nama = window.prompt('Nama tagihan:', t.nama);
-  if (nama === null) return;
-  if (!nama.trim()) { showToast('Nama tidak boleh kosong.'); return; }
-
-  const nominalStr = window.prompt('Nominal tagihan:', t.nominal.toString());
-  if (nominalStr === null) return;
-  const nominal = parseInt((nominalStr || '').replace(/\D/g, ''), 10);
-  if (!nominal || nominal <= 0) { showToast('Nominal tidak valid.'); return; }
-
-  const jatuhTempo = window.prompt('Tanggal jatuh tempo (YYYY-MM-DD):', t.jatuhTempo || '');
-  if (jatuhTempo && !/^\d{4}-\d{2}-\d{2}$/.test(jatuhTempo.trim())) {
-    showToast('Format tanggal tidak valid. Gunakan YYYY-MM-DD'); return;
-  }
-
-  const idx = tagihan.findIndex(x => x.id === id);
-  tagihan[idx] = { ...t, nama: nama.trim(), nominal, jatuhTempo: jatuhTempo ? jatuhTempo.trim() : null };
-  saveTagihan(tagihan);
-  showToast('Tagihan diperbarui.');
-  renderTabunganContent();
+  showTagihanBottomSheet({
+    title: 'Edit Tagihan',
+    nama: t.nama,
+    nominal: t.nominal,
+    jatuhTempo: t.jatuhTempo || '',
+    isRecurring: t.isRecurring !== false,
+    onConfirm: ({ nama, nominal, jatuhTempo, isRecurring }) => {
+      const idx = tagihan.findIndex(x => x.id === id);
+      tagihan[idx] = { ...t, nama, nominal, jatuhTempo, isRecurring };
+      saveTagihan(tagihan);
+      showToast('Tagihan diperbarui.');
+      renderTabunganContent();
+    },
+  });
 }
 
 function handleHapusTagihan(id) {

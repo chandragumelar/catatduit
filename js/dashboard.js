@@ -477,8 +477,8 @@ function showShareSummary(nama, year, month, totalMasuk, totalKeluar, cashflow, 
       <div class="share-preview-grid">
         <div><div class="share-preview-item-label">Uang Masuk</div><div class="share-preview-item-value">${formatRupiah(totalMasuk)}</div></div>
         <div><div class="share-preview-item-label">Uang Keluar</div><div class="share-preview-item-value">${formatRupiah(totalKeluar)}</div></div>
-        <div><div class="share-preview-item-label">Cashflow</div><div class="share-preview-item-value">${formatRupiah(cashflow)}</div></div>
-        <div><div class="share-preview-item-label">Nabung</div><div class="share-preview-item-value">${formatRupiah(totalNabung)}</div></div>
+        <div><div class="share-preview-item-label">Sisa Bulan Ini</div><div class="share-preview-item-value">${formatRupiah(cashflow)}</div></div>
+        ${totalNabung > 0 ? `<div><div class="share-preview-item-label">Nabung</div><div class="share-preview-item-value">${formatRupiah(totalNabung)}</div></div>` : ''}
       </div>
     </div>
     <p style="font-size:13px;color:var(--gray-500);text-align:center;">Screenshot layar ini untuk dibagikan 📸</p>`;
@@ -488,7 +488,7 @@ function showShareSummary(nama, year, month, totalMasuk, totalKeluar, cashflow, 
   btnCancel.style.display = '';
   overlay.classList.add('show');
 
-  const shareText = `💰 CatatDuit — ${bulanNama} ${year}\n\nUang Masuk: ${formatRupiah(totalMasuk)}\nUang Keluar: ${formatRupiah(totalKeluar)}\nCashflow: ${formatRupiah(cashflow)}\nNabung: ${formatRupiah(totalNabung)}\n${topKat ? `Terboros: ${topKat}\n` : ''}\nCatat keuanganmu juga di CatatDuit!`;
+  const shareText = `💰 CatatDuit — ${bulanNama} ${year}\n\nUang Masuk: ${formatRupiah(totalMasuk)}\nUang Keluar: ${formatRupiah(totalKeluar)}\nSisa Bulan Ini: ${formatRupiah(cashflow)}\n${totalNabung > 0 ? `Nabung: ${formatRupiah(totalNabung)}\n` : ''}${topKat ? `Terboros: ${topKat}\n` : ''}\nCatat keuanganmu juga di CatatDuit!`;
   const close = () => overlay.classList.remove('show');
 
   btnC.onclick = () => {
