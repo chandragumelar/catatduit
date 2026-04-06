@@ -2,24 +2,24 @@
 const CACHE_NAME = "catatduit-v2-cache-v18";
 
 const ASSETS_TO_CACHE = [
-  "/catatduit/",
-  "/catatduit/index.html",
-  "/catatduit/style.css",
-  "/catatduit/manifest.json",
-  "/catatduit/chart.min.js",
-  "/catatduit/lucide.min.js",
-  "/catatduit/js/state.js",
-  "/catatduit/js/utils.js",
-  "/catatduit/js/storage.js",
-  "/catatduit/js/license.js",
-  "/catatduit/js/ui.js",
-  "/catatduit/js/dashboard.js",
-  "/catatduit/js/input.js",
-  "/catatduit/js/riwayat.js",
-  "/catatduit/js/tabungan.js",
-  "/catatduit/js/settings.js",
-  "/catatduit/js/kategori.js",
-  "/catatduit/js/app.js",
+  "/",
+  "/index.html",
+  "/style.css",
+  "/manifest.json",
+  "/chart.min.js",
+  "/lucide.min.js",
+  "/js/state.js",
+  "/js/utils.js",
+  "/js/storage.js",
+  "/js/license.js",
+  "/js/ui.js",
+  "/js/dashboard.js",
+  "/js/input.js",
+  "/js/riwayat.js",
+  "/js/tabungan.js",
+  "/js/settings.js",
+  "/js/kategori.js",
+  "/js/app.js",
   "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
 ];
 
@@ -72,7 +72,7 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(() => {
           if (event.request.mode === "navigate") {
-            return caches.match("/catatduit/index.html");
+            return caches.match("/index.html");
           }
         });
     }),
