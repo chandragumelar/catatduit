@@ -93,7 +93,20 @@ function initLicenseScreen() {
     }
     saveLicense(key);
     showToast('Aktivasi berhasil! Selamat datang di CatatDuit 🎉');
-    startApp();
+    // Boot ulang dari awal — init nav, input, lalu cek onboarding
+    initBottomNav();
+    initInputPage();
+    initQuickCapture();
+    initPWA();
+    if (!getData(STORAGE_KEYS.ONBOARDING, false)) {
+      _showScreen('screen-onboarding');
+      migrateToV3();
+      initOnboarding();
+    } else {
+      migrateToV3();
+      document.getElementById('bottom-nav').style.display = 'flex';
+      showApp();
+    }
   });
 
   setTimeout(() => inputEl.focus(), 300);
