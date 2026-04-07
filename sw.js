@@ -1,5 +1,5 @@
 // ===== SERVICE WORKER — CatatDuit v3 =====
-const CACHE_NAME = 'catatduit-v3-cache-v1';
+const CACHE_NAME = 'catatduit-v3-cache-v2';
 
 const ASSETS_CORE = [
   '/',
@@ -17,6 +17,7 @@ const ASSETS_CORE = [
   '/js/budget.js',
   '/js/health-score.js',
   '/js/quick-capture.js',
+  '/js/cerita.js',
   '/js/dashboard.calc.js',
   '/js/dashboard.insight.js',
   '/js/dashboard.chart.js',

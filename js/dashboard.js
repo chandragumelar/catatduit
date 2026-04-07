@@ -104,7 +104,12 @@ function renderDashboard() {
   container.appendChild(hsContainer);
   try { renderHealthScore(hsContainer); } catch(e) { /* jangan biarkan crash dashboard */ }
 
-  // 4. Daily check-in
+  // 4. Cerita card (entry point)
+  const ceritaContainer = document.createElement('div');
+  container.appendChild(ceritaContainer);
+  try { renderCeritaCard(ceritaContainer); } catch(e) {}
+
+  // 5. Daily check-in
   const checkinEl = document.createElement('div');
   checkinEl.className = 'card checkin-card';
   checkinEl.innerHTML = sudahCatatHariIni
