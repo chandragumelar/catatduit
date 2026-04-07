@@ -3,12 +3,15 @@
 const STORAGE_KEYS = {
   ONBOARDING: 'cd_onboarding_done',
   NAMA: 'cd_nama',
-  SALDO_AWAL: 'cd_saldo_awal',
+  SALDO_AWAL: 'cd_saldo_awal',  // legacy v2, masih dipakai untuk migration
   TRANSAKSI: 'cd_transaksi',
   KATEGORI: 'cd_kategori',
   TAGIHAN: 'cd_tagihan',
   GOALS: 'cd_goals',
   LICENSE: 'cd_license',
+  WALLETS: 'cd_wallets',         // v3 baru
+  SCHEMA_VERSION: 'cd_schema_v', // v3 baru — untuk migration guard
+  BUDGETS: 'cd_budgets',           // v3 baru — budget per kategori
 };
 
 const KATEGORI_DEFAULT = {
@@ -63,6 +66,21 @@ const BULAN_NAMES = [
 
 const MAX_NOMINAL = 999000000000;
 const MAX_GOALS = 5;
+const SCHEMA_VERSION = 3;
+
+const DEFAULT_WALLET_ID = 'utama';
+
+const WALLET_PRESETS = [
+  { id: 'bca',       nama: 'BCA',        icon: '🏦' },
+  { id: 'bri',       nama: 'BRI',        icon: '🏦' },
+  { id: 'mandiri',   nama: 'Mandiri',    icon: '🏦' },
+  { id: 'bni',       nama: 'BNI',        icon: '🏦' },
+  { id: 'gopay',     nama: 'GoPay',      icon: '💚' },
+  { id: 'ovo',       nama: 'OVO',        icon: '💜' },
+  { id: 'dana',      nama: 'DANA',       icon: '💙' },
+  { id: 'shopeepay', nama: 'ShopeePay',  icon: '🧡' },
+  { id: 'cash',      nama: 'Cash',       icon: '💵' },
+];
 
 // Mutable app state
 const state = {
@@ -71,10 +89,13 @@ const state = {
   editingId: null,
   inputJenis: 'keluar',
   inputKategori: null,
-  riwayatFilter: { bulan: null, jenis: 'semua' },
+  inputWalletId: null,        // v3: wallet yang dipilih saat input
+  selectedWalletId: 'semua', // v3: filter wallet di dashboard
+  riwayatFilter: { bulan: null, jenis: 'semua', walletId: 'semua' },
   kategoriTab: 'keluar',
   tabunganTab: 'tabungan',
   chartInstances: {},
-  // preserve input state when navigating to kategori
   inputPreserve: null,
 };
+
+// Budget storage key sudah ada di STORAGE_KEYS via BUDGETS

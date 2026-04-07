@@ -61,40 +61,8 @@
       <div class="onboarding-logo">💰</div>
       <h1 class="onboarding-title">CatatDuit</h1>
       <p class="onboarding-tagline">Catat pengeluaran, kenali keuanganmu.</p>
-
-      <!-- Step 1: Nama -->
-      <div id="onboarding-step-1" class="onboarding-card">
-        <p class="onboarding-question">Halo! Siapa namamu?</p>
-        <p class="onboarding-trust">🔒 Semua data tersimpan langsung di perangkat ini — tidak ada server, tidak ada yang bisa mengaksesnya selain kamu.</p>
-        <input
-          type="text"
-          id="input-nama"
-          class="onboarding-input"
-          placeholder="Tulis namamu di sini..."
-          maxlength="30"
-          autocomplete="off"
-        />
-        <p class="onboarding-error" id="onboarding-error"></p>
-        <button id="btn-mulai" class="btn-primary" disabled>Mulai →</button>
-      </div>
-
-      <!-- Step 2: Saldo Awal -->
-      <div id="onboarding-step-2" class="onboarding-card" style="display:none;">
-        <p class="onboarding-question">Berapa total uang kamu sekarang?</p>
-        <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Gabungkan semua — rekening, dompet, e-wallet. Ini jadi titik awal perhitunganmu.</p>
-        <div class="nominal-wrap">
-          <span class="nominal-prefix">Rp</span>
-          <input
-            type="text"
-            id="input-saldo-awal"
-            class="input-nominal"
-            placeholder="0"
-            inputmode="numeric"
-          />
-        </div>
-        <p class="onboarding-error" id="onboarding-saldo-error"></p>
-        <button id="btn-lanjut" class="btn-primary" disabled style="margin-top:16px;">Lanjut →</button>
-      </div>
+      <!-- Step content di-render dinamis oleh app.js -->
+      <div id="onboarding-dynamic"></div>
     </div>
   </div>
 
@@ -160,6 +128,10 @@
               <input type="text" id="input-nominal" class="input-nominal" placeholder="0" inputmode="numeric" />
             </div>
             <p class="input-error" id="error-nominal"></p>
+          </div>
+
+          <!-- Wallet picker (hidden kalau single wallet) -->
+          <div class="input-section" id="input-wallet-wrap" style="display:none;">
           </div>
 
           <!-- Kategori -->
@@ -312,9 +284,19 @@
   <script src="js/storage.js"></script>
   <script src="js/license.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/pwa.js"></script>
+  <script src="js/quick-capture.js"></script>
+  <script src="js/budget.js"></script>
+  <script src="js/health-score.js"></script>
+  <script src="js/dashboard.calc.js"></script>
+  <script src="js/dashboard.insight.js"></script>
+  <script src="js/dashboard.chart.js"></script>
   <script src="js/dashboard.js"></script>
   <script src="js/input.js"></script>
   <script src="js/riwayat.js"></script>
+  <script src="js/bottom-sheet.js"></script>
+  <script src="js/goals.js"></script>
+  <script src="js/tagihan.js"></script>
   <script src="js/tabungan.js"></script>
   <script src="js/settings.js"></script>
   <script src="js/kategori.js"></script>
