@@ -99,6 +99,7 @@ function _formatJatuhTempo(t, year, month) {
 
 function _showTagihanSheet(id = null) {
   const tagihan = getTagihan();
+  const wallets = getWallets();
   const isEdit  = id !== null;
   const t       = isEdit ? tagihan.find(x => x.id === id) : null;
   if (isEdit && !t) return;
@@ -136,7 +137,17 @@ function _showTagihanSheet(id = null) {
           <button type="button" class="jenis-btn ${recurringVal ? 'active' : ''}" id="bs-recurring-ya">Ya</button>
           <button type="button" class="jenis-btn ${!recurringVal ? 'active' : ''}" id="bs-recurring-tidak">Tidak</button>
         </div>
-      </div>`,
+      </div>
+      ${wallets.length > 1 ? `
+      <div class="bottom-sheet-field">
+        <label class="input-label">Biasanya bayar dari</label>
+        <p class="bottom-sheet-hint" style="margin-bottom:8px;">Bisa diubah saat bayar nanti.</p>
+        <div class="wallet-chip-wrap" id="bs-wallet-chips">
+          ${wallets.map(w => `
+            <button type="button" class="chip wallet-chip ${(t?.preferred_wallet_id || wallets[0].id) === w.id ? 'active' : ''}"
+              data-wallet-id="${w.id}">${w.icon} ${escHtml(w.nama)}</button>`).join('')}
+        </div>
+      </div>` : ''}`,
     confirmText: isEdit ? 'Simpan' : 'Tambah Tagihan',
     onOpen: () => {
       document.getElementById('bs-nominal').addEventListener('input', (e) => {
@@ -153,6 +164,13 @@ function _showTagihanSheet(id = null) {
         document.getElementById('bs-recurring-tidak').classList.add('active');
         document.getElementById('bs-recurring-ya').classList.remove('active');
       });
+      // Wallet preferred chips
+      document.querySelectorAll('#bs-wallet-chips .wallet-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('#bs-wallet-chips .wallet-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+        });
+      });
     },
     onConfirm: () => {
       const nama      = document.getElementById('bs-nama').value.trim();
@@ -161,13 +179,16 @@ function _showTagihanSheet(id = null) {
       if (!nama)            return 'Nama tidak boleh kosong.';
       if (!nominal || nominal <= 0) return 'Nominal tidak valid.';
 
+      const preferredWallet = document.querySelector('#bs-wallet-chips .wallet-chip.active')?.dataset.walletId
+        || (wallets.length === 1 ? wallets[0].id : null);
+
       if (isEdit) {
         const idx = tagihan.findIndex(x => x.id === id);
-        tagihan[idx] = { ...t, nama, nominal, jatuhTempo, isRecurring: recurringVal };
+        tagihan[idx] = { ...t, nama, nominal, jatuhTempo, isRecurring: recurringVal, preferred_wallet_id: preferredWallet };
         saveTagihan(tagihan);
         showToast('Tagihan diperbarui.');
       } else {
-        tagihan.push({ id: generateId(), nama, nominal, jatuhTempo, isRecurring: recurringVal, paidMonths: [] });
+        tagihan.push({ id: generateId(), nama, nominal, jatuhTempo, isRecurring: recurringVal, paidMonths: [], preferred_wallet_id: preferredWallet });
         saveTagihan(tagihan);
         showToast('Tagihan ditambahkan!');
       }
@@ -184,11 +205,27 @@ function _showBayarSheet(id) {
   const t       = tagihan.find(x => x.id === id);
   if (!t) return;
   const { year, month } = getCurrentMonthYear();
+  const wallets = getWallets();
+  const singleWallet = wallets.length <= 1;
+  const defaultWalletId = t.preferred_wallet_id || wallets[0]?.id || DEFAULT_WALLET_ID;
+
+  // Wallet picker — hanya tampil kalau > 1 wallet
+  const walletPickerHTML = !singleWallet ? `
+    <div class="bottom-sheet-field">
+      <label class="input-label">Bayar dari dompet <span style="color:var(--red)">*</span></label>
+      <div class="wallet-chip-wrap" id="bs-bayar-wallet-chips">
+        ${wallets.map(w => `
+          <button type="button" class="chip wallet-chip ${w.id === defaultWalletId ? 'active' : ''}"
+            data-wallet-id="${w.id}">${w.icon} ${escHtml(w.nama)}</button>`).join('')}
+      </div>
+      <p class="bottom-sheet-hint" id="bs-bayar-wallet-error" style="color:var(--red);min-height:16px;"></p>
+    </div>` : '';
 
   _openBottomSheet({
     title: 'Konfirmasi pembayaran',
     subtitle: t.nama,
     fields: `
+      ${walletPickerHTML}
       <div class="bottom-sheet-field">
         <label class="input-label">Nominal</label>
         <div class="nominal-wrap">
@@ -209,15 +246,35 @@ function _showBayarSheet(id) {
         const raw = e.target.value.replace(/\D/g, '');
         e.target.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
       });
+      // Wallet chip toggle
+      document.querySelectorAll('#bs-bayar-wallet-chips .wallet-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('#bs-bayar-wallet-chips .wallet-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          document.getElementById('bs-bayar-wallet-error').textContent = '';
+        });
+      });
     },
     onConfirm: () => {
       const nominal  = parseNominal(document.getElementById('bs-nominal').value);
       const tanggal  = document.getElementById('bs-tanggal').value || getTodayStr();
       if (!nominal || nominal <= 0) return 'Nominal tidak valid.';
 
+      // Validasi wallet — wajib kalau multi wallet
+      let walletId;
+      if (singleWallet) {
+        walletId = wallets[0]?.id || DEFAULT_WALLET_ID;
+      } else {
+        const selected = document.querySelector('#bs-bayar-wallet-chips .wallet-chip.active');
+        if (!selected) {
+          document.getElementById('bs-bayar-wallet-error').textContent = 'Pilih dompet dulu.';
+          return 'Pilih dompet dulu.';
+        }
+        walletId = selected.dataset.walletId;
+      }
+
       // Catat sebagai transaksi keluar
       const txList = getTransaksi();
-      const walletId = getWallets()[0]?.id || DEFAULT_WALLET_ID;
       txList.push({
         id: generateId(),
         jenis: 'keluar',

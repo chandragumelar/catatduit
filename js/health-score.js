@@ -121,32 +121,90 @@ function _hsClick(a, b) { return _hsPick(a, b); }
 
 // ===== PARAGRAF PENJELASAN =====
 
+// Narasi "Kenapa?" — 2 versi per score range, rotate per session
+// Terasa seperti teman yang baca kondisi keuangan lo dan ngomong langsung
+
 function getHealthExplanation(scoreData) {
   if (!scoreData.ready) return '';
-  const { komponen } = scoreData;
+  const { total, komponen } = scoreData;
   const { konsistensi, nabung, cashflow, tagihan } = komponen;
 
-  const lines = [];
+  const now = new Date();
+  const sudahBayarTagihan = tagihan.tagihanBulanIni.filter(
+    t => isTagihanPaidThisMonth(t, now.getFullYear(), now.getMonth())).length;
+  const totalTagihan = tagihan.tagihanBulanIni.length;
 
-  lines.push(`Konsistensi catat: ${konsistensi.skor}/100 — kamu mencatat di ${konsistensi.hariAdaTx} dari ${konsistensi.hariSudahLewat} hari bulan ini.`);
+  // Bagian-bagian narasi dibangun dari data aktual
+  const bagianData = _buildNarasiBagian({ konsistensi, nabung, cashflow, tagihan, sudahBayarTagihan, totalTagihan });
 
-  if (nabung.totalMasuk > 0) {
-    const pct = Math.round((nabung.totalNabung / nabung.totalMasuk) * 100);
-    lines.push(`Rasio nabung: ${nabung.skor}/100 — ${formatRupiah(nabung.totalNabung)} dari pemasukan ${formatRupiah(nabung.totalMasuk)} (${pct}%).`);
-  } else {
-    lines.push(`Rasio nabung: ${nabung.skor}/100 — belum ada pemasukan tercatat bulan ini.`);
-  }
+  if (total >= 80) return _hsPick(
+    `${bagianData.akurasi} ${bagianData.cashflowPos} ${bagianData.nabungPos} ${bagianData.tagihanPos} Ini bukan keberuntungan — ini pola.`,
+    `${bagianData.akurasi} ${bagianData.nabungPos} ${bagianData.tagihanPos} Kalau bulan depan sama, ini sudah jadi gaya hidupmu.`,
+  );
 
-  lines.push(`Cashflow: ${cashflow.skor}/100 — ${cashflow.skor === 100 ? 'pengeluaran masih di bawah pemasukan.' : 'pengeluaran melebihi pemasukan bulan ini.'}`);
+  if (total >= 60) return _hsPick(
+    `${bagianData.akurasi} ${bagianData.cashflowPos} ${bagianData.nabungNeutral} ${bagianData.tagihanNeutral} Fondasinya sudah ada — tinggal dijaga.`,
+    `${bagianData.akurasi2} ${bagianData.cashflowPos} ${bagianData.tagihanNeutral} Sedikit lebih konsisten, gambarannya jauh lebih akurat.`,
+  );
 
-  if (tagihan.tagihanBulanIni.length > 0) {
-    const sudah = tagihan.tagihanBulanIni.filter(t => isTagihanPaidThisMonth(t, new Date().getFullYear(), new Date().getMonth())).length;
-    lines.push(`Tagihan: ${tagihan.skor}/100 — ${sudah} dari ${tagihan.tagihanBulanIni.length} tagihan bulan ini sudah terbayar.`);
-  } else {
-    lines.push(`Tagihan: ${tagihan.skor}/100 — tidak ada tagihan bulan ini.`);
-  }
+  if (total >= 40) return _hsPick(
+    `${bagianData.akurasi2} ${bagianData.cashflowNeg} ${bagianData.tagihanNeg} Tidak harus diselesaikan semua besok — mulai dari satu hal dulu.`,
+    `${bagianData.akurasi} ${bagianData.cashflowNeg} ${bagianData.nabungNeutral} ${bagianData.tagihanNeg} Satu langkah kecil sekarang lebih baik dari rencana besar yang tidak dimulai.`,
+  );
 
-  return lines.join('\n');
+  return _hsPick(
+    `${bagianData.akurasi2} ${bagianData.cashflowNeg} ${bagianData.tagihanNeg} Tidak apa-apa — yang penting sekarang tahu posisinya.`,
+    `${bagianData.akurasi2} ${bagianData.cashflowNeg} ${bagianData.tagihanNeg} Justru karena kamu buka app ini dan lihat angkanya — itu sudah langkah pertama yang paling susah.`,
+  );
+}
+
+function _buildNarasiBagian({ konsistensi, nabung, cashflow, tagihan, sudahBayarTagihan, totalTagihan }) {
+  const { hariAdaTx, hariSudahLewat } = konsistensi;
+  const pctAkurasi = Math.round((hariAdaTx / hariSudahLewat) * 100);
+
+  // Akurasi data (konsistensi catat)
+  const akurasi = hariAdaTx >= hariSudahLewat * 0.8
+    ? `Data bulan ini cukup lengkap — kamu catat ${hariAdaTx} dari ${hariSudahLewat} hari, jadi gambarannya bisa dipercaya.`
+    : `Dari ${hariSudahLewat} hari bulan ini, baru ${hariAdaTx} hari yang tercatat — sekitar ${100 - pctAkurasi}% pengeluaran mungkin belum terpantau.`;
+  const akurasi2 = hariAdaTx >= hariSudahLewat * 0.8
+    ? `${hariAdaTx} dari ${hariSudahLewat} hari tercatat — cukup untuk lihat polanya.`
+    : `Catatan masuk baru ${hariAdaTx} dari ${hariSudahLewat} hari, jadi kondisi sebenarnya bisa jadi berbeda dari yang kelihatan.`;
+
+  // Cashflow
+  const selisihCashflow = Math.abs(cashflow.totalMasuk - cashflow.totalKeluar);
+  const cashflowPos = cashflow.totalMasuk > 0
+    ? `Pengeluaran masih terkendali di bawah pemasukan — ada sisa ${formatRupiah(selisihCashflow)} bulan ini.`
+    : `Cashflow bulan ini positif.`;
+  const cashflowNeg = cashflow.totalMasuk > 0
+    ? `Pengeluaran sudah melewati pemasukan ${formatRupiah(selisihCashflow)} bulan ini.`
+    : `Pengeluaran melebihi pemasukan bulan ini.`;
+
+  // Nabung
+  const pctNabung = nabung.totalMasuk > 0
+    ? Math.round((nabung.totalNabung / nabung.totalMasuk) * 100) : 0;
+  const nabungPos = nabung.totalNabung > 0
+    ? `${pctNabung}% dari pemasukan sudah disisihkan untuk nabung — ${formatRupiah(nabung.totalNabung)}.`
+    : `Belum ada yang disisihkan untuk nabung bulan ini.`;
+  const nabungNeutral = nabung.totalNabung > 0
+    ? `Ada ${formatRupiah(nabung.totalNabung)} yang sudah disisihkan.`
+    : `Nabung bulan ini belum ada — satu area yang masih bisa diperkuat.`;
+
+  // Tagihan
+  const tagihanPos = totalTagihan === 0
+    ? `Tidak ada tagihan bulan ini.`
+    : sudahBayarTagihan === totalTagihan
+      ? `Semua ${totalTagihan} tagihan bulan ini sudah lunas.`
+      : `${sudahBayarTagihan} dari ${totalTagihan} tagihan sudah terbayar.`;
+  const tagihanNeutral = totalTagihan === 0
+    ? ``
+    : sudahBayarTagihan < totalTagihan
+      ? `${totalTagihan - sudahBayarTagihan} tagihan masih perlu diselesaikan.`
+      : `Tagihan beres semua.`;
+  const tagihanNeg = totalTagihan > 0 && sudahBayarTagihan < totalTagihan
+    ? `${totalTagihan - sudahBayarTagihan} tagihan masih outstanding.`
+    : ``;
+
+  return { akurasi, akurasi2, cashflowPos, cashflowNeg, nabungPos, nabungNeutral, tagihanPos, tagihanNeutral, tagihanNeg };
 }
 
 // ===== RENDER =====
@@ -189,7 +247,7 @@ function renderHealthScore(container) {
       </div>
     </div>
     <div class="health-score-bars">
-      ${_renderKomponenBar('Catat rutin',    scoreData.komponen.konsistensi.skor)}
+      ${_renderKomponenBar('Akurasi data',    scoreData.komponen.konsistensi.skor)}
       ${_renderKomponenBar('Nabung',         scoreData.komponen.nabung.skor)}
       ${_renderKomponenBar('Cashflow',       scoreData.komponen.cashflow.skor)}
       ${_renderKomponenBar('Tagihan',        scoreData.komponen.tagihan.skor)}

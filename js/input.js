@@ -73,8 +73,9 @@ function renderWalletPicker() {
     state.inputWalletId = wallets[0].id;
   }
 
+  const walletLabel = state.inputJenis === 'masuk' ? 'Ke dompet' : 'Dari dompet';
   wrap.innerHTML = `
-    <label class="input-label">Dari dompet</label>
+    <label class="input-label">${walletLabel}</label>
     <div class="wallet-chip-wrap" id="wallet-chips"></div>`;
 
   const chipsWrap = wrap.querySelector('#wallet-chips');
@@ -99,10 +100,15 @@ function renderChips() {
   const wrap = document.getElementById('chip-kategori');
   if (!wrap) return;
 
-  const isNabung = state.inputJenis === 'nabung';
-  const list = isNabung ? KATEGORI_DEFAULT.nabung : (getKategori()[state.inputJenis] || []);
+  // Nabung tidak pakai kategori
+  if (state.inputJenis === 'nabung') {
+    wrap.innerHTML = '';
+    return;
+  }
+
+  const list = getKategori()[state.inputJenis] || [];
   const freq = getKategoriFrequency(state.inputJenis);
-  const sorted = isNabung ? list : [...list].sort((a, b) => (freq[b.id] || 0) - (freq[a.id] || 0));
+  const sorted = [...list].sort((a, b) => (freq[b.id] || 0) - (freq[a.id] || 0));
   const top8 = sorted.slice(0, 8);
   const rest = sorted.slice(8);
 
@@ -120,12 +126,12 @@ function renderChips() {
     moreBtn.onclick = () => {
       moreBtn.remove();
       rest.forEach(k => wrap.appendChild(_makeChip(k)));
-      if (!isNabung) appendTambahKategoriChip(wrap);
+      appendTambahKategoriChip(wrap);
     };
     wrap.appendChild(moreBtn);
   }
 
-  if (!isNabung) appendTambahKategoriChip(wrap);
+  appendTambahKategoriChip(wrap);
 }
 
 function _makeChip(k) {
@@ -270,7 +276,10 @@ function handleSimpan() {
     document.getElementById('error-nominal').textContent = 'Nominal harus lebih dari 0.';
     valid = false;
   }
-  if (!kategori) {
+  // Nabung tidak pakai kategori — set default otomatis
+  if (state.inputJenis === 'nabung') {
+    if (!kategori) state.inputKategori = 'tabungan';
+  } else if (!kategori) {
     document.getElementById('error-kategori').textContent = 'Pilih kategori dulu.';
     valid = false;
   }
