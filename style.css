@@ -1607,3 +1607,56 @@ input, select, textarea { font-family: inherit; }
   border-top: 1px solid var(--gray-100);
 }
 .cerita-print-btn { width: 100%; }
+
+/* ===== KEUANGAN BULAN INI — collapsible card ===== */
+.keuangan-card { padding: 16px; cursor: pointer; }
+
+.keuangan-collapsed { user-select: none; }
+.keuangan-collapsed-left { flex: 1; }
+
+.keuangan-hero {
+  font-size: 28px; font-weight: 700;
+  margin: 4px 0 2px; letter-spacing: -0.5px;
+}
+.keuangan-hint {
+  font-size: 12px; color: var(--teal);
+  font-weight: 500; margin-top: 2px;
+}
+
+/* Detail section */
+.keuangan-detail {
+  margin-top: 16px;
+  border-top: 1px solid var(--gray-100);
+  padding-top: 14px;
+  cursor: default;
+}
+.keuangan-section { margin-bottom: 4px; }
+
+.keuangan-row {
+  display: flex; justify-content: space-between;
+  align-items: center;
+  font-size: 14px; color: var(--gray-700);
+  padding: 5px 0;
+}
+.keuangan-row-label { color: var(--gray-600); }
+.keuangan-row-val   { font-weight: 500; }
+
+.keuangan-row--sub {
+  font-size: 13px; color: var(--gray-500);
+}
+.keuangan-row--minus {
+  color: var(--gray-500); font-size: 13px;
+}
+.keuangan-row--minus span:last-child { color: var(--red); }
+
+.keuangan-row--result {
+  font-size: 14px; font-weight: 600; color: var(--gray-800);
+}
+.keuangan-row--final {
+  font-size: 16px; color: var(--gray-900);
+}
+
+.keuangan-divider {
+  height: 1px; background: var(--gray-100);
+  margin: 6px 0;
+}

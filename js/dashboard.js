@@ -67,37 +67,13 @@ function renderDashboard() {
       <p class="insight-text">${escHtml(insightText)}</p>
     </div>`);
 
-  // 2. Wallet summary (v3: tampil kalau > 1 wallet)
+  // 2. Keuangan Bulan Ini — card collapsible (gabungan wallet summary + uang bebas)
   const wallets = getWallets();
-  if (wallets.length > 1) {
-    const walletCard = document.createElement('div');
-    walletCard.className = 'card';
-    walletCard.innerHTML = `
-      <p class="summary-label">SALDO PER WALLET</p>
-      <div class="wallet-summary-list">
-        ${wallets.map(w => {
-          const saldo = getSaldoWallet(w.id);
-          return `<div class="wallet-summary-item">
-            <span class="wallet-icon">${w.icon}</span>
-            <span class="wallet-nama">${escHtml(w.nama)}</span>
-            <span class="wallet-saldo ${saldo >= 0 ? 'income' : 'expense'}">${formatRupiah(saldo)}</span>
-          </div>`;
-        }).join('')}
-      </div>
-      <div class="wallet-summary-total">
-        <span>Total</span>
-        <span class="${estimasiSaldo >= 0 ? 'income' : 'expense'}">${formatRupiah(estimasiSaldo)}</span>
-      </div>`;
-    container.appendChild(walletCard);
-  } else {
-    // Single wallet: tampilkan seperti v2 estimasi saldo
-    _appendHTML(container, `
-      <div class="card summary-card--estimasi">
-        <p class="summary-label">ESTIMASI SALDO</p>
-        <p class="summary-value ${estimasiSaldo >= 0 ? 'income' : 'expense'} summary-value--large">${formatRupiah(estimasiSaldo)}</p>
-        <p class="summary-sub-label">Saldo awal + semua pemasukan − semua pengeluaran</p>
-      </div>`);
-  }
+  _renderKeuanganBulanIni(container, {
+    wallets, estimasiSaldo, totalNabung, totalTagihanBelumBayar,
+    tagihanBelumBayar, tagihanSudahBayar, tagihanBulanIni,
+    uangBebas, bebasDipakai, tagihan,
+  });
 
   // 3. Health Score
   const hsContainer = document.createElement('div');
@@ -164,53 +140,7 @@ function renderDashboard() {
       </div>
     </div>`);
 
-  // 6. Uang Bebas
-  const uangBebasCard = document.createElement('div');
-  uangBebasCard.className = 'card';
-  if (tagihan.length === 0) {
-    uangBebasCard.innerHTML = `
-      <p class="summary-label">UANG BEBAS BULAN INI</p>
-      <p class="uang-bebas-prompt">Tambah cicilan dan subscription rutinmu — biar kelihatan berapa uang yang bebas kamu pakai bulan ini.</p>
-      <button class="btn-secondary" id="btn-goto-tagihan">Tambah Tagihan</button>`;
-  } else {
-    const namaBelumBayar = tagihanBelumBayar.map(t => `· ${escHtml(t.nama)}`).join('  ');
-    const paidCount = tagihanSudahBayar.length;
-    const totalCount = tagihanBulanIni.length;
-    uangBebasCard.innerHTML = `
-      <p class="summary-label">UANG BEBAS BULAN INI</p>
-      <div class="uang-bebas-breakdown">
-        <div class="uang-bebas-row">
-          <span>Total uang kamu sekarang</span>
-          <span>${formatRupiah(estimasiSaldo)}</span>
-        </div>
-        ${totalTagihanBelumBayar > 0 ? `
-        <div class="uang-bebas-row uang-bebas-row--minus">
-          <span>Tagihan belum dibayar${namaBelumBayar ? `<br><small class="tagihan-names">${namaBelumBayar}</small>` : ''}</span>
-          <span class="minus">− ${formatRupiah(totalTagihanBelumBayar)}</span>
-        </div>` : ''}
-        <div class="uang-bebas-divider"></div>
-        <div class="uang-bebas-row uang-bebas-row--result">
-          <span>Setelah tagihan</span>
-          <span class="${uangBebas >= 0 ? 'income' : 'expense'}">${formatRupiah(uangBebas)}</span>
-        </div>
-        ${totalNabung > 0 ? `
-        <div class="uang-bebas-row uang-bebas-row--minus">
-          <span>Nabung bulan ini</span>
-          <span class="minus">− ${formatRupiah(totalNabung)}</span>
-        </div>
-        <div class="uang-bebas-divider"></div>
-        <div class="uang-bebas-row uang-bebas-row--result uang-bebas-row--final">
-          <span>Bebas dipakai</span>
-          <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
-        </div>` : ''}
-      </div>
-      ${totalCount > 0 ? `<p class="tagihan-paid-status">${paidCount} dari ${totalCount} tagihan bulan ini sudah terbayar</p>` : ''}`;
-  }
-  container.appendChild(uangBebasCard);
-  document.getElementById('btn-goto-tagihan')?.addEventListener('click', () => {
-    state.tabunganTab = 'tagihan';
-    navigateTo('tabungan');
-  });
+  // 6. (merged ke section 2 — _renderKeuanganBulanIni)
 
   // 7. Catatan terakhir
   const recentCard = document.createElement('div');
@@ -335,4 +265,102 @@ function _appendHTML(container, html) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
   while (tmp.firstChild) container.appendChild(tmp.firstChild);
+}
+
+// ===== KEUANGAN BULAN INI — collapsible card =====
+// Gabungan: wallet summary + uang bebas. Collapsed by default, expand on tap.
+
+let _keuanganExpanded = false; // state per session
+
+function _renderKeuanganBulanIni(container, {
+  wallets, estimasiSaldo, totalNabung, totalTagihanBelumBayar,
+  tagihanBelumBayar, tagihanSudahBayar, tagihanBulanIni,
+  uangBebas, bebasDipakai, tagihan,
+}) {
+  // Tentukan angka hero — bebas dipakai kalau ada tagihan/nabung, else estimasi saldo
+  const hasRincian = totalTagihanBelumBayar > 0 || totalNabung > 0;
+  const heroAngka  = hasRincian ? bebasDipakai : estimasiSaldo;
+  const heroLabel  = hasRincian ? 'Bebas dipakai' : 'Total saldo';
+  const heroClass  = heroAngka >= 0 ? 'income' : 'expense';
+
+  const card = document.createElement('div');
+  card.className = 'card keuangan-card';
+  card.id = 'keuangan-bulan-ini-card';
+
+  function render() {
+    card.innerHTML = `
+      <div class="keuangan-collapsed" id="keuangan-toggle">
+        <div class="keuangan-collapsed-left">
+          <p class="summary-label">KEUANGAN BULAN INI</p>
+          <p class="keuangan-hero ${heroClass}">${formatRupiah(heroAngka)}</p>
+          <p class="keuangan-hint">${_keuanganExpanded ? 'Sembunyikan ▴' : 'Lihat rincian ▾'}</p>
+        </div>
+      </div>
+
+      ${_keuanganExpanded ? `
+      <div class="keuangan-detail" id="keuangan-detail">
+
+        ${wallets.length > 1 ? `
+        <div class="keuangan-section">
+          ${wallets.map(w => {
+            const saldo = getSaldoWallet(w.id);
+            return `<div class="keuangan-row">
+              <span class="keuangan-row-label">${w.icon} ${escHtml(w.nama)}</span>
+              <span class="keuangan-row-val ${saldo >= 0 ? '' : 'expense'}">${formatRupiah(saldo)}</span>
+            </div>`;
+          }).join('')}
+        </div>` : ''}
+
+        <div class="keuangan-divider"></div>
+        <div class="keuangan-row keuangan-row--sub">
+          <span>Total saldo</span>
+          <span>${formatRupiah(estimasiSaldo)}</span>
+        </div>
+
+        ${totalTagihanBelumBayar > 0 ? `
+        <div class="keuangan-row keuangan-row--minus">
+          <span>Tagihan belum dibayar</span>
+          <span>− ${formatRupiah(totalTagihanBelumBayar)}</span>
+        </div>
+        <div class="keuangan-divider"></div>
+        <div class="keuangan-row keuangan-row--result">
+          <span>Setelah tagihan</span>
+          <span class="${uangBebas >= 0 ? 'income' : 'expense'}">${formatRupiah(uangBebas)}</span>
+        </div>` : ''}
+
+        ${totalNabung > 0 ? `
+        <div class="keuangan-row keuangan-row--minus">
+          <span>Nabung bulan ini</span>
+          <span>− ${formatRupiah(totalNabung)}</span>
+        </div>
+        <div class="keuangan-divider"></div>
+        <div class="keuangan-row keuangan-row--result keuangan-row--final">
+          <span>Bebas dipakai</span>
+          <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
+        </div>` : ''}
+
+        ${tagihanBulanIni.length > 0 ? `
+        <p class="tagihan-paid-status">
+          ${tagihanSudahBayar.length} dari ${tagihanBulanIni.length} tagihan bulan ini sudah terbayar
+        </p>` : tagihan.length === 0 ? `
+        <button class="btn-text-small" id="btn-goto-tagihan-card" style="margin-top:8px;">
+          + Tambah tagihan rutin
+        </button>` : ''}
+
+      </div>` : ''}`;
+
+    // Toggle handler — seluruh collapsed area bisa di-tap
+    card.querySelector('#keuangan-toggle')?.addEventListener('click', () => {
+      _keuanganExpanded = !_keuanganExpanded;
+      render();
+    });
+
+    card.querySelector('#btn-goto-tagihan-card')?.addEventListener('click', () => {
+      state.tabunganTab = 'tagihan';
+      navigateTo('tabungan');
+    });
+  }
+
+  render();
+  container.appendChild(card);
 }
