@@ -2,8 +2,8 @@
 // Flow: input email → kirim magic link → user klik → callback → session
 
 // Supabase client (anon key aman di client — RLS jaga semua table)
-const _SUPABASE_URL = "https://obefugvlqxgawumsnctp.supabase.co"; // ganti saat deploy
-const _SUPABASE_ANON = "sb_publishable_WWG7gKyRlu7ZJX6s_JuGyw_P0oG6qby"; // ganti saat deploy
+const _SUPABASE_URL = "https://obefugvlqxgawumsnctp.supabase.co";
+const _SUPABASE_ANON = "sb_publishable_WWG7gKyRlu7ZJX6s_JuGyw_P0oG6qby";
 
 let _supabase = null;
 
