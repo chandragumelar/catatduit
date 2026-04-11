@@ -11,7 +11,8 @@ const STORAGE_KEYS = {
   LICENSE: 'cd_license',
   WALLETS: 'cd_wallets',         // v3 baru
   SCHEMA_VERSION: 'cd_schema_v', // v3 baru — untuk migration guard
-  BUDGETS: 'cd_budgets',           // v3 baru — budget per kategori
+  BUDGETS: 'cd_budgets',         // v3 baru — budget per kategori
+  AUTH_CACHE: 'cd_auth_cache',   // v4 — trial/paid status cache (HMAC-signed)
 };
 
 const KATEGORI_DEFAULT = {

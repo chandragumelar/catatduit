@@ -44,14 +44,14 @@ function renderDashboard() {
   // Hitung semua data
   const calc = calcDashboard();
   const {
-    year, month, nama,
+    year, month,
     totalMasuk, totalKeluar, totalNabung, cashflow,
-    estimasiSaldo, totalNabungAllTime,
+    estimasiSaldo,
     trendText, trendClass,
     hariIni, hariDalamBulan, rataHarian, budgetHarian,
-    tagihan, tagihanBulanIni, tagihanBelumBayar, tagihanSudahBayar,
+    tagihan, tagihanBulanIni, tagihanSudahBayar,
     totalTagihanBelumBayar, uangBebas, bebasDipakai,
-    borosList, katSorted, rolling, chartLabels,
+    borosList, katSorted,
     sudahCatatHariIni, recentTx, bigSpending,
   } = calc;
 
@@ -71,7 +71,7 @@ function renderDashboard() {
   const wallets = getWallets();
   _renderKeuanganBulanIni(container, {
     wallets, estimasiSaldo, totalNabung, totalTagihanBelumBayar,
-    tagihanBelumBayar, tagihanSudahBayar, tagihanBulanIni,
+    tagihanSudahBayar, tagihanBulanIni,
     uangBebas, bebasDipakai, tagihan,
   });
 
@@ -274,13 +274,12 @@ let _keuanganExpanded = false; // state per session
 
 function _renderKeuanganBulanIni(container, {
   wallets, estimasiSaldo, totalNabung, totalTagihanBelumBayar,
-  tagihanBelumBayar, tagihanSudahBayar, tagihanBulanIni,
+  tagihanSudahBayar, tagihanBulanIni,
   uangBebas, bebasDipakai, tagihan,
 }) {
   // Tentukan angka hero — bebas dipakai kalau ada tagihan/nabung, else estimasi saldo
   const hasRincian = totalTagihanBelumBayar > 0 || totalNabung > 0;
   const heroAngka  = hasRincian ? bebasDipakai : estimasiSaldo;
-  const heroLabel  = hasRincian ? 'Bebas dipakai' : 'Total saldo';
   const heroClass  = heroAngka >= 0 ? 'income' : 'expense';
 
   const card = document.createElement('div');

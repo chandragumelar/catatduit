@@ -1,7 +1,7 @@
 // ===== DASHBOARD.CHART.JS — Chart rendering + Share summary =====
 
 function initDashboardCharts(calc) {
-  const { txList, rolling, chartLabels, chartMasuk, chartKeluar, chartCashflow, katSorted, totalKeluar } = calc;
+  const { txList, rolling, chartLabels, chartMasuk, chartKeluar, chartCashflow, katSorted } = calc;
 
   destroyChart('combo');
   destroyChart('surplus');

@@ -5,17 +5,6 @@
 const LICENSE_PREFIX = 'CD-';
 const LICENSE_CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No I, O, 0, 1
 
-function licenseChecksum(segments) {
-  // segments: array of 3 strings (without prefix)
-  const joined = segments.join('').toUpperCase();
-  let sum = 0;
-  for (let i = 0; i < joined.length; i++) {
-    const idx = LICENSE_CHARSET.indexOf(joined[i]);
-    if (idx === -1) return -1;
-    sum = (sum * 31 + idx) % 97;
-  }
-  return sum;
-}
 
 function validateLicenseKey(key) {
   if (!key || typeof key !== 'string') return false;
@@ -41,7 +30,6 @@ function validateLicenseKey(key) {
     const idx = LICENSE_CHARSET.indexOf(dataChars[i]);
     sum = (sum * 31 + idx) % 97;
   }
-  const expectedCheckIdx = 42 % LICENSE_CHARSET.length;
   const actualCheckIdx = LICENSE_CHARSET.indexOf(checkChar);
 
   // Check: (sum + actualCheckIdx) % 97 === 42 % 97

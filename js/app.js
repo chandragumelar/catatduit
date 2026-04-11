@@ -1,5 +1,5 @@
 // ===== APP.JS — Boot + Onboarding v3 =====
-// Flow: License → Nama → Pilih Wallet → Saldo per Wallet → App
+// Flow: Auth (Magic Link) → Trial check → Onboarding → App
 
 // ===== STATE ONBOARDING =====
 // _ob = temporary onboarding state, tidak disimpan sampai selesai
@@ -12,7 +12,8 @@ const _ob = {
 
 // ===== BOOT =====
 
-function init() {
+async function init() {
+  // LocalStorage check
   try {
     localStorage.setItem('_t', '1');
     localStorage.removeItem('_t');
@@ -24,28 +25,84 @@ function init() {
   const nav = document.getElementById('bottom-nav');
   if (nav) nav.style.display = 'none';
 
-  if (!isLicenseValid()) {
-    _showScreen('screen-license');
-    initLicenseScreen();
+  // Init auth screens (email input + magic wait)
+  initAuthScreens();
+
+  // Cek apakah ini Magic Link callback
+  const isMagicCallback = window.location.hash.includes('access_token') ||
+                          window.location.pathname.startsWith('/auth/callback');
+  if (isMagicCallback) {
+    _showScreen('screen-magic-wait');
+    try {
+      await handleMagicLinkCallback();
+    } catch {
+      // Callback gagal — balik ke email screen
+      _showScreen('screen-email');
+      return;
+    }
+    // Bersihkan hash dari URL tanpa reload
+    history.replaceState(null, '', window.location.pathname);
+  }
+
+  // Cek trial status via Supabase
+  let trialStatus;
+  try {
+    trialStatus = await checkTrialStatus();
+  } catch {
+    trialStatus = { route: 'OFFLINE_NO_CACHE' };
+  }
+
+  // Route berdasarkan status
+  if (trialStatus.route === 'AUTH') {
+    _showScreen('screen-email');
     return;
   }
 
+  if (trialStatus.route === 'OFFLINE_NO_CACHE') {
+    // Tidak ada session + tidak ada cache → minta login
+    _showScreen('screen-email');
+    return;
+  }
+
+  if (trialStatus.route === 'D') {
+    // Hard lock
+    _showScreen('screen-hardlock');
+    initHardLockScreen();
+    return;
+  }
+
+  // Route A, B, C → boot app normal
+  // Legacy license key tetap diterima sebagai fallback paid
+  _bootApp(nav, trialStatus);
+}
+
+function _bootApp(nav, trialStatus) {
   if (!getData(STORAGE_KEYS.ONBOARDING, false)) {
     _showScreen('screen-onboarding');
-    migrateToV3(); // aman dipanggil di sini, no-op kalau belum ada data
+    migrateToV3();
     initOnboarding();
     initBottomNav();
     initInputPage();
     return;
   }
 
-  migrateToV3(); // existing user: pastikan data sudah v3
+  migrateToV3();
   initBottomNav();
   initInputPage();
   initQuickCapture();
   initPWA();
   if (nav) nav.style.display = 'flex';
   showApp();
+
+  // Route C: tampilkan grace popup setelah app boot
+  if (trialStatus.route === 'C') {
+    setTimeout(() => showGracePopup(trialStatus.daysLeft), 800);
+  }
+
+  // Route B atau C: render countdown badge di settings
+  if (trialStatus.route === 'B' || trialStatus.route === 'C') {
+    renderTrialCountdown(trialStatus.daysLeft);
+  }
 }
 
 function _showScreen(id) {

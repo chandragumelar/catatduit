@@ -112,7 +112,7 @@ const INSIGHT_PIPELINE = [
   },
 
   // --- Budget warning ---
-  (d) => {
+  (_) => {
     try { return getBudgetInsight(); } catch(e) { return null; }
   },
 

@@ -118,7 +118,7 @@ function calcDashboard() {
     hariIni, hariDalamBulan, rataHarian, budgetHarian,
     tagihan, tagihanBulanIni, tagihanBelumBayar, tagihanSudahBayar,
     totalTagihanBelumBayar, uangBebas, bebasDipakai,
-    borosList, katSorted, katTotal, totalKeluar,
+    borosList, katSorted, katTotal,
     rolling, chartLabels, chartMasuk, chartKeluar, chartCashflow,
     sudahCatatHariIni, recentTx, bigSpending,
   };
