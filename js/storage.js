@@ -165,11 +165,6 @@ function markTagihanPaid(tagihanId, year, month) {
 function getGoals() { return getData(STORAGE_KEYS.GOALS, []); }
 function saveGoals(data) { return setData(STORAGE_KEYS.GOALS, data); }
 
-// ===== LICENSE =====
-
-function getLicense() { return getData(STORAGE_KEYS.LICENSE, null); }
-function saveLicense(key) { return setData(STORAGE_KEYS.LICENSE, key); }
-
 // ===== HELPERS =====
 
 function getKategoriById(id, jenis) {

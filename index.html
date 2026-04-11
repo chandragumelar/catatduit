@@ -33,76 +33,6 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- ===== AUTH: EMAIL SCREEN ===== -->
-    <div id="screen-email" class="screen">
-      <div class="onboarding-wrap">
-        <div class="onboarding-logo">💰</div>
-        <h1 class="onboarding-title">CatatDuit</h1>
-        <p class="onboarding-tagline">Catat pengeluaran, kenali keuanganmu.</p>
-        <div class="onboarding-card">
-          <p class="onboarding-question">Masuk dengan email</p>
-          <p
-            style="font-size: 13px; color: var(--gray-500); margin-bottom: 14px"
-          >
-            Kami kirim link masuk ke emailmu — tidak perlu password.
-          </p>
-          <input
-            type="email"
-            id="auth-email-input"
-            class="onboarding-input"
-            placeholder="nama@email.com"
-            autocomplete="email"
-            inputmode="email"
-          />
-          <p class="onboarding-error" id="auth-email-error"></p>
-          <button id="auth-email-btn" class="btn-primary" disabled>
-            Kirim Link Masuk
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== AUTH: MAGIC LINK WAIT SCREEN ===== -->
-    <div id="screen-magic-wait" class="screen">
-      <div class="onboarding-wrap">
-        <div class="onboarding-logo">📧</div>
-        <h1 class="onboarding-title">Cek emailmu</h1>
-        <div class="onboarding-card">
-          <p class="onboarding-question">Link masuk sudah dikirim!</p>
-          <p
-            style="font-size: 13px; color: var(--gray-500); margin-bottom: 8px"
-          >
-            Cek inbox (atau folder spam) untuk email dari CatatDuit. Klik link
-            di email untuk masuk.
-          </p>
-          <p
-            id="auth-wait-email-display"
-            style="
-              font-size: 13px;
-              font-weight: 600;
-              color: var(--gray-700);
-              margin-bottom: 16px;
-            "
-          ></p>
-          <p
-            style="font-size: 12px; color: var(--gray-400); margin-bottom: 16px"
-          >
-            Link berlaku 1 jam.
-          </p>
-          <button id="auth-resend-btn" class="btn-text-small" disabled>
-            Kirim ulang (60s)
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== HARD LOCK SCREEN ===== -->
-    <div id="screen-hardlock" class="screen">
-      <div class="hardlock-scroll">
-        <!-- diisi oleh paywall.js → initHardLockScreen() -->
-      </div>
-    </div>
-
     <!-- ===== ONBOARDING SCREEN ===== -->
     <div id="screen-onboarding" class="screen">
       <div class="onboarding-wrap">
@@ -423,14 +353,9 @@
     </style>
 
     <!-- JS Modules (load order matters) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="js/state.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/storage.js"></script>
-    <script src="js/license.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/trial.js"></script>
-    <script src="js/paywall.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/cerita.js"></script>
     <script src="js/pwa.js"></script>

@@ -8,11 +8,9 @@ const STORAGE_KEYS = {
   KATEGORI: 'cd_kategori',
   TAGIHAN: 'cd_tagihan',
   GOALS: 'cd_goals',
-  LICENSE: 'cd_license',
-  WALLETS: 'cd_wallets',         // v3 baru
-  SCHEMA_VERSION: 'cd_schema_v', // v3 baru — untuk migration guard
-  BUDGETS: 'cd_budgets',         // v3 baru — budget per kategori
-  AUTH_CACHE: 'cd_auth_cache',   // v4 — trial/paid status cache (HMAC-signed)
+  WALLETS: 'cd_wallets',
+  SCHEMA_VERSION: 'cd_schema_v',
+  BUDGETS: 'cd_budgets',
 };
 
 const KATEGORI_DEFAULT = {

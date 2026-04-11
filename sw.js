@@ -11,7 +11,6 @@ const ASSETS_CORE = [
   '/js/state.js',
   '/js/utils.js',
   '/js/storage.js',
-  '/js/license.js',
   '/js/ui.js',
   '/js/bottom-sheet.js',
   '/js/budget.js',

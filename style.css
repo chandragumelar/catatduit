@@ -862,7 +862,7 @@ input, select, textarea { font-family: inherit; }
 
 /* ===== RESPONSIVE ===== */
 @media (min-width: 768px) {
-  #screen-app, .screen, #screen-license, #screen-onboarding {
+  #screen-app, .screen, #screen-onboarding {
     max-width: 480px;
     width: 480px;
     margin: 0 auto;
