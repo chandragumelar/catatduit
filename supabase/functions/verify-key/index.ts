@@ -4,8 +4,8 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL = Deno.env.get("https://obefugvlqxgawumsnctp.supabase.co")!;
-const SERVICE_KEY = Deno.env.get("sb_secret_GxzACcvBl8knQZrw_WU1dg_3kbNNt5q")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ALLOWED_ORIGIN =
   Deno.env.get("ALLOWED_ORIGIN") ?? "https://app-catatduit.vercel.app";
 
