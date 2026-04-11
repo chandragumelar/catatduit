@@ -45,7 +45,7 @@ async function sendMagicLink(email) {
   const { error } = await getSupabase().auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: "https://app-catatduit.vercel.app/auth/callback",
+      emailRedirectTo: "https://app-catatduit.vercel.app",
       shouldCreateUser: true,
     },
   });
@@ -54,11 +54,12 @@ async function sendMagicLink(email) {
 
 // Dipanggil saat app load di /auth/callback atau detect hash fragment
 async function handleMagicLinkCallback() {
-  const { data, error } = await getSupabase().auth.exchangeCodeForSession(
-    window.location.href,
-  );
+  const {
+    data: { session },
+    error,
+  } = await getSupabase().auth.getSession();
   if (error) throw error;
-  return data.session;
+  return session;
 }
 
 async function signOut() {
