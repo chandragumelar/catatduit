@@ -273,26 +273,28 @@ function _initSettingsEvents(txList, wallets) {
   // Kategori
   document.getElementById('btn-go-kategori')?.addEventListener('click', () => navigateTo('kategori'));
 
-  // Currency symbol — simpan lalu re-render halaman aktif supaya semua simbol ikut berubah
+  // Currency symbol — simpan lalu re-render semua yang perlu update
   document.getElementById('currency-select')?.addEventListener('change', (e) => {
     setData(STORAGE_KEYS.CURRENCY, e.target.value);
-    // Update semua nominal-prefix yang visible tanpa full re-render
-    document.querySelectorAll('.nominal-prefix, .qc-prefix').forEach(el => {
-      el.textContent = getCurrencySymbol();
-    });
-    // Re-render halaman yang sedang aktif (kecuali settings itu sendiri)
+
+    // Selalu update input page prefix (ada di index.html, tidak di-render ulang)
+    const pfx = document.getElementById('input-currency-prefix');
+    if (pfx) pfx.textContent = getCurrencySymbol();
+
+    // Re-render halaman yang sedang aktif
     const page = state.currentPage;
-    if (page === 'dashboard')      renderDashboard();
-    else if (page === 'riwayat')   renderRiwayatContent();
-    else if (page === 'tabungan')  renderTabungan();
-    else if (page === 'input') {
-      const pfx = document.getElementById('input-currency-prefix');
-      if (pfx) pfx.textContent = getCurrencySymbol();
-    }
-    // Juga update prefix di bottom sheet yang mungkin sedang terbuka
+    if (page === 'dashboard')    renderDashboard();
+    if (page === 'riwayat')      renderRiwayatContent();
+    if (page === 'tabungan')     renderTabungan();
+    // Settings selalu di-render ulang (wallet list punya saldo awal pakai formatRupiah)
+    renderSettings();
+
+    // Update semua nominal-prefix dan qc-prefix yang ada di DOM
+    // (mencakup bottom sheet yang sedang terbuka)
     document.querySelectorAll('.nominal-prefix, .qc-prefix').forEach(el => {
       el.textContent = getCurrencySymbol();
     });
+
     showToast('Simbol mata uang diubah ✓');
   });
 
