@@ -18,7 +18,7 @@ function renderBudgetSection(container) {
       <p class="budget-empty-text">Belum ada budget. Set limit pengeluaran per kategori biar lebih terkontrol.</p>
       <button class="btn-secondary" id="btn-set-budget-empty">Set Budget</button>`;
     container.appendChild(card);
-    document.getElementById('btn-set-budget-empty')?.addEventListener('click', () => showBudgetManager());
+    container.querySelector('#btn-set-budget-empty')?.addEventListener('click', () => showBudgetManager());
     return;
   }
 
@@ -43,7 +43,7 @@ function renderBudgetSection(container) {
     </div>`;
 
   container.appendChild(card);
-  document.getElementById('btn-kelola-budget')?.addEventListener('click', () => showBudgetManager());
+  container.querySelector('#btn-kelola-budget')?.addEventListener('click', () => showBudgetManager());
 }
 
 function _buildBudgetRowHTML(katId, s) {

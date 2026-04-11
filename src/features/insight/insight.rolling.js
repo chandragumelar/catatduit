@@ -199,7 +199,7 @@ function renderRollingInsightCard(containerId, txList) {
   const insight = calcRollingInsight(txList);
 
   if (!insight.hasData) {
-    container.innerHTML = `<p class="insight-empty">Butuh lebih banyak data untuk analisis 2 mingguan.</p>`;
+    container.innerHTML = `<p class="insight-empty">Analisis siap setelah kamu catat lebih banyak transaksi 📊</p>`;
     return;
   }
 

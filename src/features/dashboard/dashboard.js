@@ -170,7 +170,7 @@ function renderDashboard() {
       <div class="card pace-card">
         <div class="pace-content">
           <div class="pace-left">
-            <p class="pace-label">Rata-rata di hari ke-${spanHari} bulan ini</p>
+            <p class="pace-label">Pengeluaran rata-rata harian bulan ini</p>
             <p class="pace-value">Rata-rata pengeluaran <strong>${formatRupiah(rataHarian)}</strong><span class="pace-unit">/hari</span></p>
           </div>
           ${budgetHarian > 0 ? `
@@ -204,6 +204,7 @@ function renderDashboard() {
       <div class="summary-card summary-card--main">
         <p class="summary-label">Cashflow Bulan Ini</p>
         <p class="summary-value ${cashflow >= 0 ? 'income' : 'expense'} summary-value--large">${formatRupiah(cashflow)}</p>
+        <p class="summary-sub-label" style="color:var(--gray-400);">Masuk − keluar dari transaksi bulan ini</p>
         ${totalNabung > 0 ? `<p class="summary-sub-label">Sudah nabung ${formatRupiah(totalNabung)} bulan ini</p>` : ''}
       </div>
       <div class="summary-card">
@@ -250,7 +251,8 @@ function renderDashboard() {
   }
 
   // — Rolling Insight 2 minggu (Sprint C #19)
-  if (txList.length >= 5) {
+  // Selalu tampilkan card, tapi isi konten bergantung pada data di window 2 minggu
+  {
     const rollingEl = _makeCollapsibleCard({
       id:      DASHBOARD_CARDS.ROLLING_INSIGHT,
       title:   '📊 Analisis 2 Minggu',
@@ -363,6 +365,7 @@ function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
       </div>
     </div>
     <div class="chart-container"><canvas id="chart-combo"></canvas></div>
+    <p class="chart-week-note" id="chart-week-note" style="display:none;font-size:11px;color:var(--gray-400);text-align:center;margin-top:4px;">W = minggu · W0 = minggu ini · W-1 = minggu lalu</p>
 
     <div class="section-header" style="margin-top:16px;margin-bottom:8px;">
       <h3 class="section-title">Cashflow per Bulan</h3>
@@ -461,12 +464,16 @@ function _renderKeuanganBulanIni(container, {
         </div>
         <div class="keuangan-divider"></div>
         <div class="keuangan-row keuangan-row--result keuangan-row--final">
-          <span>Bebas dipakai</span>
+          <span>Bebas dipakai <span style="font-size:10px;font-weight:400;color:var(--gray-400);display:block;">dari total saldo − tagihan − nabung</span></span>
           <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
         </div>` : ''}
         ${tagihanBulanIni.length > 0 ? `
         <p class="tagihan-paid-status">
-          ${tagihanSudahBayar.length} dari ${tagihanBulanIni.length} tagihan bulan ini sudah terbayar
+          ${tagihanSudahBayar.length === tagihanBulanIni.length
+            ? '✅ Semua tagihan bulan ini sudah beres!'
+            : tagihanSudahBayar.length === 0
+              ? `${tagihanBulanIni.length} tagihan bulan ini belum dibayar`
+              : `${tagihanBulanIni.length - tagihanSudahBayar.length} dari ${tagihanBulanIni.length} tagihan belum dibayar`}
         </p>` : tagihan.length === 0 ? `
         <button class="btn-text-small" id="btn-goto-tagihan-card" style="margin-top:8px;">
           + Tambah tagihan rutin

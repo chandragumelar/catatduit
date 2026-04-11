@@ -73,10 +73,10 @@ function calcDashboard() {
   // Kategori terboros
   const katBulanIni  = {};
   const katBulanLalu = {};
-  txBulanIni.filter(tx => tx.jenis === 'keluar').forEach(tx => {
+  txBulanIni.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').forEach(tx => {
     katBulanIni[tx.kategori] = (katBulanIni[tx.kategori] || 0) + tx.nominal;
   });
-  txBulanLalu.filter(tx => tx.jenis === 'keluar').forEach(tx => {
+  txBulanLalu.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').forEach(tx => {
     katBulanLalu[tx.kategori] = (katBulanLalu[tx.kategori] || 0) + tx.nominal;
   });
   const borosList = Object.entries(katBulanIni)

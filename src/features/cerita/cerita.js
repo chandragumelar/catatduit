@@ -2,7 +2,7 @@
 // On-demand, filter bulan+tahun, threshold 5 transaksi
 // Output: fullscreen bottom sheet + print/PDF
 
-const CERITA_MIN_TX = 5;
+const CERITA_MIN_TX = 15;
 
 // ===== PERSONA ENGINE =====
 

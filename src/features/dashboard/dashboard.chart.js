@@ -19,6 +19,8 @@ function initDashboardCharts(calc) {
       document.querySelectorAll('.chart-period-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       _renderComboChart(btn.dataset.period, calc);
+      const note = document.getElementById('chart-week-note');
+      if (note) note.style.display = btn.dataset.period === 'weekly' ? 'block' : 'none';
     });
   });
 
@@ -100,7 +102,7 @@ function _renderComboChart(period, calc) {
       startDate.setDate(endDate.getDate() - 6);
       weeks.push({ start: startDate, end: endDate });
     }
-    labels    = weeks.map((_, i) => i === 7 ? 'Ini' : `W-${7 - i}`);
+    labels    = weeks.map((_, i) => i === 7 ? 'W0' : `W-${7 - i}`);
     dataMasuk  = weeks.map(({ start, end }) =>
       calc.txList.filter(tx => {
         const d = new Date(tx.tanggal + 'T00:00:00');

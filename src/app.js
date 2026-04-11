@@ -206,7 +206,17 @@ function _stepSaldo() {
   el.innerHTML = `
     <p class="onboarding-question">Berapa isi masing-masing dompet sekarang?</p>
     <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">Boleh perkiraan dulu — ini bisa diubah kapan saja.</p>
-    <p style="font-size:12px;color:var(--gray-400);margin-bottom:16px;">Pakai mata uang lain? <span id="ob-currency-link" style="color:var(--primary);cursor:pointer;text-decoration:underline;">Ganti di pengaturan &rarr;</span></p>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+      <span style="font-size:12px;color:var(--gray-400);">Simbol mata uang:</span>
+      <select id="ob-currency-select" style="font-size:13px;padding:2px 6px;border:1px solid var(--gray-200);border-radius:6px;background:var(--surface);color:var(--text-primary);cursor:pointer;">
+        <option value="Rp">Rp — Rupiah</option>
+        <option value="$">$ — Dollar</option>
+        <option value="RM">RM — Ringgit</option>
+        <option value="₱">₱ — Peso</option>
+        <option value="฿">฿ — Baht</option>
+        <option value="SGD">SGD — Singapore Dollar</option>
+      </select>
+    </div>
     <div id="ob-saldo-fields"></div>
     <p class="onboarding-error" id="ob-saldo-error"></p>
     <button id="ob-btn-selesai" class="btn-primary" style="margin-top:16px;">Mulai Pantau 🎉</button>`;
@@ -228,19 +238,16 @@ function _stepSaldo() {
     fieldsWrap.appendChild(row);
   });
 
-  el.querySelector('#ob-currency-link')?.addEventListener('click', () => {
-    // Selesaikan onboarding dulu dengan data sejauh ini, lalu buka settings
-    const wallets = selectedWallets.map(wallet => {
-      const input = fieldsWrap.querySelector(`[data-wallet-id="${wallet.id}"]`);
-      const saldo = input ? parseNominal(input.value) : 0;
-      return { id: wallet.id, nama: wallet.nama, icon: wallet.icon, saldo_awal: saldo };
-    });
-    saveWallets(wallets);
-    setData(STORAGE_KEYS.ONBOARDING, true);
-    setData(STORAGE_KEYS.SCHEMA_VERSION, SCHEMA_VERSION);
-    _showScreen('screen-app');
-    navigateTo('settings');
+  // R1: Inline currency selector — simpan pilihan langsung, tidak redirect
+  el.querySelector('#ob-currency-select')?.addEventListener('change', (e) => {
+    setData(STORAGE_KEYS.CURRENCY_SYMBOL, e.target.value);
+    // Update prefix labels yang sudah ter-render
+    el.querySelectorAll('.nominal-prefix').forEach(span => { span.textContent = e.target.value; });
   });
+  // Set default value sesuai setting yang sudah ada (kalau ada)
+  const existingCurrency = getData(STORAGE_KEYS.CURRENCY_SYMBOL, 'Rp');
+  const currencySelect = el.querySelector('#ob-currency-select');
+  if (currencySelect) currencySelect.value = existingCurrency;
 
   el.querySelector('#ob-btn-selesai').addEventListener('click', () => {
     // Simpan wallets dengan saldo masing-masing
