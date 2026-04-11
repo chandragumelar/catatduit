@@ -143,6 +143,12 @@ const INSIGHT_PIPELINE = [
     );
   },
 
+  // --- Sprint C #19: Rolling 2-week insight (granular per kategori) ---
+  (d) => {
+    if (typeof getRollingInsightText !== 'function') return null;
+    return getRollingInsightText(d.txList);
+  },
+
   // --- Fallback: selalu ada sesuatu ---
   (d) => {
     const { nama, txList } = d;

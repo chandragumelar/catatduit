@@ -1,40 +1,78 @@
-# CatatDuit
+# CatatDuit v3 — Sprint C
 
-Personal finance tracker for Indonesian users. Built with vanilla JS, no backend, no login — data stays on your device.
-
-**Demo:** [app-catatduit.vercel.app](https://app-catatduit.vercel.app)
-
----
-
-## What it does
-
-- Track income, expenses, and savings across multiple wallets (BCA, GoPay, DANA, etc.)
-- Monthly dashboard with cashflow and free cash estimate
-- Budget per category, savings goals, bill reminders
-- Financial Health Score based on your actual data
-- Export/import CSV for backup
-- Works offline, installable as PWA
+PWA expense tracker untuk pasar Indonesia.
+Deploy: app-catatduit.vercel.app | Dijual di Shopee via Warung Digital.
 
 ---
 
-## Stack
+## Struktur Folder (Sprint C — refactor)
 
-Vanilla JS · localStorage · Chart.js · Lucide Icons · PWA
-
-No framework. No build step. No server.
-
----
-
-## Run locally
-
-```bash
-git clone https://github.com/chandragumelar/catatduit.git
-cd catatduit
-npx serve .
+```
+catatduit/
+├── index.html
+├── style.css
+├── sw.js                    # Service Worker
+├── calc.worker.js           # Web Worker (harus di root untuk scope SW)
+├── manifest.json
+├── vercel.json
+├── lib/
+│   ├── chart.min.js
+│   └── lucide.min.js
+└── src/
+    ├── app.js               # Boot + Onboarding
+    ├── core/                # Foundation — no UI deps
+    │   ├── state.js         # Constants, STORAGE_KEYS, KATEGORI_DEFAULT
+    │   ├── utils.js         # Pure utils, WorkerBridge
+    │   └── storage.js       # localStorage CRUD, migrations, atomic transfer
+    ├── shared/              # Cross-feature UI helpers
+    │   ├── ui.js
+    │   ├── bottom-sheet.js
+    │   ├── pwa.js
+    │   └── quick-capture.js
+    └── features/
+        ├── dashboard/       # dashboard.js, calc, insight, chart, health-score
+        ├── transfer/        # Sprint C #18 — Transfer UI
+        ├── insight/         # Sprint C #19 — Rolling 2-week insight
+        ├── budget/
+        ├── input/
+        ├── riwayat/
+        ├── cerita/
+        ├── goals/
+        ├── tagihan/
+        ├── tabungan/
+        ├── settings/
+        └── kategori/
 ```
 
+> calc.worker.js tetap di root karena Web Worker scope relatif ke SW scope (/), bukan ke caller file.
+
 ---
 
-## Privacy
+## Sprint C — Fitur Baru
 
-Everything is stored in your browser's localStorage. Nothing is sent anywhere. Clearing your browser cache will delete your data — export regularly.
+### #18 — Account Transfer Antar Wallet
+- Tombol Transfer di greeting card (muncul kalau >= 2 wallet)
+- Bottom sheet: pilih from/to, nominal, tanggal, catatan, swap button
+- Live saldo hint + soft warning kalau nominal > saldo
+- Atomic: satu transfer = dua entry (transfer_out + transfer_in) diikat group_id
+- Delete otomatis hapus pair (deleteTransferAtomic dari B2)
+
+### #19 — Rolling 2-Week Category Insight
+- Window: 14 hari terakhir vs 14 hari sebelumnya (rolling, bukan kalender bulan)
+- Severity: tipis (10%+), naik (30%+), signifikan (60%+), melonjak (120%+)
+- Anomaly: deteksi kategori baru muncul atau hilang tiba-tiba
+- Card "Analisis 2 Minggu" di dashboard (collapsible, priority 58)
+- Summary text juga masuk Momen Insight pipeline
+
+---
+
+## Sprint History
+
+| Sprint | Status |
+|--------|--------|
+| A — Foundation + Notif | Done |
+| A2 — UI Quick Wins | Done |
+| B — Analytics | Done |
+| B2 — Budget & Navigation | Done |
+| C — Transfer & Insights | Done |
+| C2 — Cerita Flagship | Next |

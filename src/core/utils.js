@@ -141,7 +141,7 @@ const WorkerBridge = (() => {
     if (_workerFailed) return null;
     if (_worker) return _worker;
     try {
-      _worker = new Worker('js/calc.worker.js');
+      _worker = new Worker('calc.worker.js');
       _worker.onmessage = (e) => {
         const { id, ok, result, error } = e.data;
         const p = _pendingMap[id];

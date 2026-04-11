@@ -92,21 +92,22 @@ const BULAN_NAMES = [
 
 const MAX_NOMINAL    = 999000000000;
 const MAX_GOALS      = 5;
-const SCHEMA_VERSION = 4; // Sprint B2: weekly budget, atomic tx, card priority
+const SCHEMA_VERSION = 5; // Sprint C: account transfer UI, rolling insight
 
 // Sprint B2 #16: Dashboard card IDs
 const DASHBOARD_CARDS = {
-  GREETING:  'card-greeting',
-  KEUANGAN:  'card-keuangan',
-  HEALTH:    'card-health',
-  CERITA:    'card-cerita',
-  CHECKIN:   'card-checkin',
-  VELOCITY:  'card-velocity',
-  CASHFLOW:  'card-cashflow',
-  BUDGET:    'card-budget',
-  CHARTS:    'card-charts',
-  BOROS:     'card-boros',
-  RECENT:    'card-recent',
+  GREETING:        'card-greeting',
+  KEUANGAN:        'card-keuangan',
+  HEALTH:          'card-health',
+  CERITA:          'card-cerita',
+  CHECKIN:         'card-checkin',
+  VELOCITY:        'card-velocity',
+  CASHFLOW:        'card-cashflow',
+  BUDGET:          'card-budget',
+  CHARTS:          'card-charts',
+  BOROS:           'card-boros',
+  RECENT:          'card-recent',
+  ROLLING_INSIGHT: 'card-rolling-insight', // Sprint C #19
 };
 
 const DEFAULT_WALLET_ID = 'utama';

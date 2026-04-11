@@ -36,10 +36,10 @@
     />
 
     <!-- Chart.js -->
-    <script src="chart.min.js"></script>
+    <script src="lib/chart.min.js"></script>
 
     <!-- Lucide Icons -->
-    <script src="lucide.min.js"></script>
+    <script src="lib/lucide.min.js"></script>
 
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -371,27 +371,33 @@
     </style>
 
     <!-- JS Modules (load order matters) -->
-    <script src="js/state.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/cerita.js"></script>
-    <script src="js/pwa.js"></script>
-    <script src="js/quick-capture.js"></script>
-    <script src="js/budget.js"></script>
-    <script src="js/health-score.js"></script>
-    <script src="js/dashboard.calc.js"></script>
-    <script src="js/dashboard.insight.js"></script>
-    <script src="js/dashboard.chart.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/input.js"></script>
-    <script src="js/riwayat.js"></script>
-    <script src="js/bottom-sheet.js"></script>
-    <script src="js/goals.js"></script>
-    <script src="js/tagihan.js"></script>
-    <script src="js/tabungan.js"></script>
-    <script src="js/settings.js"></script>
-    <script src="js/kategori.js"></script>
-    <script src="js/app.js"></script>
+    <!-- core -->
+    <script src="src/core/state.js"></script>
+    <script src="src/core/utils.js"></script>
+    <script src="src/core/storage.js"></script>
+    <!-- shared -->
+    <script src="src/shared/ui.js"></script>
+    <script src="src/shared/bottom-sheet.js"></script>
+    <script src="src/shared/pwa.js"></script>
+    <script src="src/shared/quick-capture.js"></script>
+    <!-- features -->
+    <script src="src/features/cerita/cerita.js"></script>
+    <script src="src/features/budget/budget.js"></script>
+    <script src="src/features/dashboard/health-score.js"></script>
+    <script src="src/features/dashboard/dashboard.calc.js"></script>
+    <script src="src/features/dashboard/dashboard.insight.js"></script>
+    <script src="src/features/dashboard/dashboard.chart.js"></script>
+    <script src="src/features/dashboard/dashboard.js"></script>
+    <script src="src/features/transfer/transfer.js"></script>
+    <script src="src/features/insight/insight.rolling.js"></script>
+    <script src="src/features/input/input.js"></script>
+    <script src="src/features/riwayat/riwayat.js"></script>
+    <script src="src/features/goals/goals.js"></script>
+    <script src="src/features/tagihan/tagihan.js"></script>
+    <script src="src/features/tabungan/tabungan.js"></script>
+    <script src="src/features/settings/settings.js"></script>
+    <script src="src/features/kategori/kategori.js"></script>
+    <!-- boot -->
+    <script src="src/app.js"></script>
   </body>
 </html>

@@ -2100,3 +2100,160 @@ input, select, textarea { font-family: inherit; }
   vertical-align: middle;
   letter-spacing: 0.02em;
 }
+
+/* ===== SPRINT C #18 — Transfer Shortcut Button ===== */
+.greeting-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.btn-transfer-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light, rgba(13,148,136,0.1));
+  border: 1px solid var(--primary);
+  border-radius: 99px;
+  padding: 5px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-transfer-shortcut:active { transform: scale(0.96); }
+.btn-transfer-shortcut i, .btn-transfer-shortcut svg { width: 13px; height: 13px; }
+
+/* Transfer bottom sheet extras */
+.tf-swap-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  margin: -4px 0;
+}
+.tf-swap-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: none;
+  border: 1px dashed var(--primary);
+  border-radius: 99px;
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.tf-swap-btn:hover { background: rgba(13,148,136,0.07); }
+.tf-saldo-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  min-height: 14px;
+}
+
+/* ===== SPRINT C #19 — Rolling Insight Card ===== */
+.rolling-insight-wrap {
+  padding: 0;
+}
+.rolling-insight-summary {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg-card, #f9fafb);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.rolling-insight-period {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 6px;
+}
+.ri-period-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.ri-period-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.ri-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 12px 0 6px;
+}
+.ri-section-gone { color: #9CA3AF; }
+.ri-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-light, #f0f0f0);
+  gap: 8px;
+}
+.ri-row:last-child { border-bottom: none; }
+.ri-row-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.ri-icon { font-size: 18px; flex-shrink: 0; }
+.ri-row-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ri-nama {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ri-compare {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ri-pct {
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 2px 9px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.ri-pct--danger { background: #FEE2E2; color: #B91C1C; }
+.ri-pct--warn   { background: #FEF3C7; color: #92400E; }
+.ri-pct--good   { background: #D1FAE5; color: #065F46; }
+.ri-pct--new    { background: #EDE9FE; color: #5B21B6; }
+.ri-pct--gone   { background: #F3F4F6; color: #6B7280; }
+.ri-baseline-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light, #f0f0f0);
+}
+.insight-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 12px 0;
+}

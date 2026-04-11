@@ -115,11 +115,18 @@ function renderDashboard() {
   const sections = [];
   const push = (id, el, priority = 50) => el && sections.push({ id, el, priority });
 
-  // — Greeting (fixed top)
+  // — Greeting (fixed top) + Transfer shortcut (Sprint C #18)
+  const wallets = getWallets();
+  const showTransferBtn = wallets.length >= 2;
   const greetEl = document.createElement('div');
   greetEl.innerHTML = `
     <div class="greeting-section">
-      <p class="greeting-text">Halo, ${escHtml(getNama())}! 👋</p>
+      <div class="greeting-top">
+        <p class="greeting-text">Halo, ${escHtml(getNama())}! 👋</p>
+        ${showTransferBtn ? `<button class="btn-transfer-shortcut" id="btn-open-transfer" title="Transfer antar dompet">
+          <i data-lucide="arrow-left-right"></i> Transfer
+        </button>` : ''}
+      </div>
       <p class="insight-text">${escHtml(insightText)}</p>
     </div>`;
   push(DASHBOARD_CARDS.GREETING, greetEl, 0);
@@ -246,6 +253,17 @@ function renderDashboard() {
     push(DASHBOARD_CARDS.BOROS, borosEl, 55);
   }
 
+  // — Rolling Insight 2 minggu (Sprint C #19)
+  if (txList.length >= 5) {
+    const rollingEl = _makeCollapsibleCard({
+      id:      DASHBOARD_CARDS.ROLLING_INSIGHT,
+      title:   '📊 Analisis 2 Minggu',
+      urgent:  false,
+      content: '<div id="rolling-insight-body" class="rolling-insight-wrap">Memuat...</div>',
+    });
+    push(DASHBOARD_CARDS.ROLLING_INSIGHT, rollingEl, 58);
+  }
+
   // — Budget (naik ke 3 kalau jebol, 5 kalau warning)
   const budgetEl = document.createElement('div');
   try { renderBudgetSection(budgetEl); } catch(e) {}
@@ -313,6 +331,7 @@ function renderDashboard() {
   }
 
   // Event listeners
+  container.querySelector('#btn-open-transfer')?.addEventListener('click', () => openTransferSheet());
   container.querySelector('#btn-checkin-catat')?.addEventListener('click', () => openInputPage('add'));
   container.querySelector('#btn-lihat-semua')?.addEventListener('click', () => navigateTo('riwayat'));
   container.querySelectorAll('.tx-item').forEach(el =>
@@ -324,6 +343,11 @@ function renderDashboard() {
 
   setTimeout(() => {
     initDashboardCharts(calc);
+    // Rolling insight render — setelah DOM ready
+    const rollingBody = container.querySelector('#rolling-insight-body');
+    if (rollingBody && typeof renderRollingInsightCard === 'function') {
+      renderRollingInsightCard('rolling-insight-body', txList);
+    }
     if (window.lucide) lucide.createIcons();
   }, 0);
 }
