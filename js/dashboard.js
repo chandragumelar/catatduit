@@ -50,6 +50,8 @@ function renderDashboard() {
     totalTagihanBelumBayar, uangBebas, bebasDipakai,
     borosList, katSorted,
     sudahCatatHariIni, recentTx, bigSpending,
+    // Sprint B
+    velocityAlert, spendByDay, countByDay, borosDay, DAY_NAMES,
   } = calc;
 
   // Insight (inject nama ke calcData untuk pipeline)
@@ -118,6 +120,18 @@ function renderDashboard() {
       </div>`);
   }
 
+  // Sprint B Item 12: Spending velocity alert
+  if (velocityAlert) {
+    _appendHTML(container, `
+      <div class="card velocity-alert-card">
+        <div class="velocity-alert-icon">⚡</div>
+        <div class="velocity-alert-body">
+          <div class="velocity-alert-title">Kecepatan belanja tinggi</div>
+          <div class="velocity-alert-sub">Baru hari ke-${velocityAlert.hariIni} dari ${velocityAlert.hariDalamBulan}, tapi sudah habis ${velocityAlert.spendPct}% dari pemasukan. Pace normal: ${velocityAlert.dayPct}%.</div>
+        </div>
+      </div>`);
+  }
+
   // 5. Summary cashflow
   _appendHTML(container, `
     <div class="summary-grid">
@@ -180,7 +194,13 @@ function renderDashboard() {
 
   _appendHTML(container, `
     <div class="card">
-      <div class="section-header"><h3 class="section-title">Pemasukan vs Pengeluaran</h3></div>
+      <div class="section-header">
+        <h3 class="section-title">Pemasukan vs Pengeluaran</h3>
+        <div class="chart-period-toggle">
+          <button class="chart-period-btn active" data-period="monthly">Bulanan</button>
+          <button class="chart-period-btn" data-period="weekly">Mingguan</button>
+        </div>
+      </div>
       <div class="chart-container"><canvas id="chart-combo"></canvas></div>
     </div>
     <div class="card">
@@ -212,7 +232,13 @@ function renderDashboard() {
         </select>
       </div>
       <div class="chart-container"><canvas id="chart-tren"></canvas></div>
-    </div>`);
+    </div>
+    ${borosDay ? `
+    <div class="card">
+      <div class="section-header"><h3 class="section-title">Pola Pengeluaran per Hari</h3></div>
+      <div class="chart-container"><canvas id="chart-dow"></canvas></div>
+      <p class="chart-dow-label">Terboros: <strong>${borosDay}</strong></p>
+    </div>` : ''}`);
 
   // 10. Pengeluaran terbesar
   if (bigSpending.length > 0) {

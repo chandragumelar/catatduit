@@ -90,6 +90,62 @@ function calcDashboard() {
   });
   const katSorted = Object.entries(katTotal).sort((a, b) => b[1] - a[1]);
 
+  // === SPRINT B ===
+
+  // Item 12: Spending velocity alert
+  // Persen budget terpakai vs persen hari terpakai
+  const dayPct    = hariIni / hariDalamBulan; // misal 0.33 = hari ke-10 dari 30
+  const spendPct  = totalMasuk > 0 ? totalKeluar / totalMasuk : 0;
+  const velocityAlert = (totalMasuk > 0 && dayPct > 0.05 && spendPct > dayPct + 0.15)
+    ? {
+        spendPct: Math.round(spendPct * 100),
+        dayPct:   Math.round(dayPct * 100),
+        hariIni,
+        hariDalamBulan,
+      }
+    : null;
+
+  // Item 13: Rule-based insight 2 minggu per kategori
+  // Bandingkan total pengeluaran per kategori minggu ini vs 2 minggu lalu
+  const today      = new Date();
+  const msPerDay   = 86400000;
+  const startMingguIni   = new Date(today.getTime() - 6 * msPerDay); // 7 hari terakhir
+  const startMingguLalu  = new Date(today.getTime() - 13 * msPerDay); // 7-14 hari lalu
+  const endMingguLalu    = new Date(today.getTime() - 7 * msPerDay);
+
+  const katMingguIni  = {};
+  const katMingguLalu = {};
+  txList.forEach(tx => {
+    if (tx.jenis !== 'keluar') return;
+    const d = new Date(tx.tanggal + 'T00:00:00');
+    if (d >= startMingguIni)  katMingguIni[tx.kategori]  = (katMingguIni[tx.kategori]  || 0) + tx.nominal;
+    if (d >= startMingguLalu && d < endMingguLalu)
+                              katMingguLalu[tx.kategori] = (katMingguLalu[tx.kategori] || 0) + tx.nominal;
+  });
+  // Cari kategori dengan perubahan paling signifikan (>20% naik)
+  const weeklyKatInsight = Object.entries(katMingguIni)
+    .map(([id, val]) => {
+      const prev = katMingguLalu[id] || 0;
+      if (prev === 0) return null;
+      const pct = Math.round(((val - prev) / prev) * 100);
+      return { id, val, prev, pct };
+    })
+    .filter(Boolean)
+    .sort((a, b) => Math.abs(b.pct) - Math.abs(a.pct))[0] || null;
+
+  // Item 14: Spending by day-of-week
+  const DAY_NAMES = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const spendByDay = Array(7).fill(0);
+  const countByDay = Array(7).fill(0);
+  txList.filter(tx => tx.jenis === 'keluar').forEach(tx => {
+    const dow = new Date(tx.tanggal + 'T00:00:00').getDay();
+    spendByDay[dow] += tx.nominal;
+    countByDay[dow]++;
+  });
+  // Hari paling boros (cukup data kalau ada transaksi)
+  const maxDow   = spendByDay.indexOf(Math.max(...spendByDay));
+  const borosDay = txList.filter(tx => tx.jenis === 'keluar').length >= 7 ? DAY_NAMES[maxDow] : null;
+
   // Rolling 12 bulan (untuk charts)
   const rolling     = getRolling12Months();
   const chartLabels = rolling.map(({ year: y, month: m }) => `${BULAN_NAMES[m].substr(0, 3)} ${String(y).substr(2)}`);
@@ -125,6 +181,9 @@ function calcDashboard() {
     borosList, katSorted, katTotal,
     rolling, chartLabels, chartMasuk, chartKeluar, chartCashflow,
     sudahCatatHariIni, recentTx, bigSpending,
+    // Sprint B
+    velocityAlert, weeklyKatInsight,
+    spendByDay, countByDay, borosDay, DAY_NAMES,
   };
 }
 

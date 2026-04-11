@@ -1887,3 +1887,53 @@ input, select, textarea { font-family: inherit; }
   color: var(--gray-400);
 }
 .checklist-arrow { font-size: 16px; color: var(--gray-400); }
+
+/* ===== SPRINT B ===== */
+
+/* Item 11: Chart period toggle */
+.chart-period-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--gray-100);
+  border-radius: 8px;
+  padding: 3px;
+}
+.chart-period-btn {
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-500);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chart-period-btn.active {
+  background: var(--white);
+  color: var(--teal);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  font-weight: 600;
+}
+
+/* Item 12: Velocity alert */
+.velocity-alert-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #fff8ed;
+  border-left: 3px solid #f59e0b;
+  padding: 12px 14px;
+}
+.velocity-alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.velocity-alert-title { font-size: 13px; font-weight: 600; color: #92400e; margin-bottom: 3px; }
+.velocity-alert-sub   { font-size: 12px; color: #b45309; line-height: 1.5; }
+
+/* Item 14: DOW chart label */
+.chart-dow-label {
+  font-size: 12px;
+  color: var(--gray-500);
+  text-align: center;
+  margin-top: 8px;
+}
+.chart-dow-label strong { color: var(--red); }

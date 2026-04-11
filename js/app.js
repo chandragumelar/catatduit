@@ -49,6 +49,9 @@ function _showScreen(id) {
 
 function showApp() {
   _showScreen('screen-app');
+  // Pastikan prefix mata uang di input page sesuai setting
+  const pfx = document.getElementById('input-currency-prefix');
+  if (pfx) pfx.textContent = getCurrencySymbol();
   navigateTo('dashboard');
   if (window.lucide) lucide.createIcons();
 }

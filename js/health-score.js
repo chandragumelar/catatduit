@@ -222,8 +222,8 @@ function renderHealthScore(container) {
     const warmupTitle = scoreData.hariAdaTx === 0
       ? 'Skor keuanganmu akan muncul di sini'
       : sisaHari === 1
-        ? 'Tinggal 1 hari lagi — hampir selesai!'
-        : `Catat ${sisaHari} hari lagi untuk mulai`;
+        ? 'Besok skormu siap — catat satu hari lagi!'
+        : `${sisaHari} hari lagi, skor keuanganmu muncul`;
     const warmupSub = scoreData.hariAdaTx === 0
       ? 'Catat pengeluaran 2 hari berturut-turut, dan skor kesehatan keuanganmu akan langsung dihitung otomatis.'
       : 'Skormu dihitung dari konsistensi mencatat — bukan dari berapa banyak uangmu.';

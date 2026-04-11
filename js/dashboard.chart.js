@@ -1,27 +1,26 @@
 // ===== DASHBOARD.CHART.JS — Chart rendering + Share summary =====
 
 function initDashboardCharts(calc) {
-  const { txList, rolling, chartLabels, chartMasuk, chartKeluar, chartCashflow, katSorted } = calc;
+  const { txList, rolling, chartLabels, chartMasuk, chartKeluar, chartCashflow, katSorted,
+          spendByDay, borosDay, DAY_NAMES } = calc;
 
   destroyChart('combo');
   destroyChart('surplus');
   destroyChart('kategori');
   destroyChart('tren');
+  destroyChart('dow');
 
-  // Chart 1: Pemasukan vs Pengeluaran (combo bar+line)
-  const comboCtx = document.getElementById('chart-combo')?.getContext('2d');
-  if (comboCtx) {
-    state.chartInstances.combo = new Chart(comboCtx, {
-      data: {
-        labels: chartLabels,
-        datasets: [
-          { type: 'bar',  label: 'Keluar', data: chartKeluar, backgroundColor: 'rgba(220,38,38,0.7)', borderRadius: 4, order: 2 },
-          { type: 'line', label: 'Masuk',  data: chartMasuk,  borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.08)', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: true, order: 1 },
-        ],
-      },
-      options: chartOptions(),
+  // Chart 1: Pemasukan vs Pengeluaran (combo bar+line) — default monthly
+  _renderComboChart('monthly', calc);
+
+  // Toggle bulanan/mingguan
+  document.querySelectorAll('.chart-period-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.chart-period-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _renderComboChart(btn.dataset.period, calc);
     });
-  }
+  });
 
   // Chart 2: Cashflow per bulan
   const surplusCtx = document.getElementById('chart-surplus')?.getContext('2d');
@@ -57,6 +56,76 @@ function initDashboardCharts(calc) {
   renderTrenChart(defaultKat, txList, rolling, chartLabels);
   document.getElementById('tren-kategori-select')?.addEventListener('change', (e) => {
     renderTrenChart(e.target.value, txList, rolling, chartLabels);
+  });
+
+  // Chart 5: Pengeluaran per hari (Sprint B Item 14)
+  if (borosDay && spendByDay) {
+    const dowCtx = document.getElementById('chart-dow')?.getContext('2d');
+    if (dowCtx) {
+      const maxVal = Math.max(...spendByDay);
+      state.chartInstances.dow = new Chart(dowCtx, {
+        type: 'bar',
+        data: {
+          labels: DAY_NAMES,
+          datasets: [{
+            label: 'Pengeluaran',
+            data: spendByDay,
+            backgroundColor: spendByDay.map(v => v === maxVal ? 'rgba(220,38,38,0.75)' : 'rgba(13,148,136,0.55)'),
+            borderRadius: 4,
+          }],
+        },
+        options: {
+          ...chartOptions({ plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${formatRupiah(ctx.raw)}` } } } }),
+        },
+      });
+    }
+  }
+}
+
+function _renderComboChart(period, calc) {
+  destroyChart('combo');
+  const comboCtx = document.getElementById('chart-combo')?.getContext('2d');
+  if (!comboCtx) return;
+
+  let labels, dataMasuk, dataKeluar;
+
+  if (period === 'weekly') {
+    // 8 minggu terakhir
+    const today  = new Date();
+    const weeks  = [];
+    for (let i = 7; i >= 0; i--) {
+      const endDate   = new Date(today);
+      endDate.setDate(today.getDate() - i * 7);
+      const startDate = new Date(endDate);
+      startDate.setDate(endDate.getDate() - 6);
+      weeks.push({ start: startDate, end: endDate });
+    }
+    labels    = weeks.map((_, i) => i === 7 ? 'Ini' : `W-${7 - i}`);
+    dataMasuk  = weeks.map(({ start, end }) =>
+      calc.txList.filter(tx => {
+        const d = new Date(tx.tanggal + 'T00:00:00');
+        return tx.jenis === 'masuk' && d >= start && d <= end;
+      }).reduce((s, tx) => s + tx.nominal, 0));
+    dataKeluar = weeks.map(({ start, end }) =>
+      calc.txList.filter(tx => {
+        const d = new Date(tx.tanggal + 'T00:00:00');
+        return tx.jenis === 'keluar' && d >= start && d <= end;
+      }).reduce((s, tx) => s + tx.nominal, 0));
+  } else {
+    labels    = calc.chartLabels;
+    dataMasuk  = calc.chartMasuk;
+    dataKeluar = calc.chartKeluar;
+  }
+
+  state.chartInstances.combo = new Chart(comboCtx, {
+    data: {
+      labels,
+      datasets: [
+        { type: 'bar',  label: 'Keluar', data: dataKeluar, backgroundColor: 'rgba(220,38,38,0.7)', borderRadius: 4, order: 2 },
+        { type: 'line', label: 'Masuk',  data: dataMasuk,  borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.08)', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: true, order: 1 },
+      ],
+    },
+    options: chartOptions(),
   });
 }
 

@@ -116,6 +116,33 @@ const INSIGHT_PIPELINE = [
     try { return getBudgetInsight(); } catch(e) { return null; }
   },
 
+  // --- Sprint B Item 13: Komparasi kategori vs 2 minggu lalu ---
+  (d) => {
+    const { weeklyKatInsight } = d;
+    if (!weeklyKatInsight) return null;
+    const { id, pct } = weeklyKatInsight;
+    if (Math.abs(pct) < 20) return null;
+    const k = getKategoriById(id, 'keluar');
+    if (pct > 0) return _pick(
+      `${k.nama} minggu ini lebih tinggi ${pct}% dari minggu lalu.`,
+      `Pengeluaran ${k.nama} naik ${pct}% dibanding pekan lalu — perlu diperhatikan?`,
+    );
+    return _pick(
+      `${k.nama} turun ${Math.abs(pct)}% dari minggu lalu. Lebih hemat!`,
+      `Ada penurunan ${Math.abs(pct)}% di ${k.nama} dibanding pekan lalu.`,
+    );
+  },
+
+  // --- Sprint B Item 14: Hari paling boros ---
+  (d) => {
+    const { borosDay } = d;
+    if (!borosDay) return null;
+    return _pick(
+      `Kamu paling boros di hari ${borosDay}. Kalau mau hemat, hari itu yang perlu dijaga.`,
+      `Pengeluaran terbesar kamu cenderung terjadi di hari ${borosDay}.`,
+    );
+  },
+
   // --- Fallback: selalu ada sesuatu ---
   (d) => {
     const { nama, txList } = d;

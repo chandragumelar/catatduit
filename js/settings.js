@@ -77,8 +77,8 @@ function renderSettings() {
           <div class="settings-item-left">
             <div class="settings-item-icon">💱</div>
             <div>
-              <div class="settings-item-label">Simbol Mata Uang</div>
-              <div class="settings-item-sub">Angka tidak dikonversi, hanya simbol yang berubah</div>
+              <div class="settings-item-label">Mata Uang</div>
+              <div class="settings-item-sub" style="font-size:11px;">Simbol saja, angka tidak dikonversi</div>
             </div>
           </div>
           <select id="currency-select" style="border:none;background:transparent;font-size:13px;color:var(--text-secondary);cursor:pointer;outline:none;padding:4px;">
@@ -285,6 +285,14 @@ function _initSettingsEvents(txList, wallets) {
     if (page === 'dashboard')      renderDashboard();
     else if (page === 'riwayat')   renderRiwayatContent();
     else if (page === 'tabungan')  renderTabungan();
+    else if (page === 'input') {
+      const pfx = document.getElementById('input-currency-prefix');
+      if (pfx) pfx.textContent = getCurrencySymbol();
+    }
+    // Juga update prefix di bottom sheet yang mungkin sedang terbuka
+    document.querySelectorAll('.nominal-prefix, .qc-prefix').forEach(el => {
+      el.textContent = getCurrencySymbol();
+    });
     showToast('Simbol mata uang diubah ✓');
   });
 
