@@ -3,7 +3,7 @@
 const STORAGE_KEYS = {
   ONBOARDING: 'cd_onboarding_done',
   NAMA: 'cd_nama',
-  SALDO_AWAL: 'cd_saldo_awal',  // legacy v2, masih dipakai untuk migration
+  SALDO_AWAL: 'cd_saldo_awal',
   TRANSAKSI: 'cd_transaksi',
   KATEGORI: 'cd_kategori',
   TAGIHAN: 'cd_tagihan',
@@ -14,9 +14,11 @@ const STORAGE_KEYS = {
   CURRENCY: 'cd_currency',
   NUDGE: 'cd_nudge_shown',
   CHECKLIST_DISMISSED: 'cd_checklist_dismissed',
+  // Sprint B2
+  BUDGET_PERIOD:  'cd_budget_period',   // 'monthly' | 'weekly'
+  CARD_COLLAPSED: 'cd_card_collapsed',  // array of card ids yang di-collapse
 };
 
-// Daftar currency yang didukung (simbol saja, no konversi)
 const CURRENCY_OPTIONS = [
   { code: 'IDR', symbol: 'Rp',  label: 'Rupiah — Rp' },
   { code: 'USD', symbol: '$',   label: 'US Dollar — $' },
@@ -39,41 +41,42 @@ const CURRENCY_OPTIONS = [
 
 const KATEGORI_DEFAULT = {
   keluar: [
-    { id: 'makan', nama: 'Makan & Minum', icon: '🍴' },
-    { id: 'transport', nama: 'Transportasi', icon: '🚗' },
-    { id: 'belanja', nama: 'Belanja', icon: '🛒' },
-    { id: 'pulsa', nama: 'Pulsa & Internet', icon: '📱' },
-    { id: 'listrik', nama: 'Listrik', icon: '💡' },
-    { id: 'air', nama: 'Air', icon: '💧' },
-    { id: 'rumah', nama: 'Rumah', icon: '🏠' },
-    { id: 'kesehatan', nama: 'Kesehatan', icon: '🏥' },
-    { id: 'subscription', nama: 'Subscription', icon: '📺' },
-    { id: 'pendidikan', nama: 'Pendidikan', icon: '📚' },
-    { id: 'olahraga', nama: 'Olahraga', icon: '💪' },
-    { id: 'perawatan', nama: 'Perawatan Diri', icon: '💅' },
-    { id: 'ewallet', nama: 'E-wallet', icon: '💳' },
-    { id: 'kartu_kredit', nama: 'Kartu Kredit', icon: '💰' },
-    { id: 'cicilan', nama: 'Cicilan', icon: '📋' },
-    { id: 'angsuran', nama: 'Angsuran', icon: '🏦' },
-    { id: 'kirim_uang', nama: 'Kirim Uang', icon: '📤' },
-    { id: 'hotel', nama: 'Hotel', icon: '🏨' },
-    { id: 'investasi_keluar', nama: 'Investasi', icon: '📈' },
-    { id: 'lainnya_keluar', nama: 'Lainnya', icon: '📦' },
+    { id: 'makan',           nama: 'Makan & Minum',    icon: '🍴' },
+    { id: 'transport',       nama: 'Transportasi',     icon: '🚗' },
+    { id: 'belanja',         nama: 'Belanja',          icon: '🛒' },
+    { id: 'pulsa',           nama: 'Pulsa & Internet', icon: '📱' },
+    { id: 'listrik',         nama: 'Listrik',          icon: '💡' },
+    { id: 'air',             nama: 'Air',              icon: '💧' },
+    { id: 'rumah',           nama: 'Rumah',            icon: '🏠' },
+    { id: 'kesehatan',       nama: 'Kesehatan',        icon: '🏥' },
+    { id: 'subscription',   nama: 'Subscription',     icon: '📺' },
+    { id: 'pendidikan',      nama: 'Pendidikan',       icon: '📚' },
+    { id: 'olahraga',        nama: 'Olahraga',         icon: '💪' },
+    { id: 'perawatan',       nama: 'Perawatan Diri',   icon: '💅' },
+    { id: 'ewallet',         nama: 'E-wallet',         icon: '💳' },
+    { id: 'kartu_kredit',    nama: 'Kartu Kredit',     icon: '💰' },
+    { id: 'cicilan',         nama: 'Cicilan',          icon: '📋' },
+    { id: 'angsuran',        nama: 'Angsuran',         icon: '🏦' },
+    { id: 'kirim_uang',      nama: 'Kirim Uang',       icon: '📤' },
+    { id: 'hotel',           nama: 'Hotel',            icon: '🏨' },
+    { id: 'investasi_keluar',nama: 'Investasi',        icon: '📈' },
+    { id: 'transfer_keluar', nama: 'Transfer Keluar',  icon: '↗️' }, // Sprint B2 #17
+    { id: 'lainnya_keluar',  nama: 'Lainnya',          icon: '📦' },
   ],
   masuk: [
-    { id: 'gaji', nama: 'Gaji', icon: '💰' },
-    { id: 'freelance', nama: 'Freelance', icon: '💻' },
-    { id: 'bonus', nama: 'Bonus & THR', icon: '🎁' },
-    { id: 'profit_investasi', nama: 'Profit Investasi', icon: '📈' },
-    { id: 'bisnis', nama: 'Bisnis / Jualan', icon: '🛍️' },
-    { id: 'transfer_masuk', nama: 'Transfer Masuk', icon: '🏦' },
-    { id: 'lainnya_masuk', nama: 'Lainnya', icon: '📦' },
+    { id: 'gaji',            nama: 'Gaji',             icon: '💰' },
+    { id: 'freelance',       nama: 'Freelance',        icon: '💻' },
+    { id: 'bonus',           nama: 'Bonus & THR',      icon: '🎁' },
+    { id: 'profit_investasi',nama: 'Profit Investasi', icon: '📈' },
+    { id: 'bisnis',          nama: 'Bisnis / Jualan',  icon: '🛍️' },
+    { id: 'transfer_masuk',  nama: 'Transfer Masuk',   icon: '↙️' }, // Sprint B2 #17
+    { id: 'lainnya_masuk',   nama: 'Lainnya',          icon: '📦' },
   ],
   nabung: [
-    { id: 'tabungan', nama: 'Tabungan', icon: '🐷' },
-    { id: 'investasi_nabung', nama: 'Investasi', icon: '📊' },
-    { id: 'dana_darurat', nama: 'Dana Darurat', icon: '🛡️' },
-    { id: 'lainnya_nabung', nama: 'Lainnya', icon: '📦' },
+    { id: 'tabungan',        nama: 'Tabungan',         icon: '🐷' },
+    { id: 'investasi_nabung',nama: 'Investasi',        icon: '📊' },
+    { id: 'dana_darurat',    nama: 'Dana Darurat',     icon: '🛡️' },
+    { id: 'lainnya_nabung',  nama: 'Lainnya',          icon: '📦' },
   ],
 };
 
@@ -87,38 +90,50 @@ const BULAN_NAMES = [
   'Juli','Agustus','September','Oktober','November','Desember',
 ];
 
-const MAX_NOMINAL = 999000000000;
-const MAX_GOALS = 5;
-const SCHEMA_VERSION = 3;
+const MAX_NOMINAL    = 999000000000;
+const MAX_GOALS      = 5;
+const SCHEMA_VERSION = 4; // Sprint B2: weekly budget, atomic tx, card priority
+
+// Sprint B2 #16: Dashboard card IDs
+const DASHBOARD_CARDS = {
+  GREETING:  'card-greeting',
+  KEUANGAN:  'card-keuangan',
+  HEALTH:    'card-health',
+  CERITA:    'card-cerita',
+  CHECKIN:   'card-checkin',
+  VELOCITY:  'card-velocity',
+  CASHFLOW:  'card-cashflow',
+  BUDGET:    'card-budget',
+  CHARTS:    'card-charts',
+  BOROS:     'card-boros',
+  RECENT:    'card-recent',
+};
 
 const DEFAULT_WALLET_ID = 'utama';
 
 const WALLET_PRESETS = [
-  { id: 'bca',       nama: 'BCA',        icon: '🏦' },
-  { id: 'bri',       nama: 'BRI',        icon: '🏦' },
-  { id: 'mandiri',   nama: 'Mandiri',    icon: '🏦' },
-  { id: 'bni',       nama: 'BNI',        icon: '🏦' },
-  { id: 'gopay',     nama: 'GoPay',      icon: '💚' },
-  { id: 'ovo',       nama: 'OVO',        icon: '💜' },
-  { id: 'dana',      nama: 'DANA',       icon: '💙' },
-  { id: 'shopeepay', nama: 'ShopeePay',  icon: '🧡' },
-  { id: 'cash',      nama: 'Cash',       icon: '💵' },
+  { id: 'bca',       nama: 'BCA',       icon: '🏦' },
+  { id: 'bri',       nama: 'BRI',       icon: '🏦' },
+  { id: 'mandiri',   nama: 'Mandiri',   icon: '🏦' },
+  { id: 'bni',       nama: 'BNI',       icon: '🏦' },
+  { id: 'gopay',     nama: 'GoPay',     icon: '💚' },
+  { id: 'ovo',       nama: 'OVO',       icon: '💜' },
+  { id: 'dana',      nama: 'DANA',      icon: '💙' },
+  { id: 'shopeepay', nama: 'ShopeePay', icon: '🧡' },
+  { id: 'cash',      nama: 'Cash',      icon: '💵' },
 ];
 
-// Mutable app state
 const state = {
-  currentPage: 'dashboard',
-  inputMode: 'add',
-  editingId: null,
-  inputJenis: 'keluar',
-  inputKategori: null,
-  inputWalletId: null,        // v3: wallet yang dipilih saat input
-  selectedWalletId: 'semua', // v3: filter wallet di dashboard
-  riwayatFilter: { bulan: null, jenis: 'semua', walletId: 'semua', search: '' },
-  kategoriTab: 'keluar',
-  tabunganTab: 'tabungan',
-  chartInstances: {},
-  inputPreserve: null,
+  currentPage:      'dashboard',
+  inputMode:        'add',
+  editingId:        null,
+  inputJenis:       'keluar',
+  inputKategori:    null,
+  inputWalletId:    null,
+  selectedWalletId: 'semua',
+  riwayatFilter:    { bulan: null, jenis: 'semua', walletId: 'semua', search: '' },
+  kategoriTab:      'keluar',
+  tabunganTab:      'tabungan',
+  chartInstances:   {},
+  inputPreserve:    null,
 };
-
-// Budget storage key sudah ada di STORAGE_KEYS via BUDGETS

@@ -26,6 +26,7 @@ function init() {
   if (!getData(STORAGE_KEYS.ONBOARDING, false)) {
     _showScreen('screen-onboarding');
     migrateToV3();
+    migrateToV4();
     initOnboarding();
     initBottomNav();
     initInputPage();
@@ -33,6 +34,7 @@ function init() {
   }
 
   migrateToV3();
+  migrateToV4();
   initBottomNav();
   initInputPage();
   initQuickCapture();

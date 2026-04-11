@@ -1937,3 +1937,166 @@ input, select, textarea { font-family: inherit; }
   margin-top: 8px;
 }
 .chart-dow-label strong { color: var(--red); }
+
+/* ============================================================
+   SPRINT B2 — Budget Period, Card Priority, Transfer Badge
+   ============================================================ */
+
+/* #15 — Budget period badge & label */
+.budget-period-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: #0d948820;
+  color: var(--primary);
+  vertical-align: middle;
+  margin-left: 4px;
+  text-transform: uppercase;
+}
+
+.budget-period-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: -4px 0 10px;
+}
+
+/* Budget period toggle (inside bottom sheet) */
+.budget-period-toggle-wrap {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 4px;
+}
+
+.budget-period-toggle {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.budget-period-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.budget-period-btn.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.budget-period-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+
+/* #16 — Card priority system */
+
+/* Urgent variant */
+.card--urgent {
+  border-left: 3px solid var(--danger, #EF4444);
+}
+
+.card-urgent-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--danger, #EF4444);
+  margin-right: 6px;
+  flex-shrink: 0;
+  animation: urgentPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes urgentPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* Collapsible card header */
+.card-collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 2px 0 4px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card-collapsible-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-collapsible-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-collapse-icon {
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+  min-width: 16px;
+  text-align: center;
+}
+
+.card-collapsible-body {
+  overflow: hidden;
+}
+
+.card--collapsed .card-collapsible-body {
+  display: none;
+}
+
+/* Priority banner */
+.priority-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FEF3C7;
+  border: 1px solid #F59E0B;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #92400E;
+  margin-bottom: 8px;
+  animation: slideDown 0.25s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* #17 — Transfer atomic badge */
+.tx-transfer-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: #3B82F620;
+  color: #3B82F6;
+  margin-left: 5px;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+}

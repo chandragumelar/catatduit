@@ -85,6 +85,20 @@ function renderSettings() {
             ${CURRENCY_OPTIONS.map(c => `<option value="${c.code}" ${(getData(STORAGE_KEYS.CURRENCY,'IDR')===c.code)?'selected':''}>${c.label}</option>`).join('')}
           </select>
         </div>
+        <div class="settings-divider"></div>
+        <div class="settings-item">
+          <div class="settings-item-left">
+            <div class="settings-item-icon">📊</div>
+            <div>
+              <div class="settings-item-label">Period Budget</div>
+              <div class="settings-item-sub" style="font-size:11px;">Bulanan atau mingguan (Senin–Minggu)</div>
+            </div>
+          </div>
+          <select id="budget-period-select" style="border:none;background:transparent;font-size:13px;color:var(--text-secondary);cursor:pointer;outline:none;padding:4px;">
+            <option value="monthly" ${getBudgetPeriod()==='monthly'?'selected':''}>Bulanan</option>
+            <option value="weekly"  ${getBudgetPeriod()==='weekly' ?'selected':''}>Mingguan</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -274,6 +288,13 @@ function _initSettingsEvents(txList, wallets) {
   document.getElementById('btn-go-kategori')?.addEventListener('click', () => navigateTo('kategori'));
 
   // Currency symbol — simpan lalu re-render semua yang perlu update
+  // Budget period
+  document.getElementById('budget-period-select')?.addEventListener('change', (e) => {
+    saveBudgetPeriod(e.target.value);
+    showToast(e.target.value === 'weekly' ? 'Budget diubah ke mingguan ✓' : 'Budget diubah ke bulanan ✓');
+    renderDashboard();
+  });
+
   document.getElementById('currency-select')?.addEventListener('change', (e) => {
     setData(STORAGE_KEYS.CURRENCY, e.target.value);
 

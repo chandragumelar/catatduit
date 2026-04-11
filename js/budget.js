@@ -1,19 +1,19 @@
-// ===== BUDGET.JS — Budget per kategori =====
-
-// ===== RENDER DI DASHBOARD =====
+// ===== BUDGET.JS — Budget per kategori (Sprint B2 #15: weekly period) =====
 
 function renderBudgetSection(container) {
-  const budgets    = getBudgets();
-  const statusMap  = calcBudgetStatus();
+  const budgets      = getBudgets();
+  const statusMap    = calcBudgetStatus();
+  const period       = getBudgetPeriod();
   const hasAnyBudget = Object.keys(budgets).length > 0;
 
   const card = document.createElement('div');
   card.className = 'card';
+  card.dataset.cardId = DASHBOARD_CARDS.BUDGET;
 
   if (!hasAnyBudget) {
     card.innerHTML = `
       <div class="section-header">
-        <h3 class="section-title">Budget Bulan Ini</h3>
+        <h3 class="section-title">Budget</h3>
       </div>
       <p class="budget-empty-text">Belum ada budget. Set limit pengeluaran per kategori biar lebih terkontrol.</p>
       <button class="btn-secondary" id="btn-set-budget-empty">Set Budget</button>`;
@@ -22,15 +22,20 @@ function renderBudgetSection(container) {
     return;
   }
 
-  const entries = Object.entries(statusMap);
-  const jebol   = entries.filter(([, s]) => s.status === 'jebol').length;
-  const warning = entries.filter(([, s]) => s.status === 'warning').length;
+  const entries     = Object.entries(statusMap);
+  const jebol       = entries.filter(([, s]) => s.status === 'jebol').length;
+  const warning     = entries.filter(([, s]) => s.status === 'warning').length;
+  const periodLabel = entries[0]?.[1]?.periodLabel || (period === 'weekly' ? 'Minggu Ini' : 'Bulan Ini');
+  const periodBadge = period === 'weekly'
+    ? `<span class="budget-period-badge">Mingguan</span>`
+    : '';
 
   card.innerHTML = `
     <div class="section-header">
-      <h3 class="section-title">Budget Bulan Ini</h3>
+      <h3 class="section-title">Budget ${periodBadge}</h3>
       <button class="btn-text-small" id="btn-kelola-budget">Kelola</button>
     </div>
+    <p class="budget-period-label">${escHtml(periodLabel)}</p>
     ${jebol > 0 ? `<p class="budget-alert jebol">🔴 ${jebol} kategori sudah melebihi budget!</p>` : ''}
     ${warning > 0 && jebol === 0 ? `<p class="budget-alert warning">🟠 ${warning} kategori mendekati limit.</p>` : ''}
     <div class="budget-list" id="budget-list-dashboard">
@@ -65,20 +70,29 @@ function _buildBudgetRowHTML(katId, s) {
     </div>`;
 }
 
-// ===== BUDGET MANAGER (bottom sheet) =====
+// ===== BUDGET MANAGER =====
 
 function showBudgetManager() {
   const budgets  = getBudgets();
   const kategori = getKategori().keluar;
+  const period   = getBudgetPeriod();
 
   _openBottomSheet({
-    title: 'Set Budget per Kategori',
+    title: 'Set Budget',
     fields: `
-      <p class="bottom-sheet-hint" style="margin-bottom:12px;">
-        Kosongkan atau isi 0 untuk tidak set limit di kategori tersebut.
+      <div class="budget-period-toggle-wrap">
+        <p class="bottom-sheet-hint" style="margin-bottom:6px;font-weight:600;">Period budget:</p>
+        <div class="budget-period-toggle">
+          <button type="button" class="budget-period-btn ${period === 'monthly' ? 'active' : ''}" data-period="monthly">📅 Bulanan</button>
+          <button type="button" class="budget-period-btn ${period === 'weekly'  ? 'active' : ''}" data-period="weekly">🗓️ Mingguan</button>
+        </div>
+        <p class="budget-period-hint" id="bm-period-hint">${_getPeriodHint(period)}</p>
+      </div>
+      <p class="bottom-sheet-hint" style="margin-top:16px;margin-bottom:12px;">
+        Kosongkan atau isi 0 untuk tidak set limit.
       </p>
       <div class="budget-manager-list" id="bm-list">
-        ${kategori.map(k => {
+        ${kategori.filter(k => k.id !== 'transfer_keluar').map(k => {
           const current = budgets[k.id] || 0;
           return `
             <div class="bm-row">
@@ -101,6 +115,14 @@ function showBudgetManager() {
           input.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
         });
       });
+      document.querySelectorAll('.budget-period-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.budget-period-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const hint = document.getElementById('bm-period-hint');
+          if (hint) hint.textContent = _getPeriodHint(btn.dataset.period);
+        });
+      });
     },
     onConfirm: () => {
       const newBudgets = {};
@@ -108,6 +130,8 @@ function showBudgetManager() {
         const val = parseNominal(input.value);
         if (val > 0) newBudgets[input.dataset.kat] = val;
       });
+      const activeBtn = document.querySelector('.budget-period-btn.active');
+      if (activeBtn) saveBudgetPeriod(activeBtn.dataset.period);
       saveBudgets(newBudgets);
       showToast('Budget disimpan ✓');
       renderDashboard();
@@ -116,10 +140,16 @@ function showBudgetManager() {
   });
 }
 
-// ===== INTEGRASI HEALTH SCORE =====
-// dipanggil dari calcHealthScore sebagai komponen opsional ke-5
-// tidak mengubah formula utama (tetap 4 komponen @ 25%)
-// tapi jadi bagian dari getHealthActionSentence
+function _getPeriodHint(period) {
+  if (period === 'weekly') {
+    const { start, end } = getBudgetPeriodRange();
+    return `Berlaku Senin–Minggu (${formatDate(start)} – ${formatDate(end)})`;
+  }
+  const { year, month } = getCurrentMonthYear();
+  return `Berlaku satu bulan: ${BULAN_NAMES[month]} ${year}`;
+}
+
+// ===== HEALTH SCORE INTEGRATION =====
 
 function getBudgetInsight() {
   const statusMap = calcBudgetStatus();
@@ -130,8 +160,8 @@ function getBudgetInsight() {
   if (jebol.length > 0) {
     const k = getKategoriById(jebol[0][0], 'keluar');
     return jebol.length === 1
-      ? `Budget ${k.nama} sudah jebol bulan ini.`
-      : `${jebol.length} kategori sudah melebihi budget bulan ini.`;
+      ? `Budget ${k.nama} sudah jebol.`
+      : `${jebol.length} kategori sudah melebihi budget.`;
   }
 
   const warning = entries.filter(([, s]) => s.status === 'warning');
