@@ -241,10 +241,14 @@ function handleImport(file) {
       showToast('Format tidak sesuai. Gunakan file export dari CatatDuit.'); return;
     }
     const hasWalletCol = header.includes('wallet');
-    let imported = 0, skipped = 0;
+    let imported = 0, skipped = 0, duped = 0;
     const txList = getTransaksi();
     const katList = [...getKategori().keluar, ...getKategori().masuk, ...KATEGORI_DEFAULT.nabung];
     const wallets = getWallets();
+    // Fingerprint set untuk dedup: tanggal+jenis+nominal+kategori
+    const existingFingerprints = new Set(
+      txList.map(tx => `${tx.tanggal}|${tx.jenis}|${tx.nominal}|${tx.kategori}`)
+    );
 
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim(); if (!line) continue;
@@ -266,6 +270,10 @@ function handleImport(file) {
       const walletId = matchedWallet ? matchedWallet.id : DEFAULT_WALLET_ID;
 
       const tgl = tanggal.trim();
+      const fingerprint = `${tgl}|${jenisNorm}|${nominal}|${kategoriId}`;
+      if (existingFingerprints.has(fingerprint)) { duped++; continue; }
+      existingFingerprints.add(fingerprint);
+
       txList.push({
         id: generateId(),
         jenis: jenisNorm,
@@ -279,9 +287,11 @@ function handleImport(file) {
       imported++;
     }
     saveTransaksi(txList);
-    showToast(skipped > 0
-      ? `${imported} catatan diimpor, ${skipped} dilewati.`
-      : `${imported} catatan berhasil diimpor 📥`, 3500);
+    const parts = [];
+    if (imported > 0) parts.push(`${imported} catatan diimpor`);
+    if (duped > 0) parts.push(`${duped} duplikat dilewati`);
+    if (skipped > 0) parts.push(`${skipped} tidak valid`);
+    showToast(parts.join(', ') + (imported > 0 ? ' 📥' : ''), 3500);
     renderDashboard();
   };
   reader.readAsText(file);

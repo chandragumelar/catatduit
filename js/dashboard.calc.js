@@ -48,7 +48,11 @@ function calcDashboard() {
   const tagihanBulanIni   = tagihan.filter(t => {
     if (!t.jatuhTempo) return false;
     const d = new Date(t.jatuhTempo + 'T00:00:00');
-    return d.getFullYear() === year && d.getMonth() === month;
+    if (t.isRecurring === false) return d.getFullYear() === year && d.getMonth() === month;
+    // Recurring: muncul mulai bulan jatuh tempo pertama
+    const currentDate = new Date(year, month, 1);
+    const startDate   = new Date(d.getFullYear(), d.getMonth(), 1);
+    return currentDate >= startDate;
   });
   const tagihanBelumBayar = tagihanBulanIni.filter(t => !isTagihanPaidThisMonth(t, year, month));
   const tagihanSudahBayar = tagihanBulanIni.filter(t =>  isTagihanPaidThisMonth(t, year, month));

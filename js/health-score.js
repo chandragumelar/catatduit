@@ -49,7 +49,10 @@ function calcHealthScore() {
   const tagihanBulanIni = tagihan.filter(t => {
     if (!t.jatuhTempo) return false;
     const d = new Date(t.jatuhTempo + 'T00:00:00');
-    return d.getFullYear() === year && d.getMonth() === month;
+    if (t.isRecurring === false) return d.getFullYear() === year && d.getMonth() === month;
+    const currentDate = new Date(year, month, 1);
+    const startDate   = new Date(d.getFullYear(), d.getMonth(), 1);
+    return currentDate >= startDate;
   });
   let skorTagihan = 100; // kalau tidak ada tagihan = perfect
   if (tagihanBulanIni.length > 0) {
@@ -213,17 +216,26 @@ function renderHealthScore(container) {
   const scoreData = calcHealthScore();
 
   if (!scoreData.ready) {
-    // Belum cukup data — tampilkan progress bar menuju threshold
     const pct = Math.round((scoreData.hariAdaTx / scoreData.threshold) * 100);
+    const sisaHari = scoreData.threshold - scoreData.hariAdaTx;
+    // Warmup copy: beda tergantung sudah catat atau belum sama sekali
+    const warmupTitle = scoreData.hariAdaTx === 0
+      ? 'Yuk mulai catat keuanganmu!'
+      : sisaHari === 1
+        ? 'Hampir sampai — satu hari lagi!'
+        : `Bagus! Catat ${sisaHari} hari lagi untuk lihat skormu.`;
+    const warmupSub = scoreData.hariAdaTx === 0
+      ? 'Setelah 2 hari catat, skor keuanganmu akan muncul di sini.'
+      : 'Skor dihitung dari kebiasaan, bukan jumlah uang — makin rutin, makin akurat.';
     const el = document.createElement('div');
     el.className = 'card health-score-card';
     el.innerHTML = `
       <p class="summary-label">FINANCIAL HEALTH SCORE</p>
-      <p class="health-score-warming">Catat ${scoreData.threshold - scoreData.hariAdaTx} hari lagi untuk lihat skor keuanganmu.</p>
+      <p class="health-score-warming">${warmupTitle}</p>
       <div class="health-progress-bar-wrap">
         <div class="health-progress-bar" style="width:${pct}%"></div>
       </div>
-      <p class="health-score-sub">${scoreData.hariAdaTx} dari ${scoreData.threshold} hari tercatat</p>`;
+      <p class="health-score-sub">${warmupSub}</p>`;
     container.appendChild(el);
     return;
   }

@@ -171,15 +171,38 @@ function renderSettings() {
   // Notifikasi
   const notifStatus = getNotifPermissionStatus();
   const notifTextEl = document.getElementById('notif-status-text');
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isIOSStandalone = isIOS && window.navigator.standalone === true;
+  const isIOSSafariNonPWA = isIOS && !window.navigator.standalone;
+
   if (notifTextEl) {
-    if (notifStatus === 'granted')     notifTextEl.textContent = 'Aktif — reminder tagihan jatuh tempo';
-    else if (notifStatus === 'denied') notifTextEl.textContent = 'Diblokir di browser';
-    else if (notifStatus === 'unsupported') notifTextEl.textContent = 'Tidak didukung browser ini';
-    else notifTextEl.textContent = 'Ketuk untuk aktifkan';
+    if (notifStatus === 'unsupported') {
+      if (isIOSSafariNonPWA) {
+        notifTextEl.textContent = 'iOS: install ke home screen dulu untuk aktifkan notifikasi';
+      } else {
+        notifTextEl.textContent = 'Tidak didukung browser ini';
+      }
+    } else if (notifStatus === 'granted') {
+      notifTextEl.textContent = 'Aktif — reminder tagihan jatuh tempo';
+    } else if (notifStatus === 'denied') {
+      notifTextEl.textContent = 'Diblokir — aktifkan di Pengaturan > Safari > Notifikasi';
+    } else {
+      notifTextEl.textContent = isIOS
+        ? 'Ketuk untuk aktifkan (iOS 16.4+ via home screen)'
+        : 'Ketuk untuk aktifkan';
+    }
   }
+
   document.getElementById('btn-notif-toggle')?.addEventListener('click', async () => {
     if (notifStatus === 'denied') {
-      showToast('Aktifkan notifikasi di pengaturan browser dulu.');
+      showToast(isIOS
+        ? 'Buka Pengaturan > Safari > Notifikasi untuk aktifkan.'
+        : 'Aktifkan notifikasi di pengaturan browser dulu.'
+      );
+      return;
+    }
+    if (isIOSSafariNonPWA) {
+      showToast('Di iPhone, install CatatDuit ke home screen dulu, lalu buka dari sana.');
       return;
     }
     await requestNotifPermission();

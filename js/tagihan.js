@@ -80,7 +80,13 @@ function _isTagihanThisMonth(t, year, month) {
   if (!t.jatuhTempo) return false;
   const d = new Date(t.jatuhTempo + 'T00:00:00');
   if (t.isRecurring === false) return d.getFullYear() === year && d.getMonth() === month;
-  return true; // recurring selalu relevan bulan ini
+  // Recurring: relevan mulai dari bulan+tahun jatuh tempo pertama kali
+  // Tidak muncul di bulan-bulan SEBELUM tanggal jatuh tempo dibuat
+  const tagihanYear  = d.getFullYear();
+  const tagihanMonth = d.getMonth();
+  const currentDate  = new Date(year, month, 1);
+  const startDate    = new Date(tagihanYear, tagihanMonth, 1);
+  return currentDate >= startDate;
 }
 
 function _formatJatuhTempo(t, year, month) {
