@@ -84,7 +84,7 @@ function showBudgetManager() {
             <div class="bm-row">
               <label class="bm-label">${k.icon} ${escHtml(k.nama)}</label>
               <div class="nominal-wrap bm-input-wrap">
-                <span class="nominal-prefix" style="font-size:12px;">Rp</span>
+                <span class="nominal-prefix" style="font-size:12px;">${getCurrencySymbol()}</span>
                 <input type="text" class="input-nominal bm-input" data-kat="${k.id}"
                   placeholder="Tidak diset"
                   value="${current > 0 ? current.toLocaleString('id-ID') : ''}"

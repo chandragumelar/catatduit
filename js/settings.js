@@ -69,6 +69,25 @@ function renderSettings() {
       </div>
     </div>
 
+    <!-- TAMPILAN -->
+    <div class="settings-section">
+      <p class="settings-section-label">Tampilan</p>
+      <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">
+        <div class="settings-item">
+          <div class="settings-item-left">
+            <div class="settings-item-icon">💱</div>
+            <div>
+              <div class="settings-item-label">Simbol Mata Uang</div>
+              <div class="settings-item-sub">Cosmetic saja, tidak ada konversi</div>
+            </div>
+          </div>
+          <select id="currency-select" style="border:none;background:transparent;font-size:13px;color:var(--text-secondary);cursor:pointer;outline:none;padding:4px;">
+            ${CURRENCY_OPTIONS.map(c => `<option value="${c.code}" ${(getData(STORAGE_KEYS.CURRENCY,'IDR')===c.code)?'selected':''}>${c.label}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+
     <!-- DATA -->
     <div class="settings-section">
       <p class="settings-section-label">Data</p>
@@ -254,6 +273,12 @@ function _initSettingsEvents(txList, wallets) {
   // Kategori
   document.getElementById('btn-go-kategori')?.addEventListener('click', () => navigateTo('kategori'));
 
+  // Currency symbol
+  document.getElementById('currency-select')?.addEventListener('change', (e) => {
+    setData(STORAGE_KEYS.CURRENCY, e.target.value);
+    showToast('Simbol mata uang diubah ✓');
+  });
+
   // Export / Import
   document.getElementById('btn-export')?.addEventListener('click', () => {
     if (txList.length > 0) exportCSV();
@@ -316,7 +341,7 @@ function _showWalletSheet(idx) {
       <div class="bottom-sheet-field">
         <label class="input-label">Saldo awal</label>
         <div class="nominal-wrap">
-          <span class="nominal-prefix">Rp</span>
+          <span class="nominal-prefix">${getCurrencySymbol()}</span>
           <input type="text" id="bs-wallet-saldo" class="input-nominal"
             placeholder="0"
             value="${w ? (w.saldo_awal || 0).toLocaleString('id-ID') : ''}"

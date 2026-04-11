@@ -4,10 +4,21 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
 }
 
+function getCurrencySymbol() {
+  try {
+    const code = localStorage.getItem(STORAGE_KEYS.CURRENCY) || 'IDR';
+    const opt  = CURRENCY_OPTIONS.find(c => c.code === code);
+    return opt ? opt.symbol : 'Rp';
+  } catch { return 'Rp'; }
+}
+
 function formatRupiah(angka) {
-  if (angka === null || angka === undefined || isNaN(angka)) return 'Rp 0';
-  const n = Number(angka);
-  return (n < 0 ? '-Rp ' : 'Rp ') + Math.abs(n).toLocaleString('id-ID');
+  if (angka === null || angka === undefined || isNaN(angka)) {
+    return getCurrencySymbol() + ' 0';
+  }
+  const n   = Number(angka);
+  const sym = getCurrencySymbol();
+  return (n < 0 ? '-' + sym + ' ' : sym + ' ') + Math.abs(n).toLocaleString('id-ID');
 }
 
 function parseNominal(str) {
@@ -108,3 +119,46 @@ function fallbackCopy(text) {
   catch (e) { showToast('Gagal salin. Screenshot saja ya.'); }
   document.body.removeChild(ta);
 }
+
+// ===== WORKER BRIDGE =====
+// Lazy-init Web Worker untuk kalkulasi berat.
+// Fallback ke main thread kalau Worker tidak tersedia.
+
+const WorkerBridge = (() => {
+  let _worker = null;
+  let _pendingMap = {}; // id → { resolve, reject }
+  let _idCounter = 0;
+  let _workerFailed = false;
+
+  function _getWorker() {
+    if (_workerFailed) return null;
+    if (_worker) return _worker;
+    try {
+      _worker = new Worker('js/calc.worker.js');
+      _worker.onmessage = (e) => {
+        const { id, ok, result, error } = e.data;
+        const p = _pendingMap[id];
+        if (!p) return;
+        delete _pendingMap[id];
+        ok ? p.resolve(result) : p.reject(new Error(error));
+      };
+      _worker.onerror = () => { _workerFailed = true; _worker = null; };
+      return _worker;
+    } catch {
+      _workerFailed = true;
+      return null;
+    }
+  }
+
+  function run(type, payload) {
+    const w = _getWorker();
+    if (!w) return Promise.resolve(null); // caller falls back to sync
+    return new Promise((resolve, reject) => {
+      const id = ++_idCounter;
+      _pendingMap[id] = { resolve, reject };
+      w.postMessage({ id, type, payload });
+    });
+  }
+
+  return { run };
+})();

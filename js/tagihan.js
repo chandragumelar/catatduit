@@ -124,7 +124,7 @@ function _showTagihanSheet(id = null) {
       <div class="bottom-sheet-field">
         <label class="input-label">Nominal</label>
         <div class="nominal-wrap">
-          <span class="nominal-prefix">Rp</span>
+          <span class="nominal-prefix">${getCurrencySymbol()}</span>
           <input type="text" id="bs-nominal" class="input-nominal"
             placeholder="0"
             value="${t ? t.nominal.toLocaleString('id-ID') : ''}"
@@ -235,7 +235,7 @@ function _showBayarSheet(id) {
       <div class="bottom-sheet-field">
         <label class="input-label">Nominal</label>
         <div class="nominal-wrap">
-          <span class="nominal-prefix">Rp</span>
+          <span class="nominal-prefix">${getCurrencySymbol()}</span>
           <input type="text" id="bs-nominal" class="input-nominal"
             value="${t.nominal.toLocaleString('id-ID')}" inputmode="numeric" />
         </div>

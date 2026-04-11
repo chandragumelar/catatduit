@@ -48,7 +48,7 @@ function openQuickCapture() {
       <div class="qc-step" id="qc-step-1">
         <p class="qc-label">Berapa yang keluar?</p>
         <div class="qc-nominal-wrap">
-          <span class="qc-prefix">Rp</span>
+          <span class="qc-prefix">${getCurrencySymbol()}</span>
           <input type="text" id="qc-nominal" class="qc-nominal-input"
             placeholder="0" inputmode="numeric" autofocus />
         </div>
@@ -174,21 +174,49 @@ function _qcGoToKategori(overlay, walletId) {
 }
 
 function _qcSimpan(overlay, nominal, kategoriId, walletId) {
-  const today = getTodayStr();
+  const today  = getTodayStr();
   const txList = getTransaksi();
-  txList.push({
-    id: generateId(),
-    jenis: 'keluar',
-    nominal,
-    kategori: kategoriId,
-    tanggal: today,
-    catatan: '',
-    wallet_id: walletId,
-    timestamp: Date.now(),
-  });
-  saveTransaksi(txList);
-  invalidateTransaksiCache();
+  const now    = Date.now();
+  const FIVE_MIN = 5 * 60 * 1000;
 
+  const duplicate = txList.find(tx =>
+    tx.jenis === 'keluar' &&
+    tx.nominal === nominal &&
+    tx.kategori === kategoriId &&
+    tx.timestamp && (now - tx.timestamp) <= FIVE_MIN
+  );
+
+  const _doSave = () => {
+    txList.push({
+      id: generateId(),
+      jenis: 'keluar',
+      nominal,
+      kategori: kategoriId,
+      tanggal: today,
+      catatan: '',
+      wallet_id: walletId,
+      timestamp: Date.now(),
+    });
+    saveTransaksi(txList);
+    invalidateTransaksiCache();
+    _qcShowDone(overlay, nominal, kategoriId);
+  };
+
+  if (duplicate) {
+    const k = getKategoriById(kategoriId, 'keluar');
+    showModal(
+      `⚠️ Transaksi serupa baru saja dicatat\n\n${k.icon} ${k.nama} · ${formatRupiah(duplicate.nominal)}\n\nYakin mau catat lagi?`,
+      _doSave,
+      'Tetap Simpan',
+      false
+    );
+    return;
+  }
+
+  _doSave();
+}
+
+function _qcShowDone(overlay, nominal, kategoriId) {
   // Step 3: done
   document.getElementById('qc-step-2').style.display = 'none';
   document.getElementById('qc-step-3').style.display = 'block';

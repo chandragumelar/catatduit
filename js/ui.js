@@ -58,6 +58,10 @@ function navigateTo(page) {
   if (page === 'settings') renderSettings();
   if (page === 'kategori') renderKategori();
   if (page === 'tabungan') renderTabungan();
+  if (page === 'input') {
+    const pfx = document.getElementById('input-currency-prefix');
+    if (pfx) pfx.textContent = getCurrencySymbol();
+  }
 }
 
 // ===== BOTTOM NAV =====

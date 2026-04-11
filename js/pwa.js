@@ -126,6 +126,8 @@ function _initNotifScheduler() {
 
   // Jalankan check sekali saat app dibuka
   _checkTagihanDueNotif();
+  _checkBudgetWarningNotif();
+  _resetReEntryTimer();
 }
 
 async function _checkTagihanDueNotif() {
@@ -212,4 +214,88 @@ async function requestNotifPermission() {
 function getNotifPermissionStatus() {
   if (!('Notification' in window)) return 'unsupported';
   return Notification.permission; // 'default' | 'granted' | 'denied'
+}
+
+// ===== NOTIFIKASI BUDGET 80% WARNING =====
+// Kirim notif sekali per kategori per bulan kalau budget ≥ 80%
+
+async function _checkBudgetWarningNotif() {
+  if (Notification.permission !== 'granted') return;
+
+  const budgets = getBudgets();
+  if (Object.keys(budgets).length === 0) return;
+
+  const { year, month } = getCurrentMonthYear();
+  const statusMap = calcBudgetStatus();
+  const monthKey  = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+  // Ambil daftar kategori yang sudah dinotif bulan ini
+  const notifRecord = JSON.parse(localStorage.getItem('cd_budget_notif') || '{}');
+  const alreadySent = notifRecord[monthKey] || [];
+
+  const toNotif = Object.entries(statusMap).filter(([katId, s]) =>
+    (s.status === 'warning' || s.status === 'jebol') && !alreadySent.includes(katId)
+  );
+
+  if (toNotif.length === 0) return;
+
+  navigator.serviceWorker.ready.then(reg => {
+    toNotif.forEach(([katId, s]) => {
+      const k = getKategoriById(katId, 'keluar');
+      const msg = s.status === 'jebol'
+        ? `${k.icon} ${k.nama} sudah melebihi budget bulan ini!`
+        : `${k.icon} ${k.nama} sudah ${s.pct}% dari budget — hati-hati.`;
+      reg.showNotification('⚠️ Budget Alert — CatatDuit', {
+        body: msg,
+        icon: '/catatduit/icons/icon-192.png',
+        tag: `budget-${katId}`,
+        data: { url: '/catatduit/?tab=dashboard' },
+      });
+    });
+  }).catch(() => {});
+
+  // Catat sudah dinotif
+  notifRecord[monthKey] = [...alreadySent, ...toNotif.map(([id]) => id)];
+  // Bersihkan record bulan lama (simpan 2 bulan terakhir saja)
+  const keys = Object.keys(notifRecord).sort();
+  if (keys.length > 2) delete notifRecord[keys[0]];
+  localStorage.setItem('cd_budget_notif', JSON.stringify(notifRecord));
+}
+
+// Dipanggil setiap kali transaksi baru disimpan (dari storage.js via hook)
+function checkBudgetNotifOnSave() {
+  if (Notification.permission === 'granted') _checkBudgetWarningNotif();
+}
+
+// ===== NOTIFIKASI RE-ENTRY 3 HARI =====
+// Kalau user ga buka app 3 hari, schedule notif ke quick capture
+
+function _resetReEntryTimer() {
+  // Catat timestamp terakhir buka app
+  localStorage.setItem('cd_last_open', Date.now().toString());
+}
+
+// Dipanggil dari SW sisi service worker — dicek saat app dibuka
+// Jika gap > 3 hari sejak last open, kirim notif
+async function checkReEntryNotif() {
+  if (Notification.permission !== 'granted') return;
+
+  const lastOpen = parseInt(localStorage.getItem('cd_last_open') || '0', 10);
+  if (!lastOpen) return;
+
+  const daysSince = (Date.now() - lastOpen) / (1000 * 60 * 60 * 24);
+  const lastReEntryNotif = localStorage.getItem('cd_reentry_notif_date');
+  const todayStr = getTodayStr();
+
+  if (daysSince >= 3 && lastReEntryNotif !== todayStr) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.showNotification('👋 Halo, sudah lama nih! — CatatDuit', {
+        body: 'Catat pengeluaran hari ini yuk, biar catatan kamu tetap akurat.',
+        icon: '/catatduit/icons/icon-192.png',
+        tag: 'reentry-reminder',
+        data: { url: '/catatduit/?action=quick-capture' },
+      });
+    }).catch(() => {});
+    localStorage.setItem('cd_reentry_notif_date', todayStr);
+  }
 }

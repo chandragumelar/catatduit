@@ -37,6 +37,7 @@ function init() {
   initInputPage();
   initQuickCapture();
   initPWA();
+  if (typeof checkReEntryNotif === 'function') checkReEntryNotif();
   if (nav) nav.style.display = 'flex';
   showApp();
 }
@@ -211,7 +212,7 @@ function _stepSaldo() {
     row.innerHTML = `
       <label class="ob-saldo-label">${wallet.icon} ${escHtml(wallet.nama)}</label>
       <div class="nominal-wrap">
-        <span class="nominal-prefix">Rp</span>
+        <span class="nominal-prefix">${getCurrencySymbol()}</span>
         <input type="text" class="input-nominal ob-saldo-input" data-wallet-id="${wallet.id}" placeholder="0" inputmode="numeric" />
       </div>`;
     row.querySelector('.ob-saldo-input').addEventListener('input', (e) => {

@@ -35,6 +35,8 @@ function saveTransaksi(data) {
   const ok = setData(STORAGE_KEYS.TRANSAKSI, data);
   if (!ok) { showToast('❌ Gagal menyimpan. Coba lagi.'); return false; }
   _transaksiCache = data;
+  // Check budget setelah simpan (pwa.js)
+  if (typeof checkBudgetNotifOnSave === 'function') checkBudgetNotifOnSave();
   return true;
 }
 

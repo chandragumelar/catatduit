@@ -11,7 +11,21 @@ const STORAGE_KEYS = {
   WALLETS: 'cd_wallets',
   SCHEMA_VERSION: 'cd_schema_v',
   BUDGETS: 'cd_budgets',
+  CURRENCY: 'cd_currency',
 };
+
+// Daftar currency yang didukung (simbol saja, no konversi)
+const CURRENCY_OPTIONS = [
+  { code: 'IDR', symbol: 'Rp',  label: 'Rupiah (Rp)' },
+  { code: 'USD', symbol: '$',   label: 'US Dollar ($)' },
+  { code: 'SGD', symbol: 'S$',  label: 'Singapore Dollar (S$)' },
+  { code: 'MYR', symbol: 'RM',  label: 'Malaysian Ringgit (RM)' },
+  { code: 'EUR', symbol: '€',   label: 'Euro (€)' },
+  { code: 'AUD', symbol: 'A$',  label: 'Australian Dollar (A$)' },
+  { code: 'GBP', symbol: '£',   label: 'British Pound (£)' },
+  { code: 'JPY', symbol: '¥',   label: 'Japanese Yen (¥)' },
+  { code: 'SAR', symbol: 'SR',  label: 'Saudi Riyal (SR)' },
+];
 
 const KATEGORI_DEFAULT = {
   keluar: [

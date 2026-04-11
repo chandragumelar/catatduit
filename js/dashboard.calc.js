@@ -127,3 +127,26 @@ function calcDashboard() {
     sudahCatatHariIni, recentTx, bigSpending,
   };
 }
+
+// ===== ASYNC WRAPPER dengan WorkerBridge =====
+// renderDashboard() bisa pakai ini untuk offload ke worker kalau data besar.
+// Saat ini sebagai bridge — kalau worker gagal, fallback ke calcDashboard() sync.
+
+async function calcDashboardAsync() {
+  const txList  = getTransaksi();
+  const wallets = getWallets();
+  const { year, month } = getCurrentMonthYear();
+
+  // Hanya offload kalau data cukup besar (>200 transaksi)
+  if (txList.length > 200) {
+    try {
+      const result = await WorkerBridge.run('calcDashboard', {
+        transaksi: txList,
+        wallets: wallets.map(w => ({ id: w.id, saldo_awal: w.saldo_awal || 0 })),
+        year, month,
+      });
+      if (result) return { ...calcDashboard(), _workerData: result };
+    } catch { /* fallback */ }
+  }
+  return calcDashboard();
+}

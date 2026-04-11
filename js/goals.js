@@ -116,7 +116,7 @@ function _showGoalSheet(idx = null) {
       <div class="bottom-sheet-field">
         <label class="input-label">Target nominal</label>
         <div class="nominal-wrap">
-          <span class="nominal-prefix">Rp</span>
+          <span class="nominal-prefix">${getCurrencySymbol()}</span>
           <input type="text" id="bs-nominal" class="input-nominal"
             placeholder="0"
             value="${goal ? goal.target.toLocaleString('id-ID') : ''}"

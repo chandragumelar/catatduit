@@ -289,16 +289,29 @@ function handleSimpan() {
   const txList = getTransaksi();
 
   if (state.inputMode === 'add') {
-    txList.push({
-      id: generateId(),
-      jenis: state.inputJenis,
-      nominal,
-      kategori,
-      tanggal: tgl,
-      catatan,
-      wallet_id: walletId,
-      timestamp: new Date(tgl + 'T' + new Date().toTimeString().slice(0, 8)).getTime(),
-    });
+    // ===== SMART DUPLICATE DETECTOR =====
+    // Cek transaksi dalam 5 menit terakhir dengan nominal + kategori yang sama
+    const now = Date.now();
+    const FIVE_MIN = 5 * 60 * 1000;
+    const duplicate = txList.find(tx =>
+      tx.jenis === state.inputJenis &&
+      tx.nominal === nominal &&
+      tx.kategori === (state.inputJenis === 'nabung' ? (kategori || 'tabungan') : kategori) &&
+      tx.timestamp && (now - tx.timestamp) <= FIVE_MIN
+    );
+
+    if (duplicate) {
+      const k = getKategoriById(duplicate.kategori, duplicate.jenis);
+      showModal(
+        `⚠️ Transaksi serupa baru saja dicatat\n\n${k.icon} ${k.nama} · ${formatRupiah(duplicate.nominal)}\n\nYakin mau catat lagi?`,
+        () => _doSimpan(txList, nominal, kategori, tgl, catatan, walletId),
+        'Tetap Simpan',
+        false
+      );
+      return;
+    }
+
+    _doSimpan(txList, nominal, kategori, tgl, catatan, walletId);
   } else {
     const idx = txList.findIndex(t => t.id === state.editingId);
     if (idx !== -1) {
@@ -313,8 +326,24 @@ function handleSimpan() {
         timestamp: txList[idx].timestamp || new Date(tgl + 'T12:00:00').getTime(),
       };
     }
+    if (saveTransaksi(txList)) {
+      showToast('Tersimpan ✓');
+      navigateTo('dashboard');
+    }
   }
+}
 
+function _doSimpan(txList, nominal, kategori, tgl, catatan, walletId) {
+  txList.push({
+    id: generateId(),
+    jenis: state.inputJenis,
+    nominal,
+    kategori: state.inputJenis === 'nabung' ? (kategori || 'tabungan') : kategori,
+    tanggal: tgl,
+    catatan,
+    wallet_id: walletId,
+    timestamp: new Date(tgl + 'T' + new Date().toTimeString().slice(0, 8)).getTime(),
+  });
   if (saveTransaksi(txList)) {
     showToast('Tersimpan ✓');
     navigateTo('dashboard');
