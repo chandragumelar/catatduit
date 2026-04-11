@@ -40,8 +40,18 @@ function calcDashboard() {
   // Pace harian
   const hariIni        = new Date().getDate();
   const hariDalamBulan = new Date(year, month + 1, 0).getDate();
-  const rataHarian     = hariIni > 0 ? Math.round(totalKeluar / hariIni) : 0;
   const budgetHarian   = totalMasuk > 0 ? Math.round(totalMasuk / hariDalamBulan) : 0;
+
+  // Rata-rata pengeluaran: pakai span hari dari transaksi tertua ke terbaru bulan ini
+  const txBulanIniDates = txBulanIni.map(tx => tx.tanggal).sort();
+  let rataHarian = 0;
+  let spanHari = 0;
+  if (txBulanIniDates.length > 0) {
+    const oldest = new Date(txBulanIniDates[0] + 'T00:00:00');
+    const newest = new Date(txBulanIniDates[txBulanIniDates.length - 1] + 'T00:00:00');
+    spanHari = Math.round((newest - oldest) / (1000 * 60 * 60 * 24)) + 1;
+    rataHarian = spanHari > 0 ? Math.round(totalKeluar / spanHari) : totalKeluar;
+  }
 
   // Uang bebas
   const tagihan           = getTagihan();
@@ -175,7 +185,7 @@ function calcDashboard() {
     totalMasuk, totalKeluar, totalNabung, cashflow,
     estimasiSaldo, totalNabungAllTime,
     prevKeluar, trendText, trendClass,
-    hariIni, hariDalamBulan, rataHarian, budgetHarian,
+    hariIni, hariDalamBulan, rataHarian, budgetHarian, spanHari,
     tagihan, tagihanBulanIni, tagihanBelumBayar, tagihanSudahBayar,
     totalTagihanBelumBayar, uangBebas, bebasDipakai,
     borosList, katSorted, katTotal,

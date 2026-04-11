@@ -73,7 +73,7 @@ function renderWalletPicker() {
     state.inputWalletId = wallets[0].id;
   }
 
-  const walletLabel = state.inputJenis === 'masuk' ? 'Ke dompet' : 'Dari dompet';
+  const walletLabel = state.inputJenis === 'masuk' ? 'Ke dompet' : state.inputJenis === 'nabung' ? 'Di dompet' : 'Dari dompet';
   wrap.innerHTML = `
     <label class="input-label">${walletLabel}</label>
     <div class="wallet-chip-wrap" id="wallet-chips"></div>`;
@@ -103,8 +103,12 @@ function renderChips() {
   // Nabung tidak pakai kategori
   if (state.inputJenis === 'nabung') {
     wrap.innerHTML = '';
+    const sec = document.getElementById('section-kategori');
+    if (sec) sec.style.display = 'none';
     return;
   }
+  const sec = document.getElementById('section-kategori');
+  if (sec) sec.style.display = '';
 
   const list = getKategori()[state.inputJenis] || [];
   const freq = getKategoriFrequency(state.inputJenis);

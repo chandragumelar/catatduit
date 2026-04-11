@@ -1,50 +1,66 @@
-// ===== HEALTH-SCORE.JS — Financial Health Score (v3) =====
-// 4 komponen @ 25% masing-masing. Tentang kebiasaan, bukan jumlah uang.
+// ===== HEALTH-SCORE.JS — Financial Health Score (v4) =====
+// Komponen: Konsistensi 20%, Cashflow 35%, Nabung 25%, Tagihan 20%
+// Nabung di-skip + bobot redistribusi kalau tidak ada pemasukan
 
-const HEALTH_SCORE_THRESHOLD_DAYS = 2; // muncul sejak hari ke-2
+const HEALTH_SCORE_THRESHOLD_DAYS = 5; // 5 hari kalender sejak tanggal tx tertua
 
 // ===== KALKULASI =====
 
 function calcHealthScore() {
   const txList = getTransaksi();
   const { year, month } = getCurrentMonthYear();
-  const today = new Date();
-  const hariIni = today.getDate();
-  const hariDalamBulan = new Date(year, month + 1, 0).getDate();
 
-  // Cek threshold — belum cukup data
   const txBulanIni = txList.filter(tx => isSameMonth(tx.tanggal, year, month));
-  const hariAdaTx = new Set(txBulanIni.map(tx => tx.tanggal)).size;
-  if (hariAdaTx < HEALTH_SCORE_THRESHOLD_DAYS) {
-    return { ready: false, hariAdaTx, threshold: HEALTH_SCORE_THRESHOLD_DAYS };
+
+  // Grace period: hitung dari tanggal tx tertua bulan ini ke hari ini
+  if (txBulanIni.length === 0) {
+    return { ready: false, hariAdaTx: 0, threshold: HEALTH_SCORE_THRESHOLD_DAYS };
   }
 
-  // --- Komponen 1: Konsistensi catat (25%) ---
-  // Hari ada transaksi ÷ total hari yang sudah lewat bulan ini
-  const hariSudahLewat = Math.min(hariIni, hariDalamBulan);
-  const skorKonsistensi = Math.round((hariAdaTx / hariSudahLewat) * 100);
+  const tanggalSorted = txBulanIni.map(tx => tx.tanggal).sort();
+  const oldest = new Date(tanggalSorted[0] + 'T00:00:00');
+  const today  = new Date();
+  today.setHours(0, 0, 0, 0);
+  const hariSejakMulai = Math.round((today - oldest) / (1000 * 60 * 60 * 24)) + 1;
+  const hariAdaTx = new Set(txBulanIni.map(tx => tx.tanggal)).size;
 
-  // --- Komponen 2: Rasio nabung (25%) ---
-  // Nominal nabung ÷ pemasukan bulan ini (cap 100)
+  if (hariSejakMulai < HEALTH_SCORE_THRESHOLD_DAYS) {
+    return { ready: false, hariAdaTx: hariSejakMulai, threshold: HEALTH_SCORE_THRESHOLD_DAYS };
+  }
+
+  // --- Komponen 1: Konsistensi catat (20%) ---
+  // Hari ada transaksi ÷ hari sejak mulai pakai
+  const skorKonsistensi = Math.min(Math.round((hariAdaTx / hariSejakMulai) * 100), 100);
+
+  // --- Komponen 2: Cashflow (35%) ---
   const totalMasuk  = txBulanIni.filter(tx => tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0);
+  const totalKeluar = txBulanIni.filter(tx => tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0);
+  let skorCashflow;
+  if (totalMasuk === 0 && totalKeluar === 0) {
+    skorCashflow = 100; // belum ada data, netral
+  } else if (totalMasuk === 0 && totalKeluar > 0) {
+    skorCashflow = 20; // keluar tapi belum input gaji — mungkin belum catat, jangan 0
+  } else {
+    const overspendRatio = (totalKeluar - totalMasuk) / totalMasuk;
+    if (overspendRatio <= 0)        skorCashflow = 100;
+    else if (overspendRatio <= 0.15) skorCashflow = 70;
+    else if (overspendRatio <= 0.30) skorCashflow = 45;
+    else                             skorCashflow = 15;
+  }
+
+  // --- Komponen 3: Nabung (25%) — skip kalau tidak ada pemasukan ---
   const totalNabung = txBulanIni.filter(tx => tx.jenis === 'nabung').reduce((s, tx) => s + tx.nominal, 0);
-  let skorNabung = 0;
+  let skorNabung = null; // null = skip
   if (totalMasuk > 0) {
     const rasio = totalNabung / totalMasuk;
-    // 20%+ nabung = 100, linear dari 0
-    skorNabung = Math.min(Math.round((rasio / 0.20) * 100), 100);
-  } else if (totalNabung > 0) {
-    // Ada nabung tapi belum ada pemasukan tercatat — kasih 50
-    skorNabung = 50;
+    if (rasio === 0)        skorNabung = 0;
+    else if (rasio <= 0.05) skorNabung = 30;
+    else if (rasio <= 0.10) skorNabung = 55;
+    else if (rasio <= 0.20) skorNabung = 75;
+    else                    skorNabung = 100;
   }
 
-  // --- Komponen 3: Cashflow positif (25%) ---
-  // Pengeluaran < Pemasukan → 100, sebaliknya → 0
-  const totalKeluar = txBulanIni.filter(tx => tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0);
-  const skorCashflow = (totalMasuk === 0 && totalKeluar === 0) ? 100
-    : totalKeluar <= totalMasuk ? 100 : 0;
-
-  // --- Komponen 4: Tagihan terbayar (25%) ---
+  // --- Komponen 4: Tagihan (20%) ---
   const tagihan = getTagihan();
   const tagihanBulanIni = tagihan.filter(t => {
     if (!t.jatuhTempo) return false;
@@ -54,21 +70,38 @@ function calcHealthScore() {
     const startDate   = new Date(d.getFullYear(), d.getMonth(), 1);
     return currentDate >= startDate;
   });
-  let skorTagihan = 100; // kalau tidak ada tagihan = perfect
+  let skorTagihan = 100;
   if (tagihanBulanIni.length > 0) {
     const sudahBayar = tagihanBulanIni.filter(t => isTagihanPaidThisMonth(t, year, month)).length;
     skorTagihan = Math.round((sudahBayar / tagihanBulanIni.length) * 100);
   }
 
-  // --- Total ---
-  const total = Math.round((skorKonsistensi + skorNabung + skorCashflow + skorTagihan) / 4);
+  // --- Total dengan bobot, redistribusi kalau nabung skip ---
+  let total;
+  if (skorNabung === null) {
+    // Nabung skip: bobot 25% dibagi ke 3 komponen lain
+    // Konsistensi 20→27%, Cashflow 35→46%, Tagihan 20→27%
+    total = Math.round(
+      (skorKonsistensi * 0.27) +
+      (skorCashflow    * 0.46) +
+      (skorTagihan     * 0.27)
+    );
+  } else {
+    total = Math.round(
+      (skorKonsistensi * 0.20) +
+      (skorCashflow    * 0.35) +
+      (skorNabung      * 0.25) +
+      (skorTagihan     * 0.20)
+    );
+  }
 
   return {
     ready: true,
     total,
+    nabungSkip: skorNabung === null,
     komponen: {
-      konsistensi: { skor: skorKonsistensi, hariAdaTx, hariSudahLewat },
-      nabung:      { skor: skorNabung, totalNabung, totalMasuk },
+      konsistensi: { skor: skorKonsistensi, hariAdaTx, hariSejakMulai },
+      nabung:      { skor: skorNabung ?? 0, totalNabung, totalMasuk, skip: skorNabung === null },
       cashflow:    { skor: skorCashflow, totalMasuk, totalKeluar },
       tagihan:     { skor: skorTagihan, tagihanBulanIni },
     },
@@ -103,9 +136,9 @@ function getHealthActionSentence(scoreData) {
   );
   if (konsistensi.skor < 50) return _hsPick(
     'Catat lebih rutin — data yang konsisten bikin gambarannya akurat.',
-    `Baru catat ${konsistensi.hariAdaTx} dari ${konsistensi.hariSudahLewat} hari. Coba catat tiap hari ya.`,
+    `Baru catat ${konsistensi.hariAdaTx} dari ${konsistensi.hariSejakMulai} hari. Coba catat tiap hari ya.`,
   );
-  if (nabung.skor < 30 && cashflow.totalMasuk > 0) return _hsClick(
+  if (nabung.skor < 30 && cashflow.totalMasuk > 0 && !nabung.skip) return _hsPick(
     'Belum ada catatan nabung bulan ini. Sisihkan walau sedikit.',
     'Coba sisihkan minimal 10% dari pemasukan untuk nabung.',
   );
@@ -162,16 +195,16 @@ function getHealthExplanation(scoreData) {
 }
 
 function _buildNarasiBagian({ konsistensi, nabung, cashflow, tagihan, sudahBayarTagihan, totalTagihan }) {
-  const { hariAdaTx, hariSudahLewat } = konsistensi;
-  const pctAkurasi = Math.round((hariAdaTx / hariSudahLewat) * 100);
+  const { hariAdaTx, hariSejakMulai } = konsistensi;
+  const pctAkurasi = Math.round((hariAdaTx / hariSejakMulai) * 100);
 
   // Akurasi data (konsistensi catat)
-  const akurasi = hariAdaTx >= hariSudahLewat * 0.8
-    ? `Data bulan ini cukup lengkap — kamu catat ${hariAdaTx} dari ${hariSudahLewat} hari, jadi gambarannya bisa dipercaya.`
-    : `Dari ${hariSudahLewat} hari bulan ini, baru ${hariAdaTx} hari yang tercatat — sekitar ${100 - pctAkurasi}% pengeluaran mungkin belum terpantau.`;
-  const akurasi2 = hariAdaTx >= hariSudahLewat * 0.8
-    ? `${hariAdaTx} dari ${hariSudahLewat} hari tercatat — cukup untuk lihat polanya.`
-    : `Catatan masuk baru ${hariAdaTx} dari ${hariSudahLewat} hari, jadi kondisi sebenarnya bisa jadi berbeda dari yang kelihatan.`;
+  const akurasi = hariAdaTx >= hariSejakMulai * 0.8
+    ? `Data bulan ini cukup lengkap — kamu catat ${hariAdaTx} dari ${hariSejakMulai} hari, jadi gambarannya bisa dipercaya.`
+    : `Dari ${hariSejakMulai} hari sejak mulai, baru ${hariAdaTx} hari yang tercatat — sekitar ${100 - pctAkurasi}% pengeluaran mungkin belum terpantau.`;
+  const akurasi2 = hariAdaTx >= hariSejakMulai * 0.8
+    ? `${hariAdaTx} dari ${hariSejakMulai} hari tercatat — cukup untuk lihat polanya.`
+    : `Catatan masuk baru ${hariAdaTx} dari ${hariSejakMulai} hari, jadi kondisi sebenarnya bisa jadi berbeda dari yang kelihatan.`;
 
   // Cashflow
   const selisihCashflow = Math.abs(cashflow.totalMasuk - cashflow.totalKeluar);
@@ -218,15 +251,14 @@ function renderHealthScore(container) {
   if (!scoreData.ready) {
     const pct = Math.round((scoreData.hariAdaTx / scoreData.threshold) * 100);
     const sisaHari = scoreData.threshold - scoreData.hariAdaTx;
-    // Warmup copy: beda tergantung sudah catat atau belum sama sekali
     const warmupTitle = scoreData.hariAdaTx === 0
-      ? 'Skor keuanganmu akan muncul di sini'
+      ? 'Financial Health Score butuh beberapa hari data'
       : sisaHari === 1
-        ? 'Besok skormu siap — catat satu hari lagi!'
-        : `${sisaHari} hari lagi, skor keuanganmu muncul`;
+        ? 'Skor keuanganmu hampir siap — 1 hari lagi!'
+        : `Skor keuanganmu siap dalam ${sisaHari} hari`;
     const warmupSub = scoreData.hariAdaTx === 0
-      ? 'Catat pengeluaran 2 hari berturut-turut, dan skor kesehatan keuanganmu akan langsung dihitung otomatis.'
-      : 'Skormu dihitung dari konsistensi mencatat — bukan dari berapa banyak uangmu.';
+      ? `Catat transaksi selama ${scoreData.threshold} hari, lalu skor kesehatan keuanganmu akan dihitung otomatis dari cashflow, tabungan, dan tagihan.`
+      : `Catat terus — butuh ${sisaHari} hari lagi supaya datanya cukup untuk menilai cashflow, tabungan, dan tagihan kamu secara akurat.`;
     const el = document.createElement('div');
     el.className = 'card health-score-card';
     el.innerHTML = `
@@ -259,32 +291,37 @@ function renderHealthScore(container) {
       </div>
     </div>
     <div class="health-score-bars">
-      ${_renderKomponenBar('Akurasi data',    scoreData.komponen.konsistensi.skor)}
-      ${_renderKomponenBar('Nabung',         scoreData.komponen.nabung.skor)}
-      ${_renderKomponenBar('Cashflow',       scoreData.komponen.cashflow.skor)}
-      ${_renderKomponenBar('Tagihan',        scoreData.komponen.tagihan.skor)}
+      ${_renderKomponenBar('Konsistensi',  scoreData.komponen.konsistensi.skor)}
+      ${scoreData.nabungSkip
+        ? _renderKomponenBarSkip('Nabung')
+        : _renderKomponenBar('Nabung', scoreData.komponen.nabung.skor)}
+      ${_renderKomponenBar('Cashflow',    scoreData.komponen.cashflow.skor)}
+      ${_renderKomponenBar('Tagihan',     scoreData.komponen.tagihan.skor)}
     </div>
     <button class="btn-text-small health-score-why" id="btn-health-why">Kenapa? ▾</button>
     <div class="health-score-explanation" id="health-explanation" style="display:none;"></div>`;
 
   container.appendChild(el);
 
-  document.getElementById('btn-health-why')?.addEventListener('click', () => {
-    const expEl  = document.getElementById('health-explanation');
-    const btnEl  = document.getElementById('btn-health-why');
-    const isOpen = expEl.style.display !== 'none';
-    if (isOpen) {
-      expEl.style.display = 'none';
-      btnEl.textContent = 'Kenapa? ▾';
-    } else {
-      expEl.style.display = 'block';
-      expEl.innerHTML = getHealthExplanation(scoreData)
-        .split('\n')
-        .map(l => `<p class="health-exp-line">${escHtml(l)}</p>`)
-        .join('');
-      btnEl.textContent = 'Tutup ▴';
-    }
-  });
+  const btnWhy = el.querySelector('#btn-health-why');
+  const expEl  = el.querySelector('#health-explanation');
+  if (btnWhy && expEl) {
+    btnWhy.addEventListener('click', () => {
+      const isOpen = expEl.style.display !== 'none';
+      if (isOpen) {
+        expEl.style.display = 'none';
+        btnWhy.textContent = 'Kenapa? ▾';
+      } else {
+        expEl.style.display = 'block';
+        expEl.innerHTML = getHealthExplanation(scoreData)
+          .split('\n')
+          .filter(Boolean)
+          .map(l => `<p class="health-exp-line">${escHtml(l)}</p>`)
+          .join('');
+        btnWhy.textContent = 'Tutup ▴';
+      }
+    });
+  }
 }
 
 function _renderKomponenBar(label, skor) {
@@ -296,5 +333,16 @@ function _renderKomponenBar(label, skor) {
         <div class="health-komponen-bar ${color}" style="width:${skor}%"></div>
       </div>
       <span class="health-komponen-skor">${skor}</span>
+    </div>`;
+}
+
+function _renderKomponenBarSkip(label) {
+  return `
+    <div class="health-komponen-row">
+      <span class="health-komponen-label">${escHtml(label)}</span>
+      <div class="health-komponen-bar-wrap" style="display:flex;align-items:center;">
+        <span style="font-size:11px;color:var(--gray-400);">belum ada pemasukan</span>
+      </div>
+      <span class="health-komponen-skor" style="color:var(--gray-400);">—</span>
     </div>`;
 }

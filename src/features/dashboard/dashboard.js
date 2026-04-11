@@ -92,7 +92,7 @@ function renderDashboard() {
     totalMasuk, totalKeluar, totalNabung, cashflow,
     estimasiSaldo,
     trendText, trendClass,
-    hariIni, hariDalamBulan, rataHarian, budgetHarian,
+    hariIni, hariDalamBulan, rataHarian, budgetHarian, spanHari,
     tagihan, tagihanBulanIni, tagihanSudahBayar, tagihanBelumBayar,
     totalTagihanBelumBayar, uangBebas, bebasDipakai,
     borosList, katSorted,
@@ -153,19 +153,15 @@ function renderDashboard() {
   const checkinEl = document.createElement('div');
   checkinEl.className = 'card checkin-card';
   checkinEl.dataset.cardId = DASHBOARD_CARDS.CHECKIN;
-  checkinEl.innerHTML = sudahCatatHariIni
-    ? `<div class="checkin-icon">✅</div>
-       <div class="checkin-info">
-         <div class="checkin-title">Sudah catat hari ini!</div>
-         <div class="checkin-sub">Keep it up, terus pantau keuanganmu.</div>
-       </div>`
-    : `<div class="checkin-icon">📝</div>
+  if (!sudahCatatHariIni) {
+    checkinEl.innerHTML = `<div class="checkin-icon">📝</div>
        <div class="checkin-info">
          <div class="checkin-title">Belum catat hari ini</div>
          <div class="checkin-sub">Yuk catat sekarang biar akurat.</div>
        </div>
        <button class="checkin-btn" id="btn-checkin-catat">Catat</button>`;
-  push(DASHBOARD_CARDS.CHECKIN, checkinEl, 35);
+    push(DASHBOARD_CARDS.CHECKIN, checkinEl, 35);
+  }
 
   // — Pace indicator
   if (totalMasuk > 0 || totalKeluar > 0) {
@@ -174,7 +170,7 @@ function renderDashboard() {
       <div class="card pace-card">
         <div class="pace-content">
           <div class="pace-left">
-            <p class="pace-label">Hari ke-${hariIni} dari ${hariDalamBulan}</p>
+            <p class="pace-label">Rata-rata di hari ke-${spanHari} bulan ini</p>
             <p class="pace-value">Rata-rata pengeluaran <strong>${formatRupiah(rataHarian)}</strong><span class="pace-unit">/hari</span></p>
           </div>
           ${budgetHarian > 0 ? `

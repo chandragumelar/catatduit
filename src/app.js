@@ -205,7 +205,8 @@ function _stepSaldo() {
   el.className = 'onboarding-card';
   el.innerHTML = `
     <p class="onboarding-question">Berapa isi masing-masing dompet sekarang?</p>
-    <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Boleh perkiraan dulu — ini bisa diubah kapan saja.</p>
+    <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">Boleh perkiraan dulu — ini bisa diubah kapan saja.</p>
+    <p style="font-size:12px;color:var(--gray-400);margin-bottom:16px;">Pakai mata uang lain? <span id="ob-currency-link" style="color:var(--primary);cursor:pointer;text-decoration:underline;">Ganti di pengaturan &rarr;</span></p>
     <div id="ob-saldo-fields"></div>
     <p class="onboarding-error" id="ob-saldo-error"></p>
     <button id="ob-btn-selesai" class="btn-primary" style="margin-top:16px;">Mulai Pantau 🎉</button>`;
@@ -225,6 +226,20 @@ function _stepSaldo() {
       e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
     });
     fieldsWrap.appendChild(row);
+  });
+
+  el.querySelector('#ob-currency-link')?.addEventListener('click', () => {
+    // Selesaikan onboarding dulu dengan data sejauh ini, lalu buka settings
+    const wallets = selectedWallets.map(wallet => {
+      const input = fieldsWrap.querySelector(`[data-wallet-id="${wallet.id}"]`);
+      const saldo = input ? parseNominal(input.value) : 0;
+      return { id: wallet.id, nama: wallet.nama, icon: wallet.icon, saldo_awal: saldo };
+    });
+    saveWallets(wallets);
+    setData(STORAGE_KEYS.ONBOARDING, true);
+    setData(STORAGE_KEYS.SCHEMA_VERSION, SCHEMA_VERSION);
+    _showScreen('screen-app');
+    navigateTo('settings');
   });
 
   el.querySelector('#ob-btn-selesai').addEventListener('click', () => {

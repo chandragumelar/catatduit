@@ -190,11 +190,11 @@ function getOnboardingProgress() {
   const hasTx     = getTransaksi().length > 0;
 
   const steps = [
-    { id: 'tx',      label: 'Catat transaksi pertama',  done: hasTx,          nav: 'input' },
-    { id: 'budget',  label: 'Set budget bulanan',        done: hasBudget,      nav: 'tabungan' },
-    { id: 'tagihan', label: 'Tambah reminder tagihan',   done: hasTagihan,     nav: 'tabungan' },
-    { id: 'goal',    label: 'Buat target menabung',      done: hasGoal,        nav: 'tabungan' },
     { id: 'wallet',  label: 'Tambah dompet kedua',       done: hasMultiWallet, nav: 'settings' },
+    { id: 'tx',      label: 'Catat transaksi pertama',   done: hasTx,          nav: 'input' },
+    { id: 'budget',  label: 'Set budget bulanan',         done: hasBudget,      nav: 'dashboard' },
+    { id: 'tagihan', label: 'Tambah reminder tagihan',    done: hasTagihan,     nav: 'tagihan-tab' },
+    { id: 'goal',    label: 'Buat target menabung',       done: hasGoal,        nav: 'tabungan' },
   ];
 
   return { steps, doneCount: steps.filter(s => s.done).length };
@@ -246,6 +246,14 @@ function renderOnboardingChecklist(containerId) {
   });
 
   container.querySelectorAll('.checklist-step:not(.done)').forEach(el => {
-    el.addEventListener('click', () => navigateTo(el.dataset.nav));
+    el.addEventListener('click', () => {
+      const nav = el.dataset.nav;
+      if (nav === 'tagihan-tab') {
+        state.tabunganTab = 'tagihan';
+        navigateTo('tabungan');
+      } else {
+        navigateTo(nav);
+      }
+    });
   });
 }

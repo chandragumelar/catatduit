@@ -174,10 +174,6 @@ function _buildSummary(topUp, topDown, newCats, goneCats, all) {
     else parts.push(`${names} naik dibanding 2 minggu lalu`);
   }
 
-  if (newCats.length > 0) {
-    parts.push(`${newCats.map(c => c.nama).join(', ')} baru muncul di periode ini`);
-  }
-
   if (topDown.length > 0 && parts.length === 0) {
     parts.push(`${topDown.map(c => c.nama).join(', ')} lebih hemat dari 2 minggu lalu`);
   }
