@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CatatDuit</title>
+    <meta name="description" content="Catat pengeluaran, kenali keuanganmu." />
+    <meta name="theme-color" content="#0D9488" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self';
+      style-src 'self' https://fonts.googleapis.com;
+      font-src https://fonts.gstatic.com;
+      img-src 'self' data:;
+      connect-src 'self';
+      manifest-src 'self';
+      worker-src 'self';
+      base-uri 'self';
+      form-action 'self';
+    " />
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:," />
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Chart.js -->
+    <script src="chart.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="lucide.min.js"></script>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ===== ONBOARDING SCREEN ===== -->
+    <div id="screen-onboarding" class="screen">
+      <div class="onboarding-wrap">
+        <div class="onboarding-logo">💰</div>
+        <h1 class="onboarding-title">CatatDuit</h1>
+        <p class="onboarding-tagline">Catat pengeluaran, kenali keuanganmu.</p>
+        <!-- Step content di-render dinamis oleh app.js -->
+        <div id="onboarding-dynamic"></div>
+      </div>
+    </div>
+
+    <!-- ===== MAIN APP ===== -->
+    <div id="screen-app" class="screen">
+      <!-- Dashboard -->
+      <div id="page-dashboard" class="page active">
+        <div class="page-header-simple">
+          <h2 class="page-title">Dashboard</h2>
+        </div>
+        <div id="onboarding-checklist-wrap"></div>
+        <div class="page-content" id="dashboard-content"></div>
+      </div>
+
+      <!-- Riwayat Transaksi -->
+      <div id="page-riwayat" class="page">
+        <div class="page-header">
+          <button class="btn-back" id="btn-back-riwayat">&larr;</button>
+          <h2 class="page-title">Riwayat Transaksi</h2>
+        </div>
+        <div class="filter-bar" id="riwayat-filter">
+          <select id="filter-bulan" class="filter-select"></select>
+          <div class="filter-toggle" id="filter-jenis">
+            <button class="toggle-btn active" data-jenis="semua">Semua</button>
+            <button class="toggle-btn" data-jenis="masuk">Masuk</button>
+            <button class="toggle-btn" data-jenis="keluar">Keluar</button>
+            <button class="toggle-btn" data-jenis="nabung">Nabung</button>
+          </div>
+        </div>
+        <div class="riwayat-search-wrap">
+          <span class="riwayat-search-icon">🔍</span>
+          <input type="search" id="riwayat-search" class="riwayat-search-input"
+            placeholder="Cari nama kategori atau catatan..." autocomplete="off" />
+          <button id="riwayat-search-clear" class="riwayat-search-clear" style="display:none;" aria-label="Hapus pencarian">✕</button>
+        </div>
+        <div class="page-content" id="riwayat-content"></div>
+      </div>
+
+      <!-- Input Transaksi -->
+      <div id="page-input" class="page">
+        <div class="page-header">
+          <button class="btn-back" id="btn-back-input">&larr;</button>
+          <h2 class="page-title" id="input-page-title">Catat Keuangan</h2>
+          <button
+            class="btn-delete-tx"
+            id="btn-delete-tx"
+            style="display: none"
+          >
+            <i data-lucide="trash-2"></i>
+          </button>
+        </div>
+        <div class="page-content">
+          <form id="form-transaksi" autocomplete="off">
+            <!-- Toggle Jenis — 3 pilihan -->
+            <div class="input-section">
+              <div class="jenis-toggle">
+                <button
+                  type="button"
+                  class="jenis-btn active"
+                  id="btn-keluar"
+                  data-jenis="keluar"
+                >
+                  Keluar
+                </button>
+                <button
+                  type="button"
+                  class="jenis-btn"
+                  id="btn-masuk"
+                  data-jenis="masuk"
+                >
+                  Masuk
+                </button>
+                <button
+                  type="button"
+                  class="jenis-btn"
+                  id="btn-nabung"
+                  data-jenis="nabung"
+                >
+                  Nabung
+                </button>
+              </div>
+            </div>
+
+            <!-- Nominal -->
+            <div class="input-section">
+              <label class="input-label">Nominal</label>
+              <div class="nominal-wrap">
+                <span class="nominal-prefix" id="input-currency-prefix">Rp</span>
+                <input
+                  type="text"
+                  id="input-nominal"
+                  class="input-nominal"
+                  placeholder="0"
+                  inputmode="numeric"
+                />
+              </div>
+              <p class="input-error" id="error-nominal"></p>
+            </div>
+
+            <!-- Wallet picker (hidden kalau single wallet) -->
+            <div
+              class="input-section"
+              id="input-wallet-wrap"
+              style="display: none"
+            ></div>
+
+            <!-- Kategori -->
+            <div class="input-section">
+              <label class="input-label">Kategori</label>
+              <div class="chip-wrap" id="chip-kategori"></div>
+              <p class="input-error" id="error-kategori"></p>
+            </div>
+
+            <!-- Tanggal -->
+            <div class="input-section">
+              <label class="input-label">Tanggal</label>
+              <input type="date" id="input-tanggal" class="input-field" />
+            </div>
+
+            <!-- Catatan -->
+            <div class="input-section">
+              <label class="input-label"
+                >Catatan <span class="label-optional">(opsional)</span></label
+              >
+              <input
+                type="text"
+                id="input-catatan"
+                class="input-field"
+                placeholder="Tambah catatan..."
+                maxlength="100"
+              />
+            </div>
+
+            <div class="input-actions">
+              <button type="submit" class="btn-primary" id="btn-simpan">
+                Simpan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Tabungan & Tagihan (new page) -->
+      <div id="page-tabungan" class="page">
+        <div class="page-header-simple">
+          <h2 class="page-title">Tabungan & Tagihan</h2>
+        </div>
+        <div class="kategori-tabs" id="tabungan-tabs">
+          <button class="tab-btn active" data-tab="tabungan">Tabungan</button>
+          <button class="tab-btn" data-tab="tagihan">Tagihan</button>
+        </div>
+        <div class="page-content" id="tabungan-content"></div>
+      </div>
+
+      <!-- Settings -->
+      <div id="page-settings" class="page">
+        <div class="page-header-simple">
+          <h2 class="page-title">Pengaturan</h2>
+        </div>
+        <div class="page-content" id="settings-content"></div>
+      </div>
+
+      <!-- Kelola Kategori -->
+      <div id="page-kategori" class="page">
+        <div class="page-header">
+          <button class="btn-back" id="btn-back-kategori">&larr;</button>
+          <h2 class="page-title">Kelola Kategori</h2>
+        </div>
+        <div class="kategori-tabs" id="kategori-tabs">
+          <button class="tab-btn active" data-tab="keluar">Uang Keluar</button>
+          <button class="tab-btn" data-tab="masuk">Uang Masuk</button>
+        </div>
+        <div class="page-content" id="kategori-content"></div>
+      </div>
+
+      <!-- Bottom Navigation — 4 items -->
+      <nav class="bottom-nav" id="bottom-nav">
+        <button class="nav-btn active" id="nav-dashboard" data-page="dashboard">
+          <i data-lucide="home"></i>
+          <span>Home</span>
+        </button>
+        <button class="nav-btn" id="nav-tabungan" data-page="tabungan">
+          <i data-lucide="calendar"></i>
+          <span>Planning</span>
+        </button>
+        <button class="nav-btn" id="nav-settings" data-page="settings">
+          <i data-lucide="settings"></i>
+          <span>Pengaturan</span>
+        </button>
+        <div class="nav-fab">
+          <button class="nav-fab-btn" id="nav-fab">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+          <span class="nav-fab-label">Catat</span>
+        </div>
+      </nav>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ===== MODAL ===== -->
+    <div id="modal-overlay" class="modal-overlay">
+      <div class="modal-box">
+        <p class="modal-message" id="modal-message"></p>
+        <div class="modal-actions">
+          <button class="btn-modal-cancel" id="modal-cancel">Batal</button>
+          <button class="btn-modal-confirm" id="modal-confirm">
+            Ya, Lanjutkan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      /* ===== BOTTOM SHEET ===== */
+      .bottom-sheet-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: rgba(0, 0, 0, 0);
+        display: flex;
+        align-items: flex-end;
+        transition: background 0.3s;
+        pointer-events: none;
+      }
+      .bottom-sheet-overlay.show {
+        background: rgba(0, 0, 0, 0.45);
+        pointer-events: all;
+      }
+      .bottom-sheet {
+        width: 100%;
+        background: var(--white);
+        border-radius: 20px 20px 0 0;
+        padding: 12px 20px 32px;
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      }
+      .bottom-sheet-overlay.show .bottom-sheet {
+        transform: translateY(0);
+      }
+      .bottom-sheet-handle {
+        width: 36px;
+        height: 4px;
+        background: var(--gray-200);
+        border-radius: 2px;
+        margin: 0 auto 16px;
+      }
+      .bottom-sheet-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 4px;
+      }
+      .bottom-sheet-subtitle {
+        font-size: 13px;
+        color: var(--gray-500);
+        margin-bottom: 16px;
+      }
+      .bottom-sheet-field {
+        margin-bottom: 14px;
+      }
+      .bottom-sheet-hint {
+        font-size: 12px;
+        color: var(--gray-400);
+        margin-top: 4px;
+      }
+      .bottom-sheet-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .bottom-sheet-actions .btn-secondary {
+        flex: 1;
+      }
+      .bottom-sheet-actions .btn-primary {
+        flex: 2;
+      }
+      /* Tagihan paid badge & button */
+      .tagihan-lunas-badge {
+        font-size: 12px;
+        color: var(--gray-400);
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 20px;
+        background: var(--gray-100);
+      }
+      .btn-sudah-bayar {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--teal);
+        border: 1.5px solid var(--teal);
+        background: transparent;
+        padding: 4px 10px;
+        border-radius: 20px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .btn-sudah-bayar:active {
+        opacity: 0.7;
+      }
+      .tagihan-paid-status {
+        font-size: 12px;
+        color: var(--gray-400);
+        margin-top: 10px;
+        text-align: right;
+      }
+    </style>
+
+    <!-- JS Modules (load order matters) -->
+    <script src="js/state.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/cerita.js"></script>
+    <script src="js/pwa.js"></script>
+    <script src="js/quick-capture.js"></script>
+    <script src="js/budget.js"></script>
+    <script src="js/health-score.js"></script>
+    <script src="js/dashboard.calc.js"></script>
+    <script src="js/dashboard.insight.js"></script>
+    <script src="js/dashboard.chart.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/riwayat.js"></script>
+    <script src="js/bottom-sheet.js"></script>
+    <script src="js/goals.js"></script>
+    <script src="js/tagihan.js"></script>
+    <script src="js/tabungan.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/kategori.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
