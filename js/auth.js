@@ -54,12 +54,11 @@ async function sendMagicLink(email) {
 
 // Dipanggil saat app load di /auth/callback atau detect hash fragment
 async function handleMagicLinkCallback() {
-  const {
-    data: { session },
-    error,
-  } = await getSupabase().auth.getSession();
+  const { data, error } = await getSupabase().auth.exchangeCodeForSession(
+    window.location.href,
+  );
   if (error) throw error;
-  return session;
+  return data.session;
 }
 
 async function signOut() {
