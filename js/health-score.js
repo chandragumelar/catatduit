@@ -220,13 +220,13 @@ function renderHealthScore(container) {
     const sisaHari = scoreData.threshold - scoreData.hariAdaTx;
     // Warmup copy: beda tergantung sudah catat atau belum sama sekali
     const warmupTitle = scoreData.hariAdaTx === 0
-      ? 'Yuk mulai catat keuanganmu!'
+      ? 'Skor keuanganmu akan muncul di sini'
       : sisaHari === 1
-        ? 'Hampir sampai — satu hari lagi!'
-        : `Bagus! Catat ${sisaHari} hari lagi untuk lihat skormu.`;
+        ? 'Tinggal 1 hari lagi — hampir selesai!'
+        : `Catat ${sisaHari} hari lagi untuk mulai`;
     const warmupSub = scoreData.hariAdaTx === 0
-      ? 'Setelah 2 hari catat, skor keuanganmu akan muncul di sini.'
-      : 'Skor dihitung dari kebiasaan, bukan jumlah uang — makin rutin, makin akurat.';
+      ? 'Catat pengeluaran 2 hari berturut-turut, dan skor kesehatan keuanganmu akan langsung dihitung otomatis.'
+      : 'Skormu dihitung dari konsistensi mencatat — bukan dari berapa banyak uangmu.';
     const el = document.createElement('div');
     el.className = 'card health-score-card';
     el.innerHTML = `

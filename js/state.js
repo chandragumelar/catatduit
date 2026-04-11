@@ -16,15 +16,23 @@ const STORAGE_KEYS = {
 
 // Daftar currency yang didukung (simbol saja, no konversi)
 const CURRENCY_OPTIONS = [
-  { code: 'IDR', symbol: 'Rp',  label: 'Rupiah (Rp)' },
-  { code: 'USD', symbol: '$',   label: 'US Dollar ($)' },
-  { code: 'SGD', symbol: 'S$',  label: 'Singapore Dollar (S$)' },
-  { code: 'MYR', symbol: 'RM',  label: 'Malaysian Ringgit (RM)' },
-  { code: 'EUR', symbol: '€',   label: 'Euro (€)' },
-  { code: 'AUD', symbol: 'A$',  label: 'Australian Dollar (A$)' },
-  { code: 'GBP', symbol: '£',   label: 'British Pound (£)' },
-  { code: 'JPY', symbol: '¥',   label: 'Japanese Yen (¥)' },
-  { code: 'SAR', symbol: 'SR',  label: 'Saudi Riyal (SR)' },
+  { code: 'IDR', symbol: 'Rp',  label: 'Rupiah — Rp' },
+  { code: 'USD', symbol: '$',   label: 'US Dollar — $' },
+  { code: 'SGD', symbol: 'S$',  label: 'Singapore Dollar — S$' },
+  { code: 'MYR', symbol: 'RM',  label: 'Malaysian Ringgit — RM' },
+  { code: 'AUD', symbol: 'A$',  label: 'Australian Dollar — A$' },
+  { code: 'EUR', symbol: '€',   label: 'Euro — €' },
+  { code: 'GBP', symbol: '£',   label: 'British Pound — £' },
+  { code: 'JPY', symbol: '¥',   label: 'Japanese Yen — ¥' },
+  { code: 'CNY', symbol: '¥',   label: 'Chinese Yuan — ¥' },
+  { code: 'KRW', symbol: '₩',   label: 'Korean Won — ₩' },
+  { code: 'HKD', symbol: 'HK$', label: 'Hong Kong Dollar — HK$' },
+  { code: 'TWD', symbol: 'NT$', label: 'Taiwan Dollar — NT$' },
+  { code: 'AED', symbol: 'د.إ', label: 'UAE Dirham — د.إ' },
+  { code: 'SAR', symbol: 'SR',  label: 'Saudi Riyal — SR' },
+  { code: 'NZD', symbol: 'NZ$', label: 'New Zealand Dollar — NZ$' },
+  { code: 'CHF', symbol: 'Fr',  label: 'Swiss Franc — Fr' },
+  { code: 'CAD', symbol: 'C$',  label: 'Canadian Dollar — C$' },
 ];
 
 const KATEGORI_DEFAULT = {

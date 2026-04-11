@@ -78,7 +78,7 @@ function renderSettings() {
             <div class="settings-item-icon">💱</div>
             <div>
               <div class="settings-item-label">Simbol Mata Uang</div>
-              <div class="settings-item-sub">Cosmetic saja, tidak ada konversi</div>
+              <div class="settings-item-sub">Angka tidak dikonversi, hanya simbol yang berubah</div>
             </div>
           </div>
           <select id="currency-select" style="border:none;background:transparent;font-size:13px;color:var(--text-secondary);cursor:pointer;outline:none;padding:4px;">
