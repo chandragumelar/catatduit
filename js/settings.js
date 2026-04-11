@@ -273,9 +273,18 @@ function _initSettingsEvents(txList, wallets) {
   // Kategori
   document.getElementById('btn-go-kategori')?.addEventListener('click', () => navigateTo('kategori'));
 
-  // Currency symbol
+  // Currency symbol — simpan lalu re-render halaman aktif supaya semua simbol ikut berubah
   document.getElementById('currency-select')?.addEventListener('change', (e) => {
     setData(STORAGE_KEYS.CURRENCY, e.target.value);
+    // Update semua nominal-prefix yang visible tanpa full re-render
+    document.querySelectorAll('.nominal-prefix, .qc-prefix').forEach(el => {
+      el.textContent = getCurrencySymbol();
+    });
+    // Re-render halaman yang sedang aktif (kecuali settings itu sendiri)
+    const page = state.currentPage;
+    if (page === 'dashboard')      renderDashboard();
+    else if (page === 'riwayat')   renderRiwayatContent();
+    else if (page === 'tabungan')  renderTabungan();
     showToast('Simbol mata uang diubah ✓');
   });
 
@@ -344,7 +353,7 @@ function _showWalletSheet(idx) {
           <span class="nominal-prefix">${getCurrencySymbol()}</span>
           <input type="text" id="bs-wallet-saldo" class="input-nominal"
             placeholder="0"
-            value="${w ? (w.saldo_awal || 0).toLocaleString('id-ID') : ''}"
+            value="${w ? formatNominalInput(w.saldo_awal || 0) : ''}"
             inputmode="numeric" />
         </div>
         ${isEdit ? '<p class="bottom-sheet-hint">Saldo aktual dihitung otomatis dari transaksi. Saldo awal hanya titik mulai.</p>' : ''}
@@ -354,7 +363,7 @@ function _showWalletSheet(idx) {
       // format saldo input
       document.getElementById('bs-wallet-saldo').addEventListener('input', (e) => {
         const raw = e.target.value.replace(/\D/g, '');
-        e.target.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+        e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
       });
 
       // preset tiles

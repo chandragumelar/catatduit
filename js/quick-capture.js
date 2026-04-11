@@ -100,7 +100,7 @@ function _initQCStep1(overlay, walletId) {
   // Format input
   input.addEventListener('input', () => {
     const raw = input.value.replace(/\D/g, '');
-    input.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+    input.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
   });
 
   // Numpad
@@ -110,7 +110,7 @@ function _initQCStep1(overlay, walletId) {
 
     if (key === '⌫') {
       const raw = input.value.replace(/\D/g, '').slice(0, -1);
-      input.value = raw ? parseInt(raw, 10).toLocaleString('id-ID') : '';
+      input.value = raw ? formatNominalInput(parseInt(raw, 10)) : '';
       return;
     }
     if (key === '✓') {
@@ -120,7 +120,7 @@ function _initQCStep1(overlay, walletId) {
     // Angka
     const raw = (input.value.replace(/\D/g, '') + key);
     const num = Math.min(parseInt(raw, 10), MAX_NOMINAL);
-    input.value = num.toLocaleString('id-ID');
+    input.value = formatNominalInput(num);
   });
 
   // Enter key
@@ -198,6 +198,7 @@ function _qcSimpan(overlay, nominal, kategoriId, walletId) {
       timestamp: Date.now(),
     });
     saveTransaksi(txList);
+    checkAndShowDonationNudge(); // Item 9
     invalidateTransaksiCache();
     _qcShowDone(overlay, nominal, kategoriId);
   };

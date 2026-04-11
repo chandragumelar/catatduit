@@ -26,18 +26,15 @@ function renderDashboard() {
   const container = document.getElementById('dashboard-content');
   if (!container) return;
 
+  // Item 10: Onboarding checklist
+  renderOnboardingChecklist('onboarding-checklist-wrap');
+
   const txList = getTransaksi();
 
   if (txList.length === 0) {
     Object.keys(state.chartInstances).forEach(k => destroyChart(k));
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">💸</div>
-        <h3 class="empty-title">Belum ada catatan</h3>
-        <p class="empty-desc">Yuk mulai catat keuanganmu!</p>
-        <button class="btn-primary" id="btn-cta-empty" style="max-width:240px;">Catat Pertamamu</button>
-      </div>`;
-    document.getElementById('btn-cta-empty')?.addEventListener('click', () => openInputPage('add'));
+    container.innerHTML = buildEmptyState('💸', 'Belum ada catatan', 'Yuk mulai catat keuanganmu!', { label: 'Catat Pertamamu', onClick: null });
+    container.querySelector('.empty-cta')?.addEventListener('click', () => openInputPage('add'));
     return;
   }
 

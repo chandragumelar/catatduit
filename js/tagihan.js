@@ -28,10 +28,7 @@ function renderTagihanTab(container) {
 
   if (sorted.length === 0) {
     tagihanCard.innerHTML += `
-      <div class="empty-state" style="padding:16px 0">
-        <div class="empty-icon">📋</div>
-        <p class="empty-desc">Belum ada tagihan. Tambah reminder tagihan rutinmu!</p>
-      </div>`;
+      ${buildEmptyState('📋', '', 'Belum ada tagihan. Tambah reminder tagihan rutinmu!', null)}`;
   } else {
     sorted.forEach(t => {
       const isPaid       = isTagihanPaidThisMonth(t, year, month);
@@ -127,7 +124,7 @@ function _showTagihanSheet(id = null) {
           <span class="nominal-prefix">${getCurrencySymbol()}</span>
           <input type="text" id="bs-nominal" class="input-nominal"
             placeholder="0"
-            value="${t ? t.nominal.toLocaleString('id-ID') : ''}"
+            value="${t ? formatNominalInput(t.nominal) : ''}"
             inputmode="numeric" />
         </div>
       </div>
@@ -158,7 +155,7 @@ function _showTagihanSheet(id = null) {
     onOpen: () => {
       document.getElementById('bs-nominal').addEventListener('input', (e) => {
         const raw = e.target.value.replace(/\D/g, '');
-        e.target.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+        e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
       });
       document.getElementById('bs-recurring-ya').addEventListener('click', () => {
         recurringVal = true;
@@ -237,7 +234,7 @@ function _showBayarSheet(id) {
         <div class="nominal-wrap">
           <span class="nominal-prefix">${getCurrencySymbol()}</span>
           <input type="text" id="bs-nominal" class="input-nominal"
-            value="${t.nominal.toLocaleString('id-ID')}" inputmode="numeric" />
+            value="${formatNominalInput(t.nominal)}" inputmode="numeric" />
         </div>
         <p class="bottom-sheet-hint">Sesuaikan kalau nominalnya berbeda dari biasanya.</p>
       </div>
@@ -250,7 +247,7 @@ function _showBayarSheet(id) {
     onOpen: () => {
       document.getElementById('bs-nominal').addEventListener('input', (e) => {
         const raw = e.target.value.replace(/\D/g, '');
-        e.target.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+        e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
       });
       // Wallet chip toggle
       document.querySelectorAll('#bs-bayar-wallet-chips .wallet-chip').forEach(chip => {

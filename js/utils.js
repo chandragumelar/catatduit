@@ -18,7 +18,14 @@ function formatRupiah(angka) {
   }
   const n   = Number(angka);
   const sym = getCurrencySymbol();
+  // Number formatting tetap id-ID (titik ribuan, koma desimal) — hanya simbol yang berubah
   return (n < 0 ? '-' + sym + ' ' : sym + ' ') + Math.abs(n).toLocaleString('id-ID');
+}
+
+// Format angka untuk input field (tanpa simbol, hanya ribuan)
+function formatNominalInput(angka) {
+  if (!angka && angka !== 0) return '';
+  return Number(angka).toLocaleString('id-ID');
 }
 
 function parseNominal(str) {

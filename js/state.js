@@ -12,6 +12,8 @@ const STORAGE_KEYS = {
   SCHEMA_VERSION: 'cd_schema_v',
   BUDGETS: 'cd_budgets',
   CURRENCY: 'cd_currency',
+  NUDGE: 'cd_nudge_shown',
+  CHECKLIST_DISMISSED: 'cd_checklist_dismissed',
 };
 
 // Daftar currency yang didukung (simbol saja, no konversi)
@@ -112,7 +114,7 @@ const state = {
   inputKategori: null,
   inputWalletId: null,        // v3: wallet yang dipilih saat input
   selectedWalletId: 'semua', // v3: filter wallet di dashboard
-  riwayatFilter: { bulan: null, jenis: 'semua', walletId: 'semua' },
+  riwayatFilter: { bulan: null, jenis: 'semua', walletId: 'semua', search: '' },
   kategoriTab: 'keluar',
   tabunganTab: 'tabungan',
   chartInstances: {},

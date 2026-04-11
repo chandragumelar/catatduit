@@ -8,7 +8,7 @@ function initInputPage() {
   const nominalInput = document.getElementById('input-nominal');
   nominalInput?.addEventListener('input', () => {
     const raw = nominalInput.value.replace(/\D/g, '');
-    nominalInput.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+    nominalInput.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
     document.getElementById('error-nominal').textContent = '';
   });
 
@@ -230,7 +230,7 @@ function openInputPage(mode, id = null) {
     state.inputKategori = tx.kategori;
     state.inputWalletId = tx.wallet_id || getWallets()[0]?.id || DEFAULT_WALLET_ID;
 
-    document.getElementById('input-nominal').value = tx.nominal.toLocaleString('id-ID');
+    document.getElementById('input-nominal').value = formatNominalInput(tx.nominal);
     tanggalInput.value = tx.tanggal;
     document.getElementById('input-catatan').value = tx.catatan || '';
 
@@ -346,6 +346,7 @@ function _doSimpan(txList, nominal, kategori, tgl, catatan, walletId) {
   });
   if (saveTransaksi(txList)) {
     showToast('Tersimpan ✓');
+    checkAndShowDonationNudge(); // Item 9
     navigateTo('dashboard');
   }
 }

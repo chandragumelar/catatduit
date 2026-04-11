@@ -40,10 +40,7 @@ function renderTabunganTab(container) {
 
   if (goals.length === 0) {
     goalsCard.innerHTML += `
-      <div class="empty-state" style="padding:24px 0">
-        <div class="empty-icon">🎯</div>
-        <p class="empty-desc">Belum ada goal. Yuk buat target menabung pertamamu!</p>
-      </div>`;
+      ${buildEmptyState('🎯', '', 'Belum ada goal. Yuk buat target menabung pertamamu!', null)}`;
   } else {
     const listEl = document.createElement('div');
     listEl.className = 'goals-list';
@@ -119,7 +116,7 @@ function _showGoalSheet(idx = null) {
           <span class="nominal-prefix">${getCurrencySymbol()}</span>
           <input type="text" id="bs-nominal" class="input-nominal"
             placeholder="0"
-            value="${goal ? goal.target.toLocaleString('id-ID') : ''}"
+            value="${goal ? formatNominalInput(goal.target) : ''}"
             inputmode="numeric" />
         </div>
       </div>`,
@@ -127,7 +124,7 @@ function _showGoalSheet(idx = null) {
     onOpen: () => {
       document.getElementById('bs-nominal').addEventListener('input', (e) => {
         const raw = e.target.value.replace(/\D/g, '');
-        e.target.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+        e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
       });
     },
     onConfirm: () => {

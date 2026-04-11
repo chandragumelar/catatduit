@@ -87,7 +87,7 @@ function showBudgetManager() {
                 <span class="nominal-prefix" style="font-size:12px;">${getCurrencySymbol()}</span>
                 <input type="text" class="input-nominal bm-input" data-kat="${k.id}"
                   placeholder="Tidak diset"
-                  value="${current > 0 ? current.toLocaleString('id-ID') : ''}"
+                  value="${current > 0 ? formatNominalInput(current) : ''}"
                   inputmode="numeric" style="font-size:13px;padding:6px 8px;" />
               </div>
             </div>`;
@@ -98,7 +98,7 @@ function showBudgetManager() {
       document.querySelectorAll('.bm-input').forEach(input => {
         input.addEventListener('input', () => {
           const raw = input.value.replace(/\D/g, '');
-          input.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+          input.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
         });
       });
     },

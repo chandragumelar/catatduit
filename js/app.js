@@ -217,7 +217,7 @@ function _stepSaldo() {
       </div>`;
     row.querySelector('.ob-saldo-input').addEventListener('input', (e) => {
       const raw = e.target.value.replace(/\D/g, '');
-      e.target.value = raw ? Math.min(parseInt(raw, 10), MAX_NOMINAL).toLocaleString('id-ID') : '';
+      e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
     });
     fieldsWrap.appendChild(row);
   });
