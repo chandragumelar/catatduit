@@ -1,4 +1,9 @@
-// ===== TAGIHAN.JS — Tab Tagihan =====
+// =============================================================================
+// TAGIHAN.JS
+// Tanggung jawab: Recurring bills tracker — tambah, tandai lunas, reminder
+// Depends on: state.js, storage.js, utils.js, ui.js
+// =============================================================================
+
 
 function renderTagihanTab(container) {
   const tagihan = getTagihan();

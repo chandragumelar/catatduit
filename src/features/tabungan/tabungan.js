@@ -1,4 +1,9 @@
-// ===== TABUNGAN.JS — Orchestrator tab Tabungan & Tagihan (v3) =====
+// =============================================================================
+// TABUNGAN.JS
+// Tanggung jawab: Orkestrasi halaman Tabungan & Tagihan (tabs)
+// Depends on: state.js, goals.js, tagihan.js
+// =============================================================================
+
 // Goals logic → goals.js | Tagihan logic → tagihan.js
 
 function renderTabungan() {

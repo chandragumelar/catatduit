@@ -1,4 +1,9 @@
-// ===== CERITA.DATA.JS — Kalkulasi data cerita + share text =====
+// =============================================================================
+// CERITA.DATA.JS
+// Tanggung jawab: Agregasi data bulanan khusus untuk Cerita Bulan Ini
+// Depends on: state.js, storage.js, utils.js, cerita.persona.js
+// =============================================================================
+
 // Depends on: cerita.persona.js
 
 const CERITA_MIN_TX = 15;
@@ -30,7 +35,7 @@ function calcCeritaData(year, month) {
   const isCurrentMonth = now.getFullYear() === year && now.getMonth() === month;
   const hariDenom      = isCurrentMonth ? now.getDate() : hariDalamBulan;
   const konsistensiPct = hariAdaTx / hariDenom;
-  const streak         = _calcStreak(txList);
+  const streak         = calcStreak(txList);
   const nama           = getNama();
 
   const base = {
@@ -58,16 +63,3 @@ function _buildKatTotal(txBulan) {
   return map;
 }
 
-function _calcStreak(txList) {
-  const dates = new Set(txList.map(tx => tx.tanggal));
-  let streak  = 0;
-  const d     = new Date();
-  if (!dates.has(d.toISOString().split('T')[0])) d.setDate(d.getDate() - 1);
-  while (true) {
-    const str = d.toISOString().split('T')[0];
-    if (!dates.has(str)) break;
-    streak++;
-    d.setDate(d.getDate() - 1);
-  }
-  return streak;
-}

@@ -1,4 +1,9 @@
-// ===== CERITA.SLIDES.JS — Carousel assembler + interaction controller =====
+// =============================================================================
+// CERITA.SLIDES.JS
+// Tanggung jawab: Sequence controller untuk slide-slide Cerita Bulan Ini
+// Depends on: state.js, cerita.slides.render.js, cerita.slides.render2.js
+// =============================================================================
+
 // Depends on: cerita.slides.render.js
 
 const SLIDE_COUNT = 5;

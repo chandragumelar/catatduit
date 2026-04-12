@@ -1,4 +1,9 @@
-// ===== DASHBOARD.CARDS.JS — Card builders (refactored dari dashboard.js) =====
+// =============================================================================
+// DASHBOARD.CARDS.JS
+// Tanggung jawab: Renderer kartu-kartu dashboard (saldo, summary keluar/masuk/nabung)
+// Depends on: state.js, storage.js, utils.js
+// =============================================================================
+
 
 function buildTxItemHTML(tx) {
   const k      = getKategoriById(tx.kategori, tx.jenis);

@@ -1,4 +1,9 @@
-// ===== CERITA.SLIDES.RENDER2.JS — Slide builders: persona, closing =====
+// =============================================================================
+// CERITA.SLIDES.RENDER2.JS
+// Tanggung jawab: Renderer slide 6-9 Cerita Bulan Ini
+// Depends on: utils.js, cerita.data.js, cerita.persona.js
+// =============================================================================
+
 
 function _slidePersona(persona, grad0, grad1, streak) {
   const streakBlock = streak > 0

@@ -1,4 +1,9 @@
-// ===== CERITA.SHARE.JS — Share image orchestrator (SVG → Canvas → PNG download) =====
+// =============================================================================
+// CERITA.SHARE.JS
+// Tanggung jawab: Share flow controller — trigger share native atau fallback
+// Depends on: cerita.share.svg.js, cerita.sharetext.js
+// =============================================================================
+
 // Depends on: cerita.share.svg.js
 
 function generateShareImage(data, bulanNama, year) {

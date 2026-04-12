@@ -1,4 +1,9 @@
-// ===== PWA.JS — Install prompt, update banner, notifikasi =====
+// =============================================================================
+// PWA.JS
+// Tanggung jawab: Install prompt PWA dan manajemen push notification permission
+// Depends on: state.js, storage.js
+// =============================================================================
+
 
 // ===== INSTALL PROMPT =====
 

@@ -1,4 +1,9 @@
-// ===== SETTINGS.JS — Settings page (v3) =====
+// =============================================================================
+// SETTINGS.JS
+// Tanggung jawab: Pengaturan app — wallet management, mata uang, ekspor data
+// Depends on: state.js, storage.js, utils.js, ui.js
+// =============================================================================
+
 
 function renderSettings() {
   const container = document.getElementById('settings-content');

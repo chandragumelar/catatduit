@@ -1,4 +1,9 @@
-// ===== STORAGE.JS — localStorage operations (v3 + Sprint B2) =====
+// =============================================================================
+// STORAGE.JS
+// Tanggung jawab: Semua operasi localStorage — CRUD, schema migration, wallet ops
+// Depends on: state.js
+// =============================================================================
+
 
 // ===== BASE =====
 

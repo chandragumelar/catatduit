@@ -1,4 +1,9 @@
-// ===== DASHBOARD.INSIGHT.JS — Momen Insight engine =====
+// =============================================================================
+// DASHBOARD.INSIGHT.JS
+// Tanggung jawab: Momen Insight engine — 8 rules deteksi pola keuangan
+// Depends on: state.js, storage.js, utils.js
+// =============================================================================
+
 // Rule-based, 100% lokal.
 // Seed berbasis tanggal → ganti tiap hari, konsisten dalam satu sesi.
 
@@ -13,7 +18,7 @@ const INSIGHT_PIPELINE = [
   (d) => {
     const { txList } = d;
     if (txList.length === 0) return null;
-    const streak = _calcStreak(txList);
+    const streak = calcStreak(txList);
     if (streak >= 3) return _pick(
       `${streak} hari berturut kamu catat. Kebiasaan bagus itu!`,
       `Streak ${streak} hari! Konsistensi ini yang bikin data kamu akurat.`,
@@ -229,17 +234,3 @@ function getInsightText(calcData) {
   return 'Catat terus keuanganmu ya!';
 }
 
-function _calcStreak(txList) {
-  if (!txList.length) return 0;
-  const dates = new Set(txList.map(tx => tx.tanggal));
-  let streak = 0;
-  const d = new Date();
-  if (!dates.has(getTodayStr())) d.setDate(d.getDate() - 1);
-  while (true) {
-    const str = d.toISOString().split('T')[0];
-    if (!dates.has(str)) break;
-    streak++;
-    d.setDate(d.getDate() - 1);
-  }
-  return streak;
-}

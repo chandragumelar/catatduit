@@ -1,4 +1,9 @@
-// ===== CERITA.SLIDES.RENDER.JS — Slide builders: intro, angka, kategori =====
+// =============================================================================
+// CERITA.SLIDES.RENDER.JS
+// Tanggung jawab: Renderer slide 1-5 Cerita Bulan Ini
+// Depends on: utils.js, cerita.data.js
+// =============================================================================
+
 
 function _slideIntro(bulanNama, year, isCurrentMonth, txCount) {
   const badge = isCurrentMonth ? 'Sampai hari ini' : 'Rekap final';

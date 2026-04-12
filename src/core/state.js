@@ -1,4 +1,9 @@
-// ===== STATE.JS — Global state & constants =====
+// =============================================================================
+// STATE.JS
+// Tanggung jawab: Konstanta global, STORAGE_KEYS, KATEGORI_DEFAULT, objek state runtime
+// Depends on: (none)
+// =============================================================================
+
 
 const STORAGE_KEYS = {
   ONBOARDING: 'cd_onboarding_done',

@@ -1,4 +1,9 @@
-// ===== DASHBOARD.JS — Orchestrator =====
+// =============================================================================
+// DASHBOARD.JS
+// Tanggung jawab: Orkestrasi halaman dashboard — memanggil semua sub-renderer
+// Depends on: state.js, storage.js, ui.js, dashboard.calc.js, dashboard.cards.js, dashboard.chart.js, dashboard.insight.js, health-score.js, insight.rolling.js
+// =============================================================================
+
 
 // Cache calc untuk collapsible chart re-init
 let _lastCalc = null;

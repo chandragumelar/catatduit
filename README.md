@@ -1,78 +1,180 @@
-# CatatDuit v3 — Sprint C
+# CatatDuit v4
 
-PWA expense tracker untuk pasar Indonesia.
-Deploy: app-catatduit.vercel.app | Dijual di Shopee via Warung Digital.
+PWA expense tracker untuk pasar Indonesia. Privacy-first: semua data di localStorage, tidak ada backend, tidak ada server sync. Dijual sebagai one-time purchase di Shopee via Warung Digital.
+
+**Live:** [app-catatduit.vercel.app](https://app-catatduit.vercel.app)
 
 ---
 
-## Struktur Folder (Sprint C — refactor)
+## Architecture
+
+### Boot Flow
+
+```
+index.html loads scripts (ordered)
+    │
+    ├─► src/core/state.js      — constants, STORAGE_KEYS, state object
+    ├─► src/core/utils.js      — pure utils, WorkerBridge
+    ├─► src/core/storage.js    — localStorage CRUD + schema migrations
+    ├─► src/core/debug.js      — DEV-only debug panel (no-op in prod)
+    │
+    ├─► src/shared/ui.js       — toast, modal, nav, icons
+    ├─► src/shared/*.js        — bottom-sheet, pwa, quick-capture
+    │
+    ├─► src/features/**/*.js   — feature modules (self-contained)
+    │
+    └─► src/app.js             — DOMContentLoaded → migrateSchema() → boot()
+```
+
+### Data Flow
+
+```
+User action
+    │
+    ▼
+Feature JS (e.g. input.js)
+    │  calls
+    ▼
+storage.js (getTransaksi / saveTransaksi / getWallets)
+    │  reads/writes
+    ▼
+localStorage
+    │
+    └─► on save: feature calls renderDashboard() / relevant render fn
+```
+
+### Heavy Calculations (Web Worker)
+
+Expensive aggregations (monthly totals, health score) run in `calc.worker.js` via `WorkerBridge` (defined in `utils.js`). The worker lives at root so its scope matches the Service Worker scope (`/`).
+
+---
+
+## File Map
 
 ```
 catatduit/
-├── index.html
-├── style.css
-├── sw.js                    # Service Worker
-├── calc.worker.js           # Web Worker (harus di root untuk scope SW)
-├── manifest.json
-├── vercel.json
+├── index.html              Entry point — all script tags, page HTML shells
+├── style.css               All styles (single file, no preprocessor)
+├── sw.js                   Service Worker — offline cache, push notifications
+├── calc.worker.js          Web Worker — heavy calc (health score, monthly agg)
+├── manifest.json           PWA manifest
+├── vercel.json             Vercel routing config (SPA fallback)
+├── package.json            Dev scripts + ESLint dep
+├── eslint.config.mjs       ESLint rules
+│
 ├── lib/
-│   ├── chart.min.js
-│   └── lucide.min.js
+│   ├── chart.min.js        Chart.js (vendored, no CDN)
+│   └── lucide.min.js       Lucide icons (vendored)
+│
+├── test/
+│   ├── run.js              Test runner (Node, no framework)
+│   └── fixtures.js         Shared test data
+│
 └── src/
-    ├── app.js               # Boot + Onboarding
-    ├── core/                # Foundation — no UI deps
-    │   ├── state.js         # Constants, STORAGE_KEYS, KATEGORI_DEFAULT
-    │   ├── utils.js         # Pure utils, WorkerBridge
-    │   └── storage.js       # localStorage CRUD, migrations, atomic transfer
-    ├── shared/              # Cross-feature UI helpers
-    │   ├── ui.js
-    │   ├── bottom-sheet.js
-    │   ├── pwa.js
-    │   └── quick-capture.js
-    └── features/
-        ├── dashboard/       # dashboard.js, calc, insight, chart, health-score
-        ├── transfer/        # Sprint C #18 — Transfer UI
-        ├── insight/         # Sprint C #19 — Rolling 2-week insight
-        ├── budget/
+    ├── app.js              Boot sequence + conversational onboarding flow
+    │
+    ├── core/               Foundation layer — zero UI dependencies
+    │   ├── state.js        Global state object, STORAGE_KEYS, KATEGORI_DEFAULT
+    │   ├── utils.js        Pure helpers: generateId, formatRupiah, WorkerBridge
+    │   ├── storage.js      localStorage CRUD, schema migrations, wallet ops
+    │   └── debug.js        DEV panel (active only when cd_debug=1 in localStorage)
+    │
+    ├── shared/             Cross-feature UI primitives
+    │   ├── ui.js           Toast, modal confirm, page navigation, lucide init
+    │   ├── bottom-sheet.js Generic bottom sheet component
+    │   ├── pwa.js          Install prompt, push notification permission
+    │   └── quick-capture.js Floating quick-entry shortcut
+    │
+    └── features/           One folder per product feature
+        ├── dashboard/
+        │   ├── dashboard.js            Page orchestrator
+        │   ├── dashboard.calc.js       Per-month aggregation (calls WorkerBridge)
+        │   ├── dashboard.cards.js      Card renderers (saldo, summary)
+        │   ├── dashboard.chart.js      Chart.js wrapper
+        │   ├── dashboard.insight.js    Momen Insight engine (8 rules)
+        │   └── health-score.js         Financial Health Score (0–100)
         ├── input/
+        │   └── input.js               Add/edit transaction form
         ├── riwayat/
-        ├── cerita/
-        ├── goals/
+        │   └── riwayat.js             Transaction history + filters
+        ├── budget/
+        │   └── budget.js              Monthly budget per category
+        ├── transfer/
+        │   └── transfer.js            Atomic wallet-to-wallet transfer
+        ├── insight/
+        │   └── insight.rolling.js     Rolling 2-week category comparison
         ├── tagihan/
+        │   └── tagihan.js             Recurring bills tracker
         ├── tabungan/
+        │   └── tabungan.js            Savings goals tracker
+        ├── goals/
+        │   └── goals.js               Financial goals
         ├── settings/
-        └── kategori/
+        │   └── settings.js            App settings, wallet management, export
+        ├── kategori/
+        │   └── kategori.js            Custom category management
+        └── cerita/
+            ├── cerita.js              Cerita Bulan Ini orchestrator
+            ├── cerita.data.js         Monthly data aggregation for cerita
+            ├── cerita.persona.js      9 financial personas logic
+            ├── cerita.slides.js       Slide sequence controller
+            ├── cerita.slides.render.js  Slide renderers (slides 1–5)
+            ├── cerita.slides.render2.js Slide renderers (slides 6–9)
+            ├── cerita.share.js        Share flow controller
+            ├── cerita.share.svg.js    SVG share card generator
+            ├── cerita.sharetext.js    Share text generator
+            └── cerita.css             Cerita-specific styles
 ```
 
-> calc.worker.js tetap di root karena Web Worker scope relatif ke SW scope (/), bukan ke caller file.
+---
+
+## How to Run Locally
+
+```bash
+npm run dev
+# Opens at http://localhost:3000
+```
+
+Requires Node.js. Uses `npx serve` — no build step.
 
 ---
 
-## Sprint C — Fitur Baru
+## How to Run Tests
 
-### #18 — Account Transfer Antar Wallet
-- Tombol Transfer di greeting card (muncul kalau >= 2 wallet)
-- Bottom sheet: pilih from/to, nominal, tanggal, catatan, swap button
-- Live saldo hint + soft warning kalau nominal > saldo
-- Atomic: satu transfer = dua entry (transfer_out + transfer_in) diikat group_id
-- Delete otomatis hapus pair (deleteTransferAtomic dari B2)
+```bash
+npm test
+# or watch mode:
+npm run test:watch
+```
 
-### #19 — Rolling 2-Week Category Insight
-- Window: 14 hari terakhir vs 14 hari sebelumnya (rolling, bukan kalender bulan)
-- Severity: tipis (10%+), naik (30%+), signifikan (60%+), melonjak (120%+)
-- Anomaly: deteksi kategori baru muncul atau hilang tiba-tiba
-- Card "Analisis 2 Minggu" di dashboard (collapsible, priority 58)
-- Summary text juga masuk Momen Insight pipeline
+Tests run in Node via `test/run.js`. No external test framework.
 
 ---
 
-## Sprint History
+## How to Deploy
 
-| Sprint | Status |
-|--------|--------|
-| A — Foundation + Notif | Done |
-| A2 — UI Quick Wins | Done |
-| B — Analytics | Done |
-| B2 — Budget & Navigation | Done |
-| C — Transfer & Insights | Done |
-| C2 — Cerita Flagship | Next |
+```bash
+# Push to main branch — Vercel auto-deploys via GitHub integration.
+# Manual deploy:
+npx vercel --prod
+```
+
+`vercel.json` routes all paths to `index.html` (SPA fallback).
+
+---
+
+## Key Conventions
+
+See [`CONVENTIONS.md`](./CONVENTIONS.md) for naming rules, state management patterns, and code standards.
+
+---
+
+## Debug Panel (DEV)
+
+To open the debug overlay in any browser:
+
+```js
+localStorage.setItem('cd_debug', '1'); location.reload();
+```
+
+To disable: `localStorage.removeItem('cd_debug'); location.reload()`

@@ -1,4 +1,9 @@
-// ===== TRANSFER.JS — Account transfer antar wallet (Sprint C #18) =====
+// =============================================================================
+// TRANSFER.JS
+// Tanggung jawab: Atomic transfer antar wallet (transfer_out + transfer_in pair)
+// Depends on: state.js, storage.js, utils.js, ui.js, bottom-sheet.js
+// =============================================================================
+
 // Depends on: storage.js (saveTransferAtomic, getWallets),
 //             bottom-sheet.js (_openBottomSheet),
 //             ui.js (showToast), utils.js (formatRupiah, parseNominal)

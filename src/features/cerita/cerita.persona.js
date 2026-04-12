@@ -1,4 +1,9 @@
-// ===== CERITA.PERSONA.JS — Persona definitions + gradient map =====
+// =============================================================================
+// CERITA.PERSONA.JS
+// Tanggung jawab: Logika penentuan 9 financial personas dari data transaksi
+// Depends on: (none)
+// =============================================================================
+
 
 const PERSONA_GRADIENTS = {
   semut:    ['#065f46', '#059669'],

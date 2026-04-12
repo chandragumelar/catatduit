@@ -1,10 +1,13 @@
 {
   "name": "catatduit",
-  "version": "1.0.0",
-  "description": "**Catat pengeluaran, kenali keuanganmu.**",
-  "main": "chart.min.js",
+  "version": "4.0.0",
+  "description": "Catat pengeluaran, kenali keuanganmu.",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npx serve . -p 3000",
+    "lint": "eslint src/ calc.worker.js sw.js",
+    "test": "node test/run.js",
+    "test:watch": "node --watch test/run.js"
   },
   "repository": {
     "type": "git",

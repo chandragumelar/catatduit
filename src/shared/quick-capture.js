@@ -1,4 +1,9 @@
-// ===== QUICK-CAPTURE.JS — Input super cepat, target <10 detik =====
+// =============================================================================
+// QUICK-CAPTURE.JS
+// Tanggung jawab: Floating quick-entry shortcut untuk input transaksi cepat
+// Depends on: state.js, ui.js, input.js
+// =============================================================================
+
 // Accessible dari: shortcut home screen (URL param ?q=1) atau FAB long-press
 // Flow: Nominal → Kategori → Simpan (wallet otomatis = default)
 

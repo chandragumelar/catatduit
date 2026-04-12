@@ -1,4 +1,9 @@
-// ===== INSIGHT.ROLLING.JS — Rolling 2-week category insight (Sprint C #19) =====
+// =============================================================================
+// INSIGHT.ROLLING.JS
+// Tanggung jawab: Rolling 2-week category comparison — severity dan anomaly detection
+// Depends on: state.js, storage.js, utils.js
+// =============================================================================
+
 // Extend rule-based dari Sprint B Item 13 dengan:
 // - window rolling 2 minggu (bukan hanya "minggu ini vs minggu lalu")
 // - granular per kategori (breakdown semua kategori, bukan hanya top-1)

@@ -1,4 +1,9 @@
-// ===== CERITA.JS — Orchestrator =====
+// =============================================================================
+// CERITA.JS
+// Tanggung jawab: Orkestrasi Cerita Bulan Ini — entry point dan flow controller
+// Depends on: state.js, storage.js, cerita.data.js, cerita.slides.js, cerita.share.js
+// =============================================================================
+
 // Dependencies: cerita.data.js, cerita.slides.js, cerita.share.js
 
 function openCerita(year, month) {

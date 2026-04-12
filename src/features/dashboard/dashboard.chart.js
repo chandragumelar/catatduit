@@ -1,4 +1,9 @@
-// ===== DASHBOARD.CHART.JS — Chart rendering + Share summary =====
+// =============================================================================
+// DASHBOARD.CHART.JS
+// Tanggung jawab: Wrapper Chart.js untuk chart spending per kategori di dashboard
+// Depends on: state.js, utils.js
+// =============================================================================
+
 
 function initDashboardCharts(calc) {
   const { txList, rolling, chartLabels, chartMasuk, chartKeluar, chartCashflow, katSorted,

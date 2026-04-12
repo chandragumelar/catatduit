@@ -1,4 +1,9 @@
-// ===== CERITA.SHARETEXT.JS — Shareable sentence generator =====
+// =============================================================================
+// CERITA.SHARETEXT.JS
+// Tanggung jawab: Generator teks share caption untuk Cerita Bulan Ini
+// Depends on: utils.js, cerita.data.js
+// =============================================================================
+
 
 const _seed = Math.random() < 0.5 ? 0 : 1;
 function _pick(a, b) { return _seed === 0 ? a : b; }

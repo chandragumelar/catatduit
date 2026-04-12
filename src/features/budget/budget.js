@@ -1,4 +1,9 @@
-// ===== BUDGET.JS — Budget per kategori (Sprint B2 #15: weekly period) =====
+// =============================================================================
+// BUDGET.JS
+// Tanggung jawab: Budget per kategori — render, simpan, dan validasi anggaran bulanan
+// Depends on: state.js, storage.js, ui.js
+// =============================================================================
+
 
 function renderBudgetSection(container) {
   const budgets      = getBudgets();

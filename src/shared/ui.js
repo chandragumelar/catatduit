@@ -1,4 +1,9 @@
-// ===== UI.JS — Toast, Modal, Navigation =====
+// =============================================================================
+// UI.JS
+// Tanggung jawab: Toast, modal confirm, navigasi halaman, inisialisasi Lucide icons
+// Depends on: state.js
+// =============================================================================
+
 
 // ===== TOAST =====
 let toastTimer = null;

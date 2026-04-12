@@ -1,4 +1,9 @@
-// ===== HEALTH-SCORE.JS — Financial Health Score (v4) =====
+// =============================================================================
+// HEALTH-SCORE.JS
+// Tanggung jawab: Kalkulasi dan render Financial Health Score (0-100)
+// Depends on: state.js, storage.js, utils.js
+// =============================================================================
+
 // Komponen: Konsistensi 20%, Cashflow 35%, Nabung 25%, Tagihan 20%
 // Nabung di-skip + bobot redistribusi kalau tidak ada pemasukan
 

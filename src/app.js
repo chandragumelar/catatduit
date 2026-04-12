@@ -1,4 +1,9 @@
-// ===== APP.JS — Boot + Onboarding =====
+// =============================================================================
+// APP.JS
+// Tanggung jawab: Boot sequence dan flow onboarding percakapan
+// Depends on: state.js, utils.js, storage.js, ui.js, pwa.js
+// =============================================================================
+
 
 // ===== STATE ONBOARDING =====
 // _ob = temporary onboarding state, tidak disimpan sampai selesai
@@ -228,11 +233,11 @@ function _stepSaldo() {
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
       <span class="onboarding-label-sm">Simbol mata uang:</span>
       <select id="ob-currency-select" style="font-size:12px;padding:2px 6px;border:1px solid var(--gray-200);border-radius:6px;background:var(--surface);color:var(--text-primary);cursor:pointer;">
-        <option value="Rp">Rp — Rupiah</option>
-        <option value="$">$ — Dollar</option>
-        <option value="RM">RM — Ringgit</option>
-        <option value="₱">₱ — Peso</option>
-        <option value="฿">฿ — Baht</option>
+        <option value="IDR">Rp — Rupiah</option>
+        <option value="USD">$ — Dollar</option>
+        <option value="MYR">RM — Ringgit</option>
+        <option value="PHP">₱ — Peso</option>
+        <option value="THB">฿ — Baht</option>
         <option value="SGD">SGD — Singapore Dollar</option>
       </select>
     </div>
@@ -259,12 +264,13 @@ function _stepSaldo() {
 
   // R1: Inline currency selector — simpan pilihan langsung, tidak redirect
   el.querySelector('#ob-currency-select')?.addEventListener('change', (e) => {
-    setData(STORAGE_KEYS.CURRENCY_SYMBOL, e.target.value);
+    setData(STORAGE_KEYS.CURRENCY, e.target.value);
     // Update prefix labels yang sudah ter-render
-    el.querySelectorAll('.nominal-prefix').forEach(span => { span.textContent = e.target.value; });
+    const sym = getCurrencySymbol();
+    el.querySelectorAll('.nominal-prefix').forEach(span => { span.textContent = sym; });
   });
   // Set default value sesuai setting yang sudah ada (kalau ada)
-  const existingCurrency = getData(STORAGE_KEYS.CURRENCY_SYMBOL, 'Rp');
+  const existingCurrency = getData(STORAGE_KEYS.CURRENCY, 'IDR');
   const currencySelect = el.querySelector('#ob-currency-select');
   if (currencySelect) currencySelect.value = existingCurrency;
 

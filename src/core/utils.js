@@ -1,4 +1,9 @@
-// ===== UTILS.JS — Pure utility functions =====
+// =============================================================================
+// UTILS.JS
+// Tanggung jawab: Pure utility functions (generateId, formatRupiah, dll) dan WorkerBridge
+// Depends on: state.js, storage.js
+// =============================================================================
+
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
@@ -169,3 +174,22 @@ const WorkerBridge = (() => {
 
   return { run };
 })();
+
+// ===== STREAK HELPER =====
+// Berapa hari berturut-turut user mencatat transaksi.
+// Dipakai di dashboard insight dan cerita.
+
+function calcStreak(txList) {
+  if (!txList.length) return 0;
+  const dates = new Set(txList.map(tx => tx.tanggal));
+  let streak = 0;
+  const d = new Date();
+  if (!dates.has(getTodayStr())) d.setDate(d.getDate() - 1);
+  while (true) {
+    const str = d.toISOString().split('T')[0];
+    if (!dates.has(str)) break;
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}

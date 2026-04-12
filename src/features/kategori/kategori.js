@@ -1,4 +1,9 @@
-// ===== KATEGORI.JS — Kelola Kategori page =====
+// =============================================================================
+// KATEGORI.JS
+// Tanggung jawab: Kelola kategori custom per jenis (keluar/masuk)
+// Depends on: state.js, storage.js, ui.js
+// =============================================================================
+
 
 function renderKategori() {
   const backBtn = document.getElementById('btn-back-kategori');

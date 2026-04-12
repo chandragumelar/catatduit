@@ -1,4 +1,9 @@
-// ===== INPUT.JS — Catat transaksi page (v3) =====
+// =============================================================================
+// INPUT.JS
+// Tanggung jawab: Form tambah/edit transaksi (keluar, masuk, nabung)
+// Depends on: state.js, storage.js, utils.js, ui.js
+// =============================================================================
+
 
 function initInputPage() {
   document.getElementById('btn-keluar')?.addEventListener('click', () => setInputJenis('keluar'));

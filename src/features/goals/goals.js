@@ -1,4 +1,9 @@
-// ===== GOALS.JS — Tab Tabungan & Goals =====
+// =============================================================================
+// GOALS.JS
+// Tanggung jawab: Financial goals — tambah, edit, tracking progres
+// Depends on: state.js, storage.js, utils.js, ui.js
+// =============================================================================
+
 
 function renderTabunganTab(container) {
   const txList = getTransaksi();

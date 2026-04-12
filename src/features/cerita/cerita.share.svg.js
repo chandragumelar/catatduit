@@ -1,4 +1,9 @@
-// ===== CERITA.SHARE.SVG.JS — SVG template builder untuk share image =====
+// =============================================================================
+// CERITA.SHARE.SVG.JS
+// Tanggung jawab: Generator SVG share card untuk Cerita Bulan Ini
+// Depends on: utils.js, cerita.data.js
+// =============================================================================
+
 // Output: 1080x1920 SVG string
 
 const SHARE_W = 1080;

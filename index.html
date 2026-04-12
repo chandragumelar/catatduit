@@ -369,17 +369,20 @@
       }
     </style>
 
-    <!-- JS Modules (load order matters) -->
-    <!-- core -->
+    <!-- ── CORE ──────────────────────────────────────────────────────────── -->
     <script src="src/core/state.js"></script>
     <script src="src/core/utils.js"></script>
     <script src="src/core/storage.js"></script>
-    <!-- shared -->
+    <script src="src/core/debug.js"></script>   <!-- DEV: debug panel, no-op in prod -->
+
+    <!-- ── SHARED UI ─────────────────────────────────────────────────────── -->
     <script src="src/shared/ui.js"></script>
     <script src="src/shared/bottom-sheet.js"></script>
     <script src="src/shared/pwa.js"></script>
     <script src="src/shared/quick-capture.js"></script>
-    <!-- features -->
+
+    <!-- ── FEATURES ──────────────────────────────────────────────────────── -->
+    <!-- cerita (internal deps: persona/sharetext/data before slides/share/main) -->
     <script src="src/features/cerita/cerita.persona.js"></script>
     <script src="src/features/cerita/cerita.sharetext.js"></script>
     <script src="src/features/cerita/cerita.data.js"></script>
@@ -389,6 +392,7 @@
     <script src="src/features/cerita/cerita.share.svg.js"></script>
     <script src="src/features/cerita/cerita.share.js"></script>
     <script src="src/features/cerita/cerita.js"></script>
+    <!-- dashboard (health-score + calc + insight before dashboard.js) -->
     <script src="src/features/budget/budget.js"></script>
     <script src="src/features/dashboard/health-score.js"></script>
     <script src="src/features/dashboard/dashboard.calc.js"></script>
@@ -396,6 +400,7 @@
     <script src="src/features/dashboard/dashboard.chart.js"></script>
     <script src="src/features/dashboard/dashboard.cards.js"></script>
     <script src="src/features/dashboard/dashboard.js"></script>
+    <!-- other features -->
     <script src="src/features/transfer/transfer.js"></script>
     <script src="src/features/insight/insight.rolling.js"></script>
     <script src="src/features/input/input.js"></script>
@@ -405,7 +410,8 @@
     <script src="src/features/tabungan/tabungan.js"></script>
     <script src="src/features/settings/settings.js"></script>
     <script src="src/features/kategori/kategori.js"></script>
-    <!-- boot -->
+
+    <!-- ── BOOT ──────────────────────────────────────────────────────────── -->
     <script src="src/app.js"></script>
   </body>
 </html>

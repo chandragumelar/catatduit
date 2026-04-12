@@ -1,4 +1,9 @@
-// ===== BOTTOM-SHEET.JS — Reusable bottom sheet component =====
+// =============================================================================
+// BOTTOM-SHEET.JS
+// Tanggung jawab: Generic bottom sheet component (open/close/render)
+// Depends on: (none)
+// =============================================================================
+
 // Menggantikan semua window.prompt() di v2.
 //
 // Usage:

@@ -1,4 +1,9 @@
-// ===== RIWAYAT.JS — Transaction history page (Sprint A2) =====
+// =============================================================================
+// RIWAYAT.JS
+// Tanggung jawab: Halaman riwayat transaksi dengan filter bulan, jenis, dan pencarian
+// Depends on: state.js, storage.js, utils.js, ui.js
+// =============================================================================
+
 
 function renderRiwayat() {
   const txList = getTransaksi();
