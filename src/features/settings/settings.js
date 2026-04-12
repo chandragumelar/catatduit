@@ -78,7 +78,7 @@ function renderSettings() {
             <div class="settings-item-icon">💱</div>
             <div>
               <div class="settings-item-label">Mata Uang</div>
-              <div class="settings-item-sub" style="font-size:11px;">Simbol saja, angka tidak dikonversi</div>
+              <div class="settings-item-sub" style="font-size:10px;">Simbol saja, angka tidak dikonversi</div>
             </div>
           </div>
           <select id="currency-select" style="border:none;background:transparent;font-size:13px;color:var(--text-secondary);cursor:pointer;outline:none;padding:4px;">
@@ -91,7 +91,7 @@ function renderSettings() {
             <div class="settings-item-icon">📊</div>
             <div>
               <div class="settings-item-label">Period Budget</div>
-              <div class="settings-item-sub" style="font-size:11px;">Bulanan atau mingguan (Senin–Minggu)</div>
+              <div class="settings-item-sub" style="font-size:10px;">Bulanan atau mingguan (Senin–Minggu)</div>
             </div>
           </div>
           <select id="budget-period-select" style="border:none;background:transparent;font-size:13px;color:var(--text-secondary);cursor:pointer;outline:none;padding:4px;">

@@ -78,7 +78,6 @@ function buildGreetingCard(insightText, nama) {
           <i data-lucide="arrow-left-right"></i> Pindah Dompet
         </button>` : ''}
       </div>
-      <p class="insight-text">${escHtml(insightText)}</p>
     </div>`;
   return el;
 }
