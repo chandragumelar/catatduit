@@ -19,10 +19,11 @@ function initDashboardCharts(calc) {
       document.querySelectorAll('.chart-period-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       _renderComboChart(btn.dataset.period, calc);
+      const isWeekly = btn.dataset.period === 'weekly';
       const cashflowLabel = document.getElementById('chart-cashflow-label');
-      if (cashflowLabel) {
-        cashflowLabel.textContent = btn.dataset.period === 'weekly' ? 'Cashflow per Minggu' : 'Cashflow per Bulan';
-      }
+      if (cashflowLabel) cashflowLabel.textContent = isWeekly ? 'Cashflow per Minggu' : 'Cashflow per Bulan';
+      const comboLabel = document.getElementById('chart-combo-label');
+      if (comboLabel) comboLabel.textContent = isWeekly ? 'Masuk & Keluar per Minggu' : 'Masuk & Keluar per Bulan';
     });
   });
 

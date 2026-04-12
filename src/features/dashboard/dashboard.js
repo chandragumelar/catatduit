@@ -87,7 +87,7 @@ function renderDashboard() {
   push(DASHBOARD_CARDS.CASHFLOW, buildCashflowCard({ cashflow, totalMasuk, totalKeluar, totalNabung, trendText, trendClass }), 45);
 
   // — Catatan terakhir
-  push(DASHBOARD_CARDS.RECENT, buildRecentCard(recentTx), 50);
+  push(DASHBOARD_CARDS.RECENT, buildRecentCard(recentTx), 98);
 
   // — Kategori terboros
   if (borosList.length > 0) {

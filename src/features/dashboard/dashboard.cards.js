@@ -335,6 +335,7 @@ function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
         <button class="chart-period-btn active" data-period="monthly">Bulanan</button>
         <button class="chart-period-btn" data-period="weekly">Mingguan</button>
       </div>
+      <p id="chart-combo-label" class="chart-label">Masuk &amp; Keluar per Bulan</p>
       <div style="position:relative;height:180px;">
         <canvas id="chart-combo"></canvas>
       </div>
