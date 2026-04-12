@@ -1,5 +1,5 @@
 // ===== SERVICE WORKER — CatatDuit v3 =====
-const CACHE_NAME = 'catatduit-v3-cache-v3'; // Sprint C
+const CACHE_NAME = 'catatduit-v3-cache-v4'; // Sprint C
 
 const ASSETS_CORE = [
   '/',
