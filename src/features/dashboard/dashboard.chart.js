@@ -113,7 +113,7 @@ function _renderComboChart(period, calc) {
     dataKeluar = weeks.map(({ start, end }) =>
       calc.txList.filter(tx => {
         const d = new Date(tx.tanggal + 'T00:00:00');
-        return tx.jenis === 'keluar' && d >= start && d <= end;
+        return tx.jenis === 'keluar' && tx.type !== 'transfer_out' && d >= start && d <= end;
       }).reduce((s, tx) => s + tx.nominal, 0));
   } else {
     labels    = calc.chartLabels;
@@ -183,12 +183,12 @@ function renderTrenChart(katId, period, calc) {
     trenData = _8weeks.map(({ start, end }) =>
       calc.txList.filter(tx => {
         const d = new Date(tx.tanggal + 'T00:00:00');
-        return tx.jenis === 'keluar' && tx.kategori === katId && d >= start && d <= end;
+        return tx.jenis === 'keluar' && tx.type !== 'transfer_out' && tx.kategori === katId && d >= start && d <= end;
       }).reduce((s, tx) => s + tx.nominal, 0));
   } else {
     labels   = calc.chartLabels;
     trenData = calc.rolling.map(({ year: y, month: m }) =>
-      calc.txList.filter(tx => tx.jenis === 'keluar' && tx.kategori === katId && isSameMonth(tx.tanggal, y, m))
+      calc.txList.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out' && tx.kategori === katId && isSameMonth(tx.tanggal, y, m))
         .reduce((s, tx) => s + tx.nominal, 0));
   }
 

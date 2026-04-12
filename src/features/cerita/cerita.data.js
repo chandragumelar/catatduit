@@ -15,7 +15,7 @@ function calcCeritaData(year, month) {
 
   const prevDate   = new Date(year, month - 1, 1);
   const prevKeluar = txList
-    .filter(tx => tx.jenis === 'keluar' && isSameMonth(tx.tanggal, prevDate.getFullYear(), prevDate.getMonth()))
+    .filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out' && isSameMonth(tx.tanggal, prevDate.getFullYear(), prevDate.getMonth()))
     .reduce((s, tx) => s + tx.nominal, 0);
 
   const katTotal  = _buildKatTotal(txBulan);
@@ -46,12 +46,13 @@ function calcCeritaData(year, month) {
 }
 
 function _sum(txList, jenis) {
+  if (jenis === 'keluar') return txList.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').reduce((s, tx) => s + tx.nominal, 0);
   return txList.filter(tx => tx.jenis === jenis).reduce((s, tx) => s + tx.nominal, 0);
 }
 
 function _buildKatTotal(txBulan) {
   const map = {};
-  txBulan.filter(tx => tx.jenis === 'keluar').forEach(tx => {
+  txBulan.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').forEach(tx => {
     map[tx.kategori] = (map[tx.kategori] || 0) + tx.nominal;
   });
   return map;

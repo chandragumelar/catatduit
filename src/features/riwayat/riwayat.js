@@ -102,7 +102,7 @@ function renderRiwayatContent() {
 
   // Totals
   const totalMasuk  = filtered.filter(tx => tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0);
-  const totalKeluar = filtered.filter(tx => tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0);
+  const totalKeluar = filtered.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').reduce((s, tx) => s + tx.nominal, 0);
   const totalNabung = filtered.filter(tx => tx.jenis === 'nabung').reduce((s, tx) => s + tx.nominal, 0);
 
   if (state.riwayatFilter.jenis === 'semua' && !searchQuery) {
@@ -123,7 +123,7 @@ function renderRiwayatContent() {
 
   // Item 7: Hari Mahal — tanggal dengan total keluar tertinggi
   const dailyKeluar = {};
-  filtered.filter(tx => tx.jenis === 'keluar').forEach(tx => {
+  filtered.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').forEach(tx => {
     dailyKeluar[tx.tanggal] = (dailyKeluar[tx.tanggal] || 0) + tx.nominal;
   });
   const uniqueDays = Object.keys(dailyKeluar);

@@ -30,7 +30,7 @@ function _calcDashboard({ transaksi, year, month, wallets }) {
   const bulanIni = transaksi.filter(tx => _isSameMonth(tx.tanggal, year, month));
 
   const totalMasuk  = bulanIni.filter(t => t.jenis === 'masuk').reduce((s, t) => s + t.nominal, 0);
-  const totalKeluar = bulanIni.filter(t => t.jenis === 'keluar').reduce((s, t) => s + t.nominal, 0);
+  const totalKeluar = bulanIni.filter(t => t.jenis === 'keluar' && t.type !== 'transfer_out').reduce((s, t) => s + t.nominal, 0);
   const totalNabung = bulanIni.filter(t => t.jenis === 'nabung').reduce((s, t) => s + t.nominal, 0);
 
   // Saldo per wallet
@@ -47,7 +47,7 @@ function _calcDashboard({ transaksi, year, month, wallets }) {
 
   // Pengeluaran per kategori bulan ini
   const byKategori = {};
-  bulanIni.filter(t => t.jenis === 'keluar').forEach(t => {
+  bulanIni.filter(t => t.jenis === 'keluar' && t.type !== 'transfer_out').forEach(t => {
     byKategori[t.kategori] = (byKategori[t.kategori] || 0) + t.nominal;
   });
 
@@ -69,7 +69,7 @@ function _buildChartData(transaksi, year, month) {
     return {
       year: y, month: m,
       masuk:  txs.filter(t => t.jenis === 'masuk').reduce((s, t) => s + t.nominal, 0),
-      keluar: txs.filter(t => t.jenis === 'keluar').reduce((s, t) => s + t.nominal, 0),
+      keluar: txs.filter(t => t.jenis === 'keluar' && t.type !== 'transfer_out').reduce((s, t) => s + t.nominal, 0),
       nabung: txs.filter(t => t.jenis === 'nabung').reduce((s, t) => s + t.nominal, 0),
     };
   });
@@ -79,7 +79,7 @@ function _buildChartData(transaksi, year, month) {
 
 function _calcBudgetStatus({ transaksi, budgets, year, month }) {
   if (!budgets || Object.keys(budgets).length === 0) return {};
-  const bulanIni = transaksi.filter(tx => tx.jenis === 'keluar' && _isSameMonth(tx.tanggal, year, month));
+  const bulanIni = transaksi.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out' && _isSameMonth(tx.tanggal, year, month));
   const result = {};
   for (const [katId, limit] of Object.entries(budgets)) {
     if (!limit || limit <= 0) continue;
@@ -96,7 +96,7 @@ function _calcBudgetStatus({ transaksi, budgets, year, month }) {
 function _calcHealthScore({ transaksi, goals, year, month }) {
   const bulanIni = transaksi.filter(tx => _isSameMonth(tx.tanggal, year, month));
   const totalMasuk  = bulanIni.filter(t => t.jenis === 'masuk').reduce((s, t) => s + t.nominal, 0);
-  const totalKeluar = bulanIni.filter(t => t.jenis === 'keluar').reduce((s, t) => s + t.nominal, 0);
+  const totalKeluar = bulanIni.filter(t => t.jenis === 'keluar' && t.type !== 'transfer_out').reduce((s, t) => s + t.nominal, 0);
   const totalNabung = bulanIni.filter(t => t.jenis === 'nabung').reduce((s, t) => s + t.nominal, 0);
 
   // Komponen 1: Rasio tabungan (25%)

@@ -7,7 +7,7 @@ function calcDashboard() {
   const txBulanIni = txList.filter(tx => isSameMonth(tx.tanggal, year, month));
 
   const totalMasuk   = txBulanIni.filter(tx => tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0);
-  const totalKeluar  = txBulanIni.filter(tx => tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0);
+  const totalKeluar  = txBulanIni.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').reduce((s, tx) => s + tx.nominal, 0);
   const totalNabung  = txBulanIni.filter(tx => tx.jenis === 'nabung').reduce((s, tx) => s + tx.nominal, 0);
   const cashflow     = totalMasuk - totalKeluar;
 
@@ -17,7 +17,7 @@ function calcDashboard() {
     ? getSaldoTotal()
     : getSaldoAwal()
       + txList.filter(tx => tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
-      - txList.filter(tx => tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0);
+      - txList.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').reduce((s, tx) => s + tx.nominal, 0);
 
   const totalNabungAllTime = txList.filter(tx => tx.jenis === 'nabung').reduce((s, tx) => s + tx.nominal, 0);
 
@@ -26,7 +26,7 @@ function calcDashboard() {
   const prevYear  = prevDate.getFullYear();
   const prevMonth = prevDate.getMonth();
   const txBulanLalu = txList.filter(tx => isSameMonth(tx.tanggal, prevYear, prevMonth));
-  const prevKeluar  = txBulanLalu.filter(tx => tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0);
+  const prevKeluar  = txBulanLalu.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').reduce((s, tx) => s + tx.nominal, 0);
 
   // Trend pengeluaran
   let trendText = '', trendClass = 'neutral';
@@ -43,7 +43,7 @@ function calcDashboard() {
   const budgetHarian   = totalMasuk > 0 ? Math.round(totalMasuk / hariDalamBulan) : 0;
 
   // Rata-rata pengeluaran: pakai span hari dari transaksi tertua ke terbaru bulan ini
-  const txBulanIniDates = txBulanIni.map(tx => tx.tanggal).sort();
+  const txBulanIniDates = txBulanIni.filter(tx => tx.type !== 'transfer_out' && tx.type !== 'transfer_in').map(tx => tx.tanggal).sort();
   let rataHarian = 0;
   let spanHari = 0;
   if (txBulanIniDates.length > 0) {
@@ -95,7 +95,7 @@ function calcDashboard() {
 
   // Pengeluaran per kategori (untuk chart)
   const katTotal = {};
-  txBulanIni.filter(tx => tx.jenis === 'keluar').forEach(tx => {
+  txBulanIni.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').forEach(tx => {
     katTotal[tx.kategori] = (katTotal[tx.kategori] || 0) + tx.nominal;
   });
   const katSorted = Object.entries(katTotal).sort((a, b) => b[1] - a[1]);
@@ -126,7 +126,7 @@ function calcDashboard() {
   const katMingguIni  = {};
   const katMingguLalu = {};
   txList.forEach(tx => {
-    if (tx.jenis !== 'keluar') return;
+    if (tx.jenis !== 'keluar' || tx.type === 'transfer_out') return;
     const d = new Date(tx.tanggal + 'T00:00:00');
     if (d >= startMingguIni)  katMingguIni[tx.kategori]  = (katMingguIni[tx.kategori]  || 0) + tx.nominal;
     if (d >= startMingguLalu && d < endMingguLalu)
@@ -147,14 +147,14 @@ function calcDashboard() {
   const DAY_NAMES = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
   const spendByDay = Array(7).fill(0);
   const countByDay = Array(7).fill(0);
-  txList.filter(tx => tx.jenis === 'keluar').forEach(tx => {
+  txList.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').forEach(tx => {
     const dow = new Date(tx.tanggal + 'T00:00:00').getDay();
     spendByDay[dow] += tx.nominal;
     countByDay[dow]++;
   });
   // Hari paling boros (cukup data kalau ada transaksi)
   const maxDow   = spendByDay.indexOf(Math.max(...spendByDay));
-  const borosDay = txList.filter(tx => tx.jenis === 'keluar').length >= 7 ? DAY_NAMES[maxDow] : null;
+  const borosDay = txList.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').length >= 7 ? DAY_NAMES[maxDow] : null;
 
   // Rolling 12 bulan (untuk charts)
   const rolling     = getRolling12Months();
@@ -162,7 +162,7 @@ function calcDashboard() {
   const chartMasuk  = rolling.map(({ year: y, month: m }) =>
     txList.filter(tx => tx.jenis === 'masuk'  && isSameMonth(tx.tanggal, y, m)).reduce((s, tx) => s + tx.nominal, 0));
   const chartKeluar = rolling.map(({ year: y, month: m }) =>
-    txList.filter(tx => tx.jenis === 'keluar' && isSameMonth(tx.tanggal, y, m)).reduce((s, tx) => s + tx.nominal, 0));
+    txList.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out' && isSameMonth(tx.tanggal, y, m)).reduce((s, tx) => s + tx.nominal, 0));
   const chartCashflow = chartMasuk.map((m, i) => m - chartKeluar[i]);
 
   // Check-in hari ini
@@ -176,7 +176,7 @@ function calcDashboard() {
 
   // Biggest spending bulan ini
   const bigSpending = [...txBulanIni]
-    .filter(tx => tx.jenis === 'keluar')
+    .filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out')
     .sort((a, b) => b.nominal - a.nominal)
     .slice(0, 3);
 
@@ -192,14 +192,14 @@ function calcDashboard() {
   const weeklyLabels   = _8weeks.map((_, i) => i === 7 ? 'W0' : `W-${7 - i}`);
   const weeklyCashflow = _8weeks.map(({ start, end }) => {
     const m = txList.filter(tx => { const d = new Date(tx.tanggal + 'T00:00:00'); return tx.jenis === 'masuk'  && d >= start && d <= end; }).reduce((s, tx) => s + tx.nominal, 0);
-    const k = txList.filter(tx => { const d = new Date(tx.tanggal + 'T00:00:00'); return tx.jenis === 'keluar' && d >= start && d <= end; }).reduce((s, tx) => s + tx.nominal, 0);
+    const k = txList.filter(tx => { const d = new Date(tx.tanggal + 'T00:00:00'); return tx.jenis === 'keluar' && tx.type !== 'transfer_out' && d >= start && d <= end; }).reduce((s, tx) => s + tx.nominal, 0);
     return m - k;
   });
 
   // Pengeluaran per kategori — minggu ini (W0)
   const txMingguIniAll = txList.filter(tx => {
     const d = new Date(tx.tanggal + 'T00:00:00');
-    return tx.jenis === 'keluar' && d >= _8weeks[7].start && d <= _8weeks[7].end;
+    return tx.jenis === 'keluar' && tx.type !== 'transfer_out' && d >= _8weeks[7].start && d <= _8weeks[7].end;
   });
   const katTotalWeekly = {};
   txMingguIniAll.filter(tx => tx.type !== 'transfer_out').forEach(tx => {

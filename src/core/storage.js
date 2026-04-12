@@ -342,7 +342,7 @@ function calcBudgetStatus() {
   const { start, end, period } = getBudgetPeriodRange();
 
   const txInPeriod = getTransaksi().filter(tx =>
-    tx.jenis === 'keluar' && tx.tanggal >= start && tx.tanggal <= end
+    tx.jenis === 'keluar' && tx.type !== 'transfer_out' && tx.tanggal >= start && tx.tanggal <= end
   );
 
   const periodLabel = period === 'weekly'

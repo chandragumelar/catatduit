@@ -34,7 +34,7 @@ function calcHealthScore() {
 
   // --- Komponen 2: Cashflow (35%) ---
   const totalMasuk  = txBulanIni.filter(tx => tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0);
-  const totalKeluar = txBulanIni.filter(tx => tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0);
+  const totalKeluar = txBulanIni.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out').reduce((s, tx) => s + tx.nominal, 0);
   let skorCashflow;
   if (totalMasuk === 0 && totalKeluar === 0) {
     skorCashflow = 100; // belum ada data, netral

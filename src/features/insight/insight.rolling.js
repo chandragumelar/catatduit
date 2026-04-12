@@ -68,7 +68,7 @@ function calcRollingInsight(txList) {
   const windowPrev = { start: _toStr(startPrev), end: _toStr(endPrev) };
 
   // Filter only keluar transaksi
-  const txKeluar = txList.filter(tx => tx.jenis === 'keluar');
+  const txKeluar = txList.filter(tx => tx.jenis === 'keluar' && tx.type !== 'transfer_out');
 
   const sumNow  = {};
   const sumPrev = {};
