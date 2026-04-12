@@ -196,6 +196,7 @@ function _showTagihanSheet(id = null) {
         showToast('Tagihan ditambahkan!');
       }
       renderTabunganContent();
+      renderOnboardingChecklist('onboarding-checklist-wrap');
       return null;
     },
   });

@@ -257,6 +257,8 @@ function renderOnboardingChecklist(containerId) {
       } else if (nav === 'tabungan-goal') {
         state.tabunganTab = 'tabungan';
         navigateTo('tabungan');
+      } else if (nav === 'input') {
+        openInputPage('add');
       } else {
         navigateTo(nav);
       }

@@ -144,6 +144,7 @@ function _showGoalSheet(idx = null) {
         showToast('Goal ditambahkan! 🎯');
       }
       renderTabunganContent();
+      renderOnboardingChecklist('onboarding-checklist-wrap');
       return null;
     },
   });
