@@ -34,6 +34,8 @@ function renderTagihanTab(container) {
       const isPaid       = isTagihanPaidThisMonth(t, year, month);
       const isThisMonth  = _isTagihanThisMonth(t, year, month);
       const jatuhFormatted = _formatJatuhTempo(t, year, month);
+      const _todayStr = new Date().toISOString().slice(0, 10);
+      const isToday   = t.jatuhTempo === _todayStr;
 
       const item = document.createElement('div');
       item.className = `tagihan-item ${isThisMonth ? 'tagihan-item--this-month' : ''}`;
@@ -41,6 +43,7 @@ function renderTagihanTab(container) {
         <div class="tagihan-info">
           <div class="tagihan-nama">${escHtml(t.nama)}</div>
           <div class="tagihan-detail">Jatuh tempo: ${jatuhFormatted}${t.isRecurring === false ? ' · Sekali bayar' : ''}</div>
+          ${isToday && !isPaid ? '<div class="tagihan-today-badge">⚠️ Jatuh tempo hari ini!</div>' : ''}
         </div>
         <div class="tagihan-right">
           <div class="tagihan-nominal">${formatRupiah(t.nominal)}</div>
@@ -176,7 +179,8 @@ function _showTagihanSheet(id = null) {
       });
     },
     onConfirm: () => {
-      const nama      = document.getElementById('bs-nama').value.trim();
+      const rawNama   = document.getElementById('bs-nama').value.trim();
+      const nama      = rawNama.charAt(0).toUpperCase() + rawNama.slice(1);
       const nominal   = parseNominal(document.getElementById('bs-nominal').value);
       const jatuhTempo = document.getElementById('bs-jatuh-tempo').value || null;
       if (!nama)            return 'Nama tidak boleh kosong.';

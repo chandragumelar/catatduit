@@ -128,7 +128,7 @@ function _stepWallet() {
   el.className = 'onboarding-card';
   el.innerHTML = `
     <p class="onboarding-question">Dompet mana yang kamu punya?</p>
-    <p class="onboarding-sub" style="margin-bottom:16px;">Pilih yang kamu pakai. Boleh lebih dari satu. Boleh diubah nanti.</p>
+    <p class="onboarding-sub" style="margin-bottom:16px;">Pilih yang kamu pakai — bisa lebih dari satu dan bisa diubah kapan saja.</p>
     <div class="wallet-preset-grid" id="ob-wallet-grid"></div>
     <div id="ob-custom-wallets"></div>
     <button class="btn-text-small" id="ob-btn-tambah-wallet" style="margin-top:8px;">+ Tambah dompet lain</button>

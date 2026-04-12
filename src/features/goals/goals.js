@@ -34,7 +34,7 @@ function renderTabunganTab(container) {
   goalsCard.className = 'card';
   goalsCard.innerHTML = `
     <div class="section-header">
-      <h3 class="section-title">Goals</h3>
+      <h3 class="section-title">Target Tabungan</h3>
       ${goals.length < MAX_GOALS ? '<button class="btn-add-goal" id="btn-add-goal"><i data-lucide="plus"></i> Tambah</button>' : ''}
     </div>`;
 
@@ -79,7 +79,7 @@ function renderTabunganTab(container) {
         <span>${formatRupiah(totalAkumulasi)} dari ${formatRupiah(totalTarget)}</span>
         <span>${Math.round(progressPct)}%</span>
       </div>
-      ${estimasi !== null ? `<p class="goal-estimasi">Estimasi tercapai dalam <strong>${estimasi} bulan lagi</strong> (rata-rata ${formatRupiah(totalBulanIni)}/bulan)</p>` : ''}`;
+      ${estimasi !== null ? `<p class="goal-estimasi">Estimasi tercapai dalam <strong>${estimasi} bulan lagi</strong></p><p class="goal-estimasi-sub">rata-rata ${formatRupiah(totalBulanIni)}/bulan</p>` : ''}`;
     goalsCard.appendChild(progressEl);
   }
 
