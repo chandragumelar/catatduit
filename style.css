@@ -74,7 +74,6 @@ input, select, textarea { font-family: inherit; }
   height: 72px;
   margin: 0 auto 16px;
   color: var(--teal);
-  animation: pop 0.4s ease;
 }
 .onboarding-logo svg {
   width: 100%;
@@ -111,7 +110,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 .onboarding-question {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--gray-900);
   margin-bottom: 12px;
@@ -129,12 +128,23 @@ input, select, textarea { font-family: inherit; }
   text-align: center;
 }
 
+.onboarding-sub {
+  font-size: 10px;
+  color: var(--gray-500);
+  line-height: 1.4;
+}
+
+.onboarding-label-sm {
+  font-size: 10px;
+  color: var(--gray-400);
+}
+
 .onboarding-input {
   width: 100%;
-  padding: 14px 16px;
+  padding: 12px 14px;
   border: 1.5px solid var(--gray-300);
   border-radius: var(--radius-sm);
-  font-size: 16px;
+  font-size: 14px;
   color: var(--gray-900);
   outline: none;
   transition: border-color 0.2s;
