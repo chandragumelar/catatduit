@@ -366,6 +366,7 @@ input, select, textarea { font-family: inherit; }
 .pace-unit { font-size: 12px; font-weight: 400; color: var(--gray-500); }
 .pace-value.income { color: var(--green); }
 .pace-value.expense { color: var(--red); }
+.pace-story { font-size: 13px; color: var(--gray-700); line-height: 1.5; margin: 0; }
 
 /* Summary Cards */
 .summary-grid {

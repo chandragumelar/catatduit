@@ -128,19 +128,28 @@ function buildCashflowCard({ cashflow, totalMasuk, totalKeluar, totalNabung, tre
 
 function buildPaceCard({ rataHarian, budgetHarian }) {
   const el = document.createElement('div');
+
+  let paceStory = '';
+  if (budgetHarian > 0) {
+    const ratio = rataHarian / budgetHarian;
+    const ratioLabel = ratio.toFixed(1);
+    if (ratio <= 1) {
+      paceStory = `Lo belanja <strong>${formatRupiah(rataHarian)}/hari</strong> — masih di bawah budget harian (${formatRupiah(budgetHarian)}). ✅`;
+    } else if (ratio <= 1.5) {
+      paceStory = `Lo belanja <strong>${formatRupiah(rataHarian)}/hari</strong> — ${ratioLabel}× budget harian lo (${formatRupiah(budgetHarian)}). Sedikit over.`;
+    } else if (ratio <= 3) {
+      paceStory = `Lo belanja <strong>${formatRupiah(rataHarian)}/hari</strong> — ${ratioLabel}× di atas budget harian (${formatRupiah(budgetHarian)}). ⚠️ Perlu dikurangi.`;
+    } else {
+      paceStory = `Lo belanja <strong>${formatRupiah(rataHarian)}/hari</strong> — ${ratioLabel}× budget harian lo (${formatRupiah(budgetHarian)}). 🚨 Jauh banget dari target.`;
+    }
+  } else {
+    paceStory = `Rata-rata pengeluaran <strong>${formatRupiah(rataHarian)}/hari</strong> bulan ini.`;
+  }
+
   el.innerHTML = `
     <div class="card pace-card">
-      <div class="pace-content">
-        <div class="pace-left">
-          <p class="pace-label">Pengeluaran rata-rata harian bulan ini</p>
-          <p class="pace-value">Rata-rata pengeluaran <strong>${formatRupiah(rataHarian)}</strong><span class="pace-unit">/hari</span></p>
-        </div>
-        ${budgetHarian > 0 ? `
-        <div class="pace-right">
-          <p class="pace-label">Budget harian</p>
-          <p class="pace-value ${rataHarian > budgetHarian ? 'expense' : 'income'}">${formatRupiah(budgetHarian)}</p>
-        </div>` : ''}
-      </div>
+      <p class="pace-label">Pengeluaran rata-rata harian</p>
+      <p class="pace-story">${paceStory}</p>
     </div>`;
   return el;
 }
@@ -301,7 +310,7 @@ function buildKeuanganCard({
           <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
         </div>` : ''}
         ${tagihanBulanIni.length > 0 ? `
-        <p class="tagihan-paid-status" style="font-size:10px;color:var(--gray-400);margin-top:4px;">
+        <p class="tagihan-paid-status keuangan-row--sub" style="margin-top:4px;">
           ${tagihanSudahBayar.length === tagihanBulanIni.length
             ? '✅ Semua tagihan bulan ini sudah beres!'
             : tagihanSudahBayar.length === 0

@@ -118,17 +118,41 @@ function renderDashboard() {
   sections.sort((a, b) => a.priority - b.priority).forEach(({ el }) => container.appendChild(el));
 
   // Priority banner (inserted at very top, above all cards)
-  const urgentMsgs = [];
-  if (hasBudgetJebol)  urgentMsgs.push('Budget jebol!');
-  if (velocityAlert)   urgentMsgs.push(`Belanja ${velocityAlert.spendPct}% dari pemasukan`);
-  if (tagihanMendekat) {
-    const names = tagihanMendekatList.map(t => t.nama).join(', ');
-    urgentMsgs.push(`Tagihan jatuh tempo besok: ${names}`);
+  // Semua kondisi dikumpulkan lalu dirangkai jadi 1 kalimat natural
+  const _bannerParts = [];
+
+  if (hasBudgetJebol) {
+    const jebolNames = Object.entries(statusMap)
+      .filter(([, s]) => s.status === 'jebol')
+      .map(([id]) => { try { return getKategoriById(id, 'keluar').nama; } catch(e) { return id; } });
+    if (jebolNames.length === 1) _bannerParts.push(`budget ${jebolNames[0]} jebol`);
+    else if (jebolNames.length > 1) _bannerParts.push(`budget ${jebolNames.slice(0,-1).join(', ')} & ${jebolNames[jebolNames.length-1]} jebol`);
+    else _bannerParts.push('budget jebol');
   }
-  if (urgentMsgs.length > 0) {
+
+  if (velocityAlert) {
+    _bannerParts.push(`belanja udah ${velocityAlert.spendPct}% dari pemasukan`);
+  }
+
+  if (tagihanMendekat) {
+    const names = tagihanMendekatList.map(t => t.nama);
+    if (names.length === 1) _bannerParts.push(`tagihan ${names[0]} jatuh tempo besok`);
+    else _bannerParts.push(`tagihan ${names.slice(0,-1).join(', ')} & ${names[names.length-1]} jatuh tempo besok`);
+  }
+
+  if (_bannerParts.length > 0) {
+    // Rangkai jadi 1 kalimat: "A, B, dan C"
+    let bannerText;
+    if (_bannerParts.length === 1) {
+      bannerText = _bannerParts[0].charAt(0).toUpperCase() + _bannerParts[0].slice(1) + '.';
+    } else {
+      const last = _bannerParts[_bannerParts.length - 1];
+      const rest = _bannerParts.slice(0, -1);
+      bannerText = rest.map((s, i) => i === 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s).join(', ') + ', dan ' + last + '.';
+    }
     const banner = document.createElement('div');
     banner.className = 'priority-banner';
-    banner.innerHTML = `<span>🔔</span><span>${urgentMsgs.join(' · ')}</span>`;
+    banner.innerHTML = `<span>🔔</span><span>${bannerText}</span>`;
     container.insertBefore(banner, container.firstChild);
   }
 
