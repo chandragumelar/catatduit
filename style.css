@@ -134,6 +134,21 @@ input, select, textarea { font-family: inherit; }
   line-height: 1.4;
 }
 
+.onboarding-step-indicator {
+  font-size: 11px;
+  color: var(--gray-400);
+  text-align: center;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+.onboarding-hint {
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
 .onboarding-label-sm {
   font-size: 10px;
   color: var(--gray-400);

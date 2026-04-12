@@ -72,22 +72,12 @@ function _renderOnboardingStep(step) {
 
   const renderers = [null, _stepNama, _stepWallet, _stepSaldo];
   wrap.innerHTML = '';
-  wrap.appendChild(_stepIndicator(step, 3));
   wrap.appendChild(renderers[step]());
 
   if (window.lucide) lucide.createIcons();
 
   // focus input pertama di step baru
   setTimeout(() => wrap.querySelector('input')?.focus(), 250);
-}
-
-// ===== STEP INDICATOR =====
-
-function _stepIndicator(current, total) {
-  const el = document.createElement('p');
-  el.className = 'onboarding-step-indicator';
-  el.textContent = `Langkah ${current} dari ${total}`;
-  return el;
 }
 
 // ===== STEP 1: Nama =====
@@ -98,8 +88,7 @@ function _stepNama() {
   el.innerHTML = `
     <p class="onboarding-question">Halo! Siapa namamu?</p>
     <p class="onboarding-trust"><i data-lucide="lock" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"></i>Semua catatan tersimpan langsung di HP kamu — tidak ada server, tidak ada yang bisa lihat.</p>
-    <input type="text" id="ob-nama" class="onboarding-input" placeholder="Contoh: Budi" maxlength="30" autocomplete="off" />
-    <p class="onboarding-hint">Nama ini akan muncul di sapaan harian kamu</p>
+    <input type="text" id="ob-nama" class="onboarding-input" placeholder="Tulis namamu di sini..." maxlength="30" autocomplete="off" />
     <p class="onboarding-error" id="ob-nama-error"></p>
     <button id="ob-btn-nama" class="btn-primary" disabled>Mulai →</button>`;
 
@@ -127,7 +116,7 @@ function _stepWallet() {
   const el = document.createElement('div');
   el.className = 'onboarding-card';
   el.innerHTML = `
-    <p class="onboarding-question">Dompet mana yang kamu punya?</p>
+    <p class="onboarding-question">Dompet mana yang mau dipantau?</p>
     <p class="onboarding-sub" style="margin-bottom:16px;">Pilih yang kamu pakai. Boleh lebih dari satu. Boleh diubah nanti.</p>
     <div class="wallet-preset-grid" id="ob-wallet-grid"></div>
     <div id="ob-custom-wallets"></div>
@@ -176,21 +165,22 @@ function _addCustomWalletField(el) {
   row.className = 'ob-custom-wallet-row';
   row.innerHTML = `
     <input type="text" class="onboarding-input ob-custom-nama" placeholder="Nama dompet (contoh: Jenius)" maxlength="20" style="margin-bottom:0;" />
-    <button type="button" class="btn-icon-sm ob-confirm-custom">+ Tambah</button>
     <button type="button" class="btn-icon-sm danger ob-remove-custom">✕</button>`;
-  row.querySelector('.ob-confirm-custom').addEventListener('click', () => {
-    const nama = row.querySelector('.ob-custom-nama').value.trim();
-    if (!nama) return;
-    const idx = Array.from(wrap.children).indexOf(row);
-    _ob.customWallets[idx] = { nama, icon: '💳' };
-    row.querySelector('.ob-confirm-custom').disabled = true;
-    row.querySelector('.ob-confirm-custom').textContent = '✓';
-    _updateWalletBtn(el);
-  });
   row.querySelector('.ob-remove-custom').addEventListener('click', () => {
     const idx = row.dataset.customIdx;
     if (idx !== undefined) _ob.customWallets.splice(parseInt(idx), 1);
     row.remove();
+    _updateWalletBtn(el);
+  });
+  row.querySelector('.ob-custom-nama').addEventListener('input', (e) => {
+    const nama = e.target.value.trim();
+    // update atau tambah ke _ob.customWallets
+    const idx = Array.from(wrap.children).indexOf(row);
+    if (nama) {
+      _ob.customWallets[idx] = { nama, icon: '💳' };
+    } else {
+      delete _ob.customWallets[idx];
+    }
     _updateWalletBtn(el);
   });
   wrap.appendChild(row);
@@ -229,7 +219,7 @@ function _stepSaldo() {
     </div>
     <div id="ob-saldo-fields"></div>
     <p class="onboarding-error" id="ob-saldo-error"></p>
-    <button id="ob-btn-selesai" class="btn-primary" style="margin-top:16px;">Ayo Mulai! 🎉</button>`;
+    <button id="ob-btn-selesai" class="btn-primary" style="margin-top:16px;">Mulai Pantau 🎉</button>`;
 
   const fieldsWrap = el.querySelector('#ob-saldo-fields');
   selectedWallets.forEach(wallet => {
