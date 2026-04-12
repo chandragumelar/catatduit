@@ -20,7 +20,17 @@ function initDashboardCharts(calc) {
       btn.classList.add('active');
       _renderComboChart(btn.dataset.period, calc);
       const note = document.getElementById('chart-week-note');
-      if (note) note.style.display = btn.dataset.period === 'weekly' ? 'block' : 'none';
+      if (note) {
+        if (btn.dataset.period === 'weekly') {
+          note.style.display = 'block';
+          note.style.fontSize = '10px';
+          note.style.textTransform = 'uppercase';
+          note.style.letterSpacing = '0.04em';
+          note.style.color = 'var(--gray-400)';
+        } else {
+          note.style.display = 'none';
+        }
+      }
     });
   });
 
