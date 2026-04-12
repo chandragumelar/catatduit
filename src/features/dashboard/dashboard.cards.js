@@ -123,36 +123,6 @@ function buildCashflowCard({ cashflow, totalMasuk, totalKeluar, totalNabung, tre
   return el;
 }
 
-// ===== PACE CARD =====
-
-function buildPaceCard({ rataHarian, budgetHarian }) {
-  const el = document.createElement('div');
-
-  let paceStory = '';
-  if (budgetHarian > 0) {
-    const ratio = rataHarian / budgetHarian;
-    const ratioLabel = ratio.toFixed(1);
-    if (ratio <= 1) {
-      paceStory = `Lo belanja <strong>${formatRupiah(rataHarian)}/hari</strong> — masih di bawah budget harian (${formatRupiah(budgetHarian)}). ✅`;
-    } else if (ratio <= 1.5) {
-      paceStory = `Lo belanja <strong>${formatRupiah(rataHarian)}/hari</strong> — ${ratioLabel}× budget harian lo (${formatRupiah(budgetHarian)}). Sedikit over.`;
-    } else if (ratio <= 3) {
-      paceStory = `Lo belanja <strong>${formatRupiah(rataHarian)}/hari</strong> — ${ratioLabel}× di atas budget harian (${formatRupiah(budgetHarian)}). ⚠️ Perlu dikurangi.`;
-    } else {
-      paceStory = `Lo belanja <strong>${formatRupiah(rataHarian)}/hari</strong> — ${ratioLabel}× budget harian lo (${formatRupiah(budgetHarian)}). 🚨 Jauh banget dari target.`;
-    }
-  } else {
-    paceStory = `Rata-rata pengeluaran <strong>${formatRupiah(rataHarian)}/hari</strong> bulan ini.`;
-  }
-
-  el.innerHTML = `
-    <div class="card pace-card">
-      <p class="pace-label">Pengeluaran rata-rata harian</p>
-      <p class="pace-story">${paceStory}</p>
-    </div>`;
-  return el;
-}
-
 // ===== RECENT TX CARD =====
 
 function buildRecentCard(recentTx) {

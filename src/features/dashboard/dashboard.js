@@ -24,7 +24,7 @@ function renderDashboard() {
     year, month,
     totalMasuk, totalKeluar, totalNabung, cashflow,
     estimasiSaldo, trendText, trendClass,
-    hariIni, rataHarian, budgetHarian,
+    hariIni,
     tagihan, tagihanBulanIni, tagihanSudahBayar, tagihanBelumBayar,
     totalTagihanBelumBayar, uangBebas, bebasDipakai,
     borosList, katSorted,
@@ -77,7 +77,6 @@ function renderDashboard() {
 
   // — Pace indicator
   if (totalMasuk > 0 || totalKeluar > 0) {
-    push('card-pace', buildPaceCard({ rataHarian, budgetHarian }), 40);
   }
 
   // — Velocity alert (naik ke 2 kalau aktif)
@@ -135,9 +134,21 @@ function renderDashboard() {
   }
 
   if (tagihanMendekat) {
-    const names = tagihanMendekatList.map(t => t.nama);
-    if (names.length === 1) _bannerParts.push(`tagihan ${names[0]} jatuh tempo besok`);
-    else _bannerParts.push(`tagihan ${names.slice(0,-1).join(', ')} & ${names[names.length-1]} jatuh tempo besok`);
+    const todayStr    = new Date().toISOString().split('T')[0];
+    const hariIniList = tagihanMendekatList.filter(t => t.jatuhTempo === todayStr);
+    const besokList   = tagihanMendekatList.filter(t => t.jatuhTempo !== todayStr);
+
+    const _joinNames = (arr) => {
+      const names = arr.map(t => t.nama);
+      if (names.length === 1) return names[0];
+      return names.slice(0, -1).join(', ') + ' & ' + names[names.length - 1];
+    };
+
+    const parts = [];
+    if (hariIniList.length > 0) parts.push(`tagihan ${_joinNames(hariIniList)} jatuh tempo hari ini`);
+    if (besokList.length > 0)   parts.push(`tagihan ${_joinNames(besokList)} jatuh tempo besok`);
+    if (parts.length === 1) _bannerParts.push(parts[0]);
+    else _bannerParts.push(parts.join(', '));
   }
 
   if (_bannerParts.length > 0) {
