@@ -117,6 +117,8 @@ function renderChips() {
   const rest = sorted.slice(8);
 
   wrap.innerHTML = '';
+  const tambahWrap = document.getElementById('chip-tambah-wrap');
+  if (tambahWrap) tambahWrap.innerHTML = '';
 
   top8.forEach(k => {
     wrap.appendChild(_makeChip(k));
@@ -149,6 +151,10 @@ function _makeChip(k) {
 }
 
 function appendTambahKategoriChip(wrap) {
+  // "Tambah Kategori" rendered in its own container below the chip row
+  const tambahWrap = document.getElementById('chip-tambah-wrap');
+  if (!tambahWrap) return;
+  tambahWrap.innerHTML = '';
   const addChip = document.createElement('button');
   addChip.type = 'button';
   addChip.className = 'chip chip--add';
@@ -164,7 +170,7 @@ function appendTambahKategoriChip(wrap) {
     };
     navigateTo('kategori');
   };
-  wrap.appendChild(addChip);
+  tambahWrap.appendChild(addChip);
   if (window.lucide) lucide.createIcons();
 }
 

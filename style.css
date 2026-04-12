@@ -673,16 +673,20 @@ input, select, textarea { font-family: inherit; }
 .chip:active { transform: scale(0.96); }
 .chip.active { background: var(--teal-light); border-color: var(--teal); color: var(--teal); font-weight: 600; }
 
-/* "+ Tambah Kategori" chip — outline style */
+/* "+ Tambah Kategori" chip — dashed outline, clearly an action not a selection */
 .chip--add {
-  border-color: var(--teal);
-  color: var(--teal);
-  font-weight: 600;
+  border-style: dashed;
+  border-color: var(--gray-300);
+  color: var(--gray-500);
+  font-weight: 500;
   max-width: 160px;
 }
+.chip--add:hover { border-color: var(--teal); color: var(--teal); }
 .chip--add svg { width: 14px; height: 14px; flex-shrink: 0; }
 
 .input-actions { padding-top: 8px; }
+
+#chip-tambah-wrap { margin-top: 8px; }
 
 /* ===== FILTER BAR ===== */
 .filter-bar {
