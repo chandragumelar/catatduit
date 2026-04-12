@@ -318,3 +318,46 @@ function buildKeuanganCard({
   render();
   return card;
 }
+
+// ===== _buildChartsHTML — HTML untuk section grafik =====
+function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
+  const allKeluar = getKategori().keluar;
+
+  const katOptions = allKeluar.map(k =>
+    `<option value="${k.id}">${k.icon} ${k.nama}</option>`
+  ).join('');
+
+  return `
+    <div class="chart-block">
+      <div class="chart-period-wrap">
+        <button class="chart-period-btn active" data-period="monthly">Bulanan</button>
+        <button class="chart-period-btn" data-period="weekly">Mingguan</button>
+      </div>
+      <canvas id="chart-combo" height="180"></canvas>
+      <p id="chart-week-note" style="display:none;font-size:12px;color:var(--gray-500);margin-top:4px;">Menampilkan 8 minggu terakhir</p>
+    </div>
+
+    <div class="chart-block" style="margin-top:16px;">
+      <p class="chart-label">Cashflow per Bulan</p>
+      <canvas id="chart-surplus" height="160"></canvas>
+    </div>
+
+    ${katSorted.length > 0 ? `
+    <div class="chart-block" style="margin-top:16px;">
+      <p class="chart-label">Pengeluaran per Kategori</p>
+      <canvas id="chart-kategori" height="${Math.max(80, katSorted.length * 28)}"></canvas>
+    </div>` : ''}
+
+    <div class="chart-block" style="margin-top:16px;">
+      <p class="chart-label">Tren Kategori</p>
+      <select id="tren-kategori-select" class="select-small" style="margin-bottom:8px;">${katOptions}</select>
+      <canvas id="chart-tren" height="160"></canvas>
+    </div>
+
+    ${borosDay ? `
+    <div class="chart-block" style="margin-top:16px;">
+      <p class="chart-label">Pengeluaran per Hari</p>
+      <canvas id="chart-dow" height="160"></canvas>
+    </div>` : ''}
+  `;
+}
