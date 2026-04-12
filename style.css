@@ -736,6 +736,20 @@ input, select, textarea { font-family: inherit; }
 .tagihan-nama { font-size: 14px; font-weight: 600; color: var(--gray-900); }
 .tagihan-detail { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
 .tagihan-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.btn-sudah-bayar {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--primary);
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+.btn-sudah-bayar:active { background: var(--primary-dark, #0e9476); transform: scale(0.96); }
 .tagihan-nominal { font-size: 14px; font-weight: 600; color: var(--gray-900); }
 
 .btn-add-tagihan {
@@ -1821,6 +1835,7 @@ input, select, textarea { font-family: inherit; }
 
 .budget-period-btn {
   flex: 1;
+  min-width: 0;
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--border);
@@ -1829,6 +1844,9 @@ input, select, textarea { font-family: inherit; }
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: all 0.15s ease;
 }
 

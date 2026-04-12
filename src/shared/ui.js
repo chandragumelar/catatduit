@@ -61,6 +61,10 @@ function navigateTo(page) {
   if (page === 'input') {
     const pfx = document.getElementById('input-currency-prefix');
     if (pfx) pfx.textContent = getCurrencySymbol();
+    // Pastikan kategori chips selalu fresh saat navigate ke halaman input
+    if (typeof setInputJenis === 'function') {
+      setInputJenis(state.inputJenis || 'keluar');
+    }
   }
 }
 
