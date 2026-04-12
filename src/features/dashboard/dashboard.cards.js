@@ -74,8 +74,8 @@ function buildGreetingCard(insightText, nama) {
     <div class="greeting-section">
       <div class="greeting-top">
         <p class="greeting-text">Halo, ${escHtml(nama)}! 👋</p>
-        ${showTransferBtn ? `<button class="btn-transfer-shortcut" id="btn-open-transfer" title="Transfer antar dompet">
-          <i data-lucide="arrow-left-right"></i> Transfer
+        ${showTransferBtn ? `<button class="btn-transfer-shortcut" id="btn-open-transfer" title="Pindah saldo antar dompet">
+          <i data-lucide="arrow-left-right"></i> Pindah Dompet
         </button>` : ''}
       </div>
       <p class="insight-text">${escHtml(insightText)}</p>
@@ -107,7 +107,8 @@ function buildCashflowCard({ cashflow, totalMasuk, totalKeluar, totalNabung, tre
       <div class="summary-card summary-card--main">
         <p class="summary-label">Cashflow Bulan Ini</p>
         <p class="summary-value ${cashflow >= 0 ? 'income' : 'expense'} summary-value--large">${formatRupiah(cashflow)}</p>
-        <p class="summary-sub-label" style="color:var(--gray-400);">Masuk − keluar dari transaksi bulan ini</p>
+        <p class="summary-sub-label" style="color:var(--gray-400);">Pemasukan dikurangi pengeluaran bulan ini</p>
+        <p class="summary-sub-label" style="color:var(--gray-400);font-size:0.75rem;">Tidak termasuk saldo awal dompet</p>
         ${totalNabung > 0 ? `<p class="summary-sub-label">Sudah nabung ${formatRupiah(totalNabung)} bulan ini</p>` : ''}
       </div>
       <div class="summary-card">

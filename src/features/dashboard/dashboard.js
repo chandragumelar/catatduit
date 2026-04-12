@@ -40,7 +40,8 @@ function renderDashboard() {
   const hasBudgetWarn  = Object.values(statusMap).some(s => s.status === 'warning');
   const tomorrow       = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowStr    = tomorrow.toISOString().split('T')[0];
-  const tagihanMendekat = (tagihanBelumBayar || []).some(t => t.jatuhTempo && t.jatuhTempo <= tomorrowStr);
+  const tagihanMendekatList = (tagihanBelumBayar || []).filter(t => t.jatuhTempo && t.jatuhTempo <= tomorrowStr);
+  const tagihanMendekat = tagihanMendekatList.length > 0;
 
   // sections: { id, el, priority }
   // priority kecil = lebih atas. Greeting (0) selalu pertama, Share (99) selalu terakhir.
@@ -124,7 +125,10 @@ function renderDashboard() {
   const urgentMsgs = [];
   if (hasBudgetJebol)  urgentMsgs.push('Budget jebol!');
   if (velocityAlert)   urgentMsgs.push(`Belanja ${velocityAlert.spendPct}% dari pemasukan`);
-  if (tagihanMendekat) urgentMsgs.push('Tagihan jatuh tempo besok');
+  if (tagihanMendekat) {
+    const names = tagihanMendekatList.map(t => t.nama).join(', ');
+    urgentMsgs.push(`Tagihan jatuh tempo besok: ${names}`);
+  }
   if (urgentMsgs.length > 0) {
     const banner = document.createElement('div');
     banner.className = 'priority-banner';
