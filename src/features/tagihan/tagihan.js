@@ -50,8 +50,8 @@ function renderTagihanTab(container) {
                 ? `<span class="tagihan-lunas-badge">✓ Lunas</span>`
                 : `<button class="btn-sudah-bayar" data-id="${t.id}">Sudah Bayar</button>`
               : ''}
-            <button class="btn-icon-sm" data-action="edit-tagihan" data-id="${t.id}" title="Edit">✏️</button>
-            <button class="btn-icon-sm danger" data-action="hapus-tagihan" data-id="${t.id}" title="Hapus">🗑️</button>
+            <button class="btn-icon-sm" data-action="edit-tagihan" data-id="${t.id}" title="Edit"><i data-lucide="pencil"></i></button>
+            <button class="btn-icon-sm danger" data-action="hapus-tagihan" data-id="${t.id}" title="Hapus"><i data-lucide="trash-2"></i></button>
           </div>
         </div>`;
       tagihanCard.appendChild(item);

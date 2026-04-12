@@ -52,8 +52,8 @@ function renderTabunganTab(container) {
           <div class="goal-name">${escHtml(goal.nama)}</div>
           <div class="goal-right">
             <span class="goal-target">${formatRupiah(goal.target)}</span>
-            <button class="btn-icon-sm" data-action="edit-goal" data-idx="${idx}" title="Edit">✏️</button>
-            <button class="btn-icon-sm danger" data-action="hapus-goal" data-idx="${idx}" title="Hapus">🗑️</button>
+            <button class="btn-icon-sm" data-action="edit-goal" data-idx="${idx}" title="Edit"><i data-lucide="pencil"></i></button>
+            <button class="btn-icon-sm danger" data-action="hapus-goal" data-idx="${idx}" title="Hapus"><i data-lucide="trash-2"></i></button>
           </div>
         </div>`;
       listEl.appendChild(item);

@@ -87,7 +87,7 @@ function _stepNama() {
   el.className = 'onboarding-card';
   el.innerHTML = `
     <p class="onboarding-question">Halo! Siapa namamu?</p>
-    <p class="onboarding-trust">🔒 Semua catatan tersimpan langsung di HP kamu — tidak ada server, tidak ada yang bisa lihat.</p>
+    <p class="onboarding-trust"><i data-lucide="lock" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"></i>Semua catatan tersimpan langsung di HP kamu — tidak ada server, tidak ada yang bisa lihat.</p>
     <input type="text" id="ob-nama" class="onboarding-input" placeholder="Tulis namamu di sini..." maxlength="30" autocomplete="off" />
     <p class="onboarding-error" id="ob-nama-error"></p>
     <button id="ob-btn-nama" class="btn-primary" disabled>Mulai →</button>`;
@@ -132,7 +132,7 @@ function _stepWallet() {
     tile.type = 'button';
     tile.className = 'wallet-preset-tile';
     tile.dataset.id = preset.id;
-    tile.innerHTML = `<span class="wallet-preset-icon">${preset.icon}</span><span class="wallet-preset-nama">${escHtml(preset.nama)}</span>`;
+    tile.innerHTML = `<span class="wallet-preset-icon"><i data-lucide="${preset.lucideIcon}"></i></span><span class="wallet-preset-nama">${escHtml(preset.nama)}</span>`;
     tile.addEventListener('click', () => {
       tile.classList.toggle('selected');
       const idx = _ob.walletIds.indexOf(preset.id);

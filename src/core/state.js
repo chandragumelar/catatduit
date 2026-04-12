@@ -113,15 +113,15 @@ const DASHBOARD_CARDS = {
 const DEFAULT_WALLET_ID = 'utama';
 
 const WALLET_PRESETS = [
-  { id: 'bca',       nama: 'BCA',       icon: '🏦' },
-  { id: 'bri',       nama: 'BRI',       icon: '🏦' },
-  { id: 'mandiri',   nama: 'Mandiri',   icon: '🏦' },
-  { id: 'bni',       nama: 'BNI',       icon: '🏦' },
-  { id: 'gopay',     nama: 'GoPay',     icon: '💚' },
-  { id: 'ovo',       nama: 'OVO',       icon: '💜' },
-  { id: 'dana',      nama: 'DANA',      icon: '💙' },
-  { id: 'shopeepay', nama: 'ShopeePay', icon: '🧡' },
-  { id: 'cash',      nama: 'Cash',      icon: '💵' },
+  { id: 'bca',       nama: 'BCA',       icon: '🏦', lucideIcon: 'landmark' },
+  { id: 'bri',       nama: 'BRI',       icon: '🏦', lucideIcon: 'landmark' },
+  { id: 'mandiri',   nama: 'Mandiri',   icon: '🏦', lucideIcon: 'landmark' },
+  { id: 'bni',       nama: 'BNI',       icon: '🏦', lucideIcon: 'landmark' },
+  { id: 'gopay',     nama: 'GoPay',     icon: '💚', lucideIcon: 'zap' },
+  { id: 'ovo',       nama: 'OVO',       icon: '💜', lucideIcon: 'circle-dollar-sign' },
+  { id: 'dana',      nama: 'DANA',      icon: '💙', lucideIcon: 'shield' },
+  { id: 'shopeepay', nama: 'ShopeePay', icon: '🧡', lucideIcon: 'shopping-bag' },
+  { id: 'cash',      nama: 'Cash',      icon: '💵', lucideIcon: 'banknote' },
 ];
 
 const state = {

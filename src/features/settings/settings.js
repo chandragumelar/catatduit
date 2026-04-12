@@ -40,8 +40,8 @@ function renderSettings() {
               </div>
             </div>
             <div style="display:flex;gap:6px;align-items:center;">
-              <button class="btn-icon-sm" data-action="edit-wallet" data-idx="${i}">✏️</button>
-              ${wallets.length > 1 ? `<button class="btn-icon-sm danger" data-action="hapus-wallet" data-idx="${i}">🗑️</button>` : ''}
+              <button class="btn-icon-sm" data-action="edit-wallet" data-idx="${i}"><i data-lucide="pencil"></i></button>
+              ${wallets.length > 1 ? `<button class="btn-icon-sm danger" data-action="hapus-wallet" data-idx="${i}"><i data-lucide="trash-2"></i></button>` : ''}
             </div>
           </div>
           ${i < wallets.length - 1 ? '<div class="settings-divider"></div>' : ''}`).join('')}
@@ -193,7 +193,7 @@ function renderSettings() {
       <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">
         <div class="settings-item danger" id="btn-reset">
           <div class="settings-item-left">
-            <div class="settings-item-icon">🗑️</div>
+            <div class="settings-item-icon"><i data-lucide="trash-2"></i></div>
             <span class="settings-item-label">Hapus Semua Data</span>
           </div>
         </div>
