@@ -70,6 +70,15 @@ function _renderOnboardingStep(step) {
   const wrap = document.getElementById('onboarding-dynamic');
   if (!wrap) return;
 
+  // hide logo, title, tagline on step 2 & 3
+  const logo    = document.querySelector('.onboarding-logo');
+  const title   = document.querySelector('.onboarding-title');
+  const tagline = document.querySelector('.onboarding-tagline');
+  const hide = step > 1;
+  logo?.classList.toggle('onboarding-logo--hidden', hide);
+  title?.classList.toggle('onboarding-title--hidden', hide);
+  tagline?.classList.toggle('onboarding-tagline--hidden', hide);
+
   const renderers = [null, _stepNama, _stepWallet, _stepSaldo];
   wrap.innerHTML = '';
   wrap.appendChild(_stepIndicator(step, 3));
