@@ -24,8 +24,7 @@ function initDashboardCharts(calc) {
         if (btn.dataset.period === 'weekly') {
           note.style.display = 'block';
           note.style.fontSize = '10px';
-          note.style.textTransform = 'uppercase';
-          note.style.letterSpacing = '0.04em';
+          note.style.textTransform = 'none';
           note.style.color = 'var(--gray-400)';
         } else {
           note.style.display = 'none';
