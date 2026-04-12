@@ -30,6 +30,7 @@ function renderDashboard() {
     borosList, katSorted,
     sudahCatatHariIni, recentTx, bigSpending,
     velocityAlert, borosDay,
+    weeklyLabels, weeklyCashflow, katSortedWeekly, borosListWeekly, bigSpendingWeekly,
   } = calc;
 
   const insightText = getInsightText({ ...calc, nama: getNama() });
@@ -90,9 +91,9 @@ function renderDashboard() {
   // — Catatan terakhir
   push(DASHBOARD_CARDS.RECENT, buildRecentCard(recentTx), 98);
 
-  // — Kategori terboros
-  if (borosList.length > 0) {
-    push(DASHBOARD_CARDS.BOROS, buildBorosCard(borosList), 55);
+  // — Kategori terboros / Pengeluaran terbesar (merged card, default monthly)
+  if (borosList.length > 0 || bigSpending.length > 0) {
+    push(DASHBOARD_CARDS.BOROS, buildSpendingCard(calc, 'monthly'), 55);
   }
 
   // — Budget (naik ke 3 kalau jebol, 5 kalau warning)
@@ -108,11 +109,6 @@ function renderDashboard() {
     content: _buildChartsHTML(calc, katSorted, totalKeluar, borosDay),
   });
   push(DASHBOARD_CARDS.CHARTS, chartsEl, 80);
-
-  // — Pengeluaran terbesar
-  if (bigSpending.length > 0) {
-    push('card-big', buildBigSpendingCard(bigSpending), 85);
-  }
 
   // — Share (fixed bottom)
   push('card-share', buildShareCard(), 99);

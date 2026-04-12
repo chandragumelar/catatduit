@@ -160,49 +160,56 @@ function buildRecentCard(recentTx) {
 
 // ===== BOROS CARD =====
 
-function buildBorosCard(borosList) {
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.dataset.cardId = DASHBOARD_CARDS.BOROS;
-  card.innerHTML = `
-    <div class="section-header"><h3 class="section-title">Kategori Terboros Bulan Ini</h3></div>
-    ${borosList.map(({ id, val, badge, badgeText }) => {
-      const k = getKategoriById(id, 'keluar');
-      return `<div class="boros-item">
-        <div class="boros-icon">${k.icon}</div>
-        <div class="boros-info">
-          <div class="boros-nama">${escHtml(k.nama)}</div>
-          <div class="boros-sub">${formatRupiah(val)}</div>
-        </div>
-        <span class="boros-badge ${badge}">${badgeText}</span>
-      </div>`;
-    }).join('')}`;
-  return card;
-}
+// ===== SPENDING CARD (merged: bulanan = per kategori, mingguan = per transaksi) =====
 
-// ===== BIG SPENDING CARD =====
-
-function buildBigSpendingCard(bigSpending) {
+function buildSpendingCard(calc, period) {
   const el = document.createElement('div');
   el.className = 'card';
-  el.innerHTML = `
-    <div class="section-header"><h3 class="section-title">Pengeluaran Terbesar Bulan Ini</h3></div>
-    ${bigSpending.map((tx, i) => {
-      const k = getKategoriById(tx.kategori, 'keluar');
-      return `<div class="big-tx-item" data-id="${tx.id}">
-        <div class="big-tx-rank">${i + 1}</div>
-        <div class="tx-icon">${k.icon}</div>
-        <div class="tx-info">
-          <div class="tx-kategori">${escHtml(k.nama)}</div>
-          ${tx.catatan ? `<div class="tx-catatan">${escHtml(tx.catatan)}</div>` : ''}
-        </div>
-        <div class="tx-right">
-          <div class="tx-nominal keluar">${formatRupiah(tx.nominal)}</div>
-          <div class="tx-tanggal">${formatDate(tx.tanggal)}</div>
-        </div>
-      </div>`;
-    }).join('')}`;
+  el.dataset.cardId = DASHBOARD_CARDS.BOROS;
+  el.innerHTML = _buildSpendingCardHTML(calc, period);
   return el;
+}
+
+function _buildSpendingCardHTML(calc, period) {
+  if (period === 'weekly') {
+    const { bigSpendingWeekly } = calc;
+    if (!bigSpendingWeekly || bigSpendingWeekly.length === 0)
+      return `<div class="section-header"><h3 class="section-title" id="spending-card-label">Pengeluaran Terbesar · Minggu Ini</h3></div><p style="color:var(--color-text-tertiary);font-size:13px;">Belum ada pengeluaran minggu ini.</p>`;
+    return `
+      <div class="section-header"><h3 class="section-title" id="spending-card-label">Pengeluaran Terbesar · Minggu Ini</h3></div>
+      ${bigSpendingWeekly.map((tx, i) => {
+        const k = getKategoriById(tx.kategori, 'keluar');
+        return `<div class="big-tx-item" data-id="${tx.id}">
+          <div class="big-tx-rank">${i + 1}</div>
+          <div class="tx-icon">${k.icon}</div>
+          <div class="tx-info">
+            <div class="tx-kategori">${escHtml(k.nama)}</div>
+            ${tx.catatan ? `<div class="tx-catatan">${escHtml(tx.catatan)}</div>` : ''}
+          </div>
+          <div class="tx-right">
+            <div class="tx-nominal keluar">${formatRupiah(tx.nominal)}</div>
+            <div class="tx-tanggal">${formatDate(tx.tanggal)}</div>
+          </div>
+        </div>`;
+      }).join('')}`;
+  } else {
+    const { borosList } = calc;
+    if (!borosList || borosList.length === 0)
+      return `<div class="section-header"><h3 class="section-title" id="spending-card-label">Kategori Terboros · Bulan Ini</h3></div><p style="color:var(--color-text-tertiary);font-size:13px;">Belum ada pengeluaran bulan ini.</p>`;
+    return `
+      <div class="section-header"><h3 class="section-title" id="spending-card-label">Kategori Terboros · Bulan Ini</h3></div>
+      ${borosList.map(({ id, val, badge, badgeText }) => {
+        const k = getKategoriById(id, 'keluar');
+        return `<div class="boros-item">
+          <div class="boros-icon">${k.icon}</div>
+          <div class="boros-info">
+            <div class="boros-nama">${escHtml(k.nama)}</div>
+            <div class="boros-sub">${formatRupiah(val)}</div>
+          </div>
+          ${badge ? `<span class="boros-badge ${badge}">${badgeText}</span>` : ''}
+        </div>`;
+      }).join('')}`;
+  }
 }
 
 // ===== SHARE CARD =====
@@ -352,14 +359,14 @@ function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
 
     ${katSorted.length > 0 ? `
     <div class="chart-block" style="margin-top:24px;">
-      <p class="chart-label">Pengeluaran per Kategori</p>
+      <p id="chart-kategori-label" class="chart-label">Pengeluaran per Kategori · Bulan Ini</p>
       <div style="position:relative;height:${katH}px;">
         <canvas id="chart-kategori"></canvas>
       </div>
     </div>` : ''}
 
     <div class="chart-block" style="margin-top:24px;">
-      <p class="chart-label">Tren Kategori</p>
+      <p id="chart-tren-label" class="chart-label">Tren per Kategori · 12 Bulan</p>
       <select id="tren-kategori-select" class="select-small" style="margin-bottom:8px;">${katOptions}</select>
       <div style="position:relative;height:160px;">
         <canvas id="chart-tren"></canvas>

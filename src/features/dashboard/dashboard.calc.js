@@ -180,6 +180,41 @@ function calcDashboard() {
     .sort((a, b) => b.nominal - a.nominal)
     .slice(0, 3);
 
+  // ===== WEEKLY DATA (untuk toggle mingguan) =====
+  const _8weeks = [];
+  for (let i = 7; i >= 0; i--) {
+    const endDate   = new Date(today);
+    endDate.setDate(today.getDate() - i * 7);
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - 6);
+    _8weeks.push({ start: startDate, end: endDate });
+  }
+  const weeklyLabels   = _8weeks.map((_, i) => i === 7 ? 'W0' : `W-${7 - i}`);
+  const weeklyCashflow = _8weeks.map(({ start, end }) => {
+    const m = txList.filter(tx => { const d = new Date(tx.tanggal + 'T00:00:00'); return tx.jenis === 'masuk'  && d >= start && d <= end; }).reduce((s, tx) => s + tx.nominal, 0);
+    const k = txList.filter(tx => { const d = new Date(tx.tanggal + 'T00:00:00'); return tx.jenis === 'keluar' && d >= start && d <= end; }).reduce((s, tx) => s + tx.nominal, 0);
+    return m - k;
+  });
+
+  // Pengeluaran per kategori — minggu ini (W0)
+  const txMingguIniAll = txList.filter(tx => {
+    const d = new Date(tx.tanggal + 'T00:00:00');
+    return tx.jenis === 'keluar' && d >= _8weeks[7].start && d <= _8weeks[7].end;
+  });
+  const katTotalWeekly = {};
+  txMingguIniAll.filter(tx => tx.type !== 'transfer_out').forEach(tx => {
+    katTotalWeekly[tx.kategori] = (katTotalWeekly[tx.kategori] || 0) + tx.nominal;
+  });
+  const katSortedWeekly = Object.entries(katTotalWeekly).sort((a, b) => b[1] - a[1]);
+
+  // Boros per kategori — minggu ini (untuk card merge mode bulanan→weekly)
+  const borosListWeekly = katSortedWeekly.slice(0, 3).map(([id, val]) => ({ id, val }));
+
+  // Top spending per transaksi — minggu ini
+  const bigSpendingWeekly = [...txMingguIniAll]
+    .sort((a, b) => b.nominal - a.nominal)
+    .slice(0, 3);
+
   return {
     year, month, txList, txBulanIni, txBulanLalu,
     totalMasuk, totalKeluar, totalNabung, cashflow,
@@ -194,6 +229,8 @@ function calcDashboard() {
     // Sprint B
     velocityAlert, weeklyKatInsight,
     spendByDay, countByDay, borosDay, DAY_NAMES,
+    // Weekly toggle data
+    weeklyLabels, weeklyCashflow, katSortedWeekly, borosListWeekly, bigSpendingWeekly,
   };
 }
 

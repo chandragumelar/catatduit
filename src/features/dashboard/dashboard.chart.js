@@ -2,7 +2,8 @@
 
 function initDashboardCharts(calc) {
   const { txList, rolling, chartLabels, chartMasuk, chartKeluar, chartCashflow, katSorted,
-          spendByDay, borosDay, DAY_NAMES } = calc;
+          spendByDay, borosDay, DAY_NAMES,
+          weeklyLabels, weeklyCashflow, katSortedWeekly } = calc;
 
   destroyChart('combo');
   destroyChart('surplus');
@@ -13,54 +14,52 @@ function initDashboardCharts(calc) {
   // Chart 1: Pemasukan vs Pengeluaran (combo bar+line) — default monthly
   _renderComboChart('monthly', calc);
 
-  // Toggle bulanan/mingguan
+  // Chart 2: Cashflow — default monthly
+  _renderCashflowChart('monthly', calc);
+
+  // Chart 3: Pengeluaran per Kategori — default monthly
+  _renderKategoriChart('monthly', calc);
+
+  // Chart 4: Tren kategori — default monthly
+  const allKeluar = getKategori().keluar;
+  const defaultKat = allKeluar[0]?.id || 'makan';
+  renderTrenChart(defaultKat, 'monthly', calc);
+  document.getElementById('tren-kategori-select')?.addEventListener('change', (e) => {
+    const period = document.querySelector('.chart-period-btn.active')?.dataset.period || 'monthly';
+    renderTrenChart(e.target.value, period, calc);
+  });
+
+  // Toggle bulanan/mingguan — sync semua grafik + spending card
   document.querySelectorAll('.chart-period-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.chart-period-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      _renderComboChart(btn.dataset.period, calc);
-      const isWeekly = btn.dataset.period === 'weekly';
-      const cashflowLabel = document.getElementById('chart-cashflow-label');
-      if (cashflowLabel) cashflowLabel.textContent = isWeekly ? 'Cashflow per Minggu' : 'Cashflow per Bulan';
-      const comboLabel = document.getElementById('chart-combo-label');
-      if (comboLabel) comboLabel.textContent = isWeekly ? 'Masuk & Keluar per Minggu' : 'Masuk & Keluar per Bulan';
-    });
-  });
+      const period    = btn.dataset.period;
+      const isWeekly  = period === 'weekly';
 
-  // Chart 2: Cashflow per bulan
-  const surplusCtx = document.getElementById('chart-surplus')?.getContext('2d');
-  if (surplusCtx) {
-    state.chartInstances.surplus = new Chart(surplusCtx, {
-      type: 'bar',
-      data: {
-        labels: chartLabels,
-        datasets: [{ label: 'Cashflow', data: chartCashflow, backgroundColor: chartCashflow.map(v => v >= 0 ? 'rgba(5,150,105,0.7)' : 'rgba(220,38,38,0.7)'), borderRadius: 4 }],
-      },
-      options: chartOptions(),
-    });
-  }
-
-  // Chart 3: Pengeluaran per kategori (horizontal bar)
-  if (katSorted.length > 0) {
-    const katCtx = document.getElementById('chart-kategori')?.getContext('2d');
-    if (katCtx) {
-      state.chartInstances.kategori = new Chart(katCtx, {
-        type: 'bar',
-        data: {
-          labels: katSorted.map(([id]) => { const k = getKategoriById(id, 'keluar'); return `${k.icon} ${k.nama}`; }),
-          datasets: [{ label: 'Pengeluaran', data: katSorted.map(([, v]) => v), backgroundColor: CHART_COLORS.slice(0, katSorted.length), borderRadius: 4 }],
-        },
-        options: { ...chartOptions(), indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${formatRupiah(ctx.raw)}` } } } },
+      // Update semua labels
+      const labels = {
+        'chart-combo-label':     isWeekly ? 'Masuk & Keluar per Minggu'              : 'Masuk & Keluar per Bulan',
+        'chart-cashflow-label':  isWeekly ? 'Cashflow per Minggu'                    : 'Cashflow per Bulan',
+        'chart-kategori-label':  isWeekly ? 'Pengeluaran per Kategori · Minggu Ini'  : 'Pengeluaran per Kategori · Bulan Ini',
+        'chart-tren-label':      isWeekly ? 'Tren per Kategori · 8 Minggu'           : 'Tren per Kategori · 12 Bulan',
+      };
+      Object.entries(labels).forEach(([id, text]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
       });
-    }
-  }
 
-  // Chart 4: Tren kategori (default kategori pertama)
-  const allKeluar = getKategori().keluar;
-  const defaultKat = allKeluar[0]?.id || 'makan';
-  renderTrenChart(defaultKat, txList, rolling, chartLabels);
-  document.getElementById('tren-kategori-select')?.addEventListener('change', (e) => {
-    renderTrenChart(e.target.value, txList, rolling, chartLabels);
+      // Re-render semua charts
+      _renderComboChart(period, calc);
+      _renderCashflowChart(period, calc);
+      _renderKategoriChart(period, calc);
+      const selectedKat = document.getElementById('tren-kategori-select')?.value || defaultKat;
+      renderTrenChart(selectedKat, period, calc);
+
+      // Update spending card
+      const spendingCard = document.querySelector(`[data-card-id="${DASHBOARD_CARDS.BOROS}"]`);
+      if (spendingCard) spendingCard.innerHTML = _buildSpendingCardHTML(calc, period);
+    });
   });
 
   // Chart 5: Pengeluaran per hari (Sprint B Item 14)
@@ -134,17 +133,69 @@ function _renderComboChart(period, calc) {
   });
 }
 
-function renderTrenChart(katId, txList, rolling, chartLabels) {
+function _renderCashflowChart(period, calc) {
+  destroyChart('surplus');
+  const surplusCtx = document.getElementById('chart-surplus')?.getContext('2d');
+  if (!surplusCtx) return;
+  const labels = period === 'weekly' ? calc.weeklyLabels : calc.chartLabels;
+  const data   = period === 'weekly' ? calc.weeklyCashflow : calc.chartCashflow;
+  state.chartInstances.surplus = new Chart(surplusCtx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ label: 'Cashflow', data, backgroundColor: data.map(v => v >= 0 ? 'rgba(5,150,105,0.7)' : 'rgba(220,38,38,0.7)'), borderRadius: 4 }],
+    },
+    options: chartOptions(),
+  });
+}
+
+function _renderKategoriChart(period, calc) {
+  destroyChart('kategori');
+  const sorted = period === 'weekly' ? calc.katSortedWeekly : calc.katSorted;
+  if (!sorted || sorted.length === 0) return;
+  const katCtx = document.getElementById('chart-kategori')?.getContext('2d');
+  if (!katCtx) return;
+  state.chartInstances.kategori = new Chart(katCtx, {
+    type: 'bar',
+    data: {
+      labels: sorted.map(([id]) => { const k = getKategoriById(id, 'keluar'); return `${k.icon} ${k.nama}`; }),
+      datasets: [{ label: 'Pengeluaran', data: sorted.map(([, v]) => v), backgroundColor: CHART_COLORS.slice(0, sorted.length), borderRadius: 4 }],
+    },
+    options: { ...chartOptions(), indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${formatRupiah(ctx.raw)}` } } } },
+  });
+}
+
+function renderTrenChart(katId, period, calc) {
   destroyChart('tren');
-  const trenData = rolling.map(({ year: y, month: m }) =>
-    txList.filter(tx => tx.jenis === 'keluar' && tx.kategori === katId && isSameMonth(tx.tanggal, y, m))
-      .reduce((s, tx) => s + tx.nominal, 0));
   const trenCtx = document.getElementById('chart-tren')?.getContext('2d');
   if (!trenCtx) return;
+
+  let labels, trenData;
+  if (period === 'weekly') {
+    labels   = calc.weeklyLabels;
+    const _8weeks = [];
+    const today = new Date();
+    for (let i = 7; i >= 0; i--) {
+      const end   = new Date(today); end.setDate(today.getDate() - i * 7);
+      const start = new Date(end);   start.setDate(end.getDate() - 6);
+      _8weeks.push({ start, end });
+    }
+    trenData = _8weeks.map(({ start, end }) =>
+      calc.txList.filter(tx => {
+        const d = new Date(tx.tanggal + 'T00:00:00');
+        return tx.jenis === 'keluar' && tx.kategori === katId && d >= start && d <= end;
+      }).reduce((s, tx) => s + tx.nominal, 0));
+  } else {
+    labels   = calc.chartLabels;
+    trenData = calc.rolling.map(({ year: y, month: m }) =>
+      calc.txList.filter(tx => tx.jenis === 'keluar' && tx.kategori === katId && isSameMonth(tx.tanggal, y, m))
+        .reduce((s, tx) => s + tx.nominal, 0));
+  }
+
   state.chartInstances.tren = new Chart(trenCtx, {
     type: 'bar',
     data: {
-      labels: chartLabels,
+      labels,
       datasets: [{ label: 'Pengeluaran', data: trenData, backgroundColor: 'rgba(13,148,136,0.7)', borderRadius: 4 }],
     },
     options: chartOptions({ plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${formatRupiah(ctx.raw)}` } } } }),
