@@ -178,3 +178,11 @@ localStorage.setItem('cd_debug', '1'); location.reload();
 ```
 
 To disable: `localStorage.removeItem('cd_debug'); location.reload()`
+
+---
+
+## Contributing
+
+Found a bug or have an idea? Open an issue — feedback welcome.
+If you want to contribute code, fork the repo and send a PR.
+No contribution is too small.
