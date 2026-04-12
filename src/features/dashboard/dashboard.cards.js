@@ -338,11 +338,11 @@ function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
       <div style="position:relative;height:180px;">
         <canvas id="chart-combo"></canvas>
       </div>
-      <p id="chart-week-note" style="display:none;font-size:10px;color:var(--gray-400);margin-top:6px;text-transform:uppercase;letter-spacing:0.04em;">Menampilkan 8 minggu terakhir</p>
+
     </div>
 
     <div class="chart-block" style="margin-top:24px;">
-      <p class="chart-label">Cashflow per Bulan</p>
+      <p id="chart-cashflow-label" class="chart-label">Cashflow per Bulan</p>
       <div style="position:relative;height:160px;">
         <canvas id="chart-surplus"></canvas>
       </div>

@@ -19,16 +19,9 @@ function initDashboardCharts(calc) {
       document.querySelectorAll('.chart-period-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       _renderComboChart(btn.dataset.period, calc);
-      const note = document.getElementById('chart-week-note');
-      if (note) {
-        if (btn.dataset.period === 'weekly') {
-          note.style.display = 'block';
-          note.style.fontSize = '10px';
-          note.style.textTransform = 'none';
-          note.style.color = 'var(--gray-400)';
-        } else {
-          note.style.display = 'none';
-        }
+      const cashflowLabel = document.getElementById('chart-cashflow-label');
+      if (cashflowLabel) {
+        cashflowLabel.textContent = btn.dataset.period === 'weekly' ? 'Cashflow per Minggu' : 'Cashflow per Bulan';
       }
     });
   });
