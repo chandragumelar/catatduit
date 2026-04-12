@@ -2138,8 +2138,11 @@ input, select, textarea { font-family: inherit; }
 /* Fix: chart-block & chart-label classes */
 .chart-block {
   position: relative;
-  height: 200px;
   margin-top: 8px;
+}
+.chart-block canvas {
+  display: block;
+  width: 100% !important;
 }
 .chart-label {
   font-size: 12px;
