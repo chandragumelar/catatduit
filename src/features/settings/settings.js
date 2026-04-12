@@ -21,9 +21,9 @@ function renderSettings() {
     <!-- PROFIL -->
     <div class="settings-section">
       <p class="settings-section-label">Profil</p>
-      <div class="card" style="margin-bottom:0;padding:0;overflow:hidden;">
+      <div class="card settings-card-flush">
         <div class="settings-input-wrap">
-          <span style="font-size:20px;">👤</span>
+          <span class="settings-avatar-icon">👤</span>
           <input type="text" class="settings-input" id="settings-nama"
             value="${escHtml(nama)}" placeholder="Nama kamu" maxlength="30" />
           <button class="btn-save-inline" id="btn-save-nama">Simpan</button>
@@ -35,7 +35,7 @@ function renderSettings() {
     <!-- WALLET -->
     <div class="settings-section">
       <p class="settings-section-label">Dompet</p>
-      <div class="card" style="margin-bottom:0;padding:0;overflow:hidden;" id="settings-wallet-list">
+      <div class="settings-card-flush card" id="settings-wallet-list">
         ${wallets.map((w, i) => `
           <div class="settings-item settings-wallet-item" data-idx="${i}">
             <div class="settings-item-left">
@@ -45,7 +45,7 @@ function renderSettings() {
                 <div class="settings-item-sub">Saldo awal: ${formatRupiah(w.saldo_awal || 0)}</div>
               </div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:6px;align-items:center;flex-shrink:0;">
+            <div class="settings-wallet-actions">
               <button class="btn-icon-sm" data-action="edit-wallet" data-idx="${i}"><i data-lucide="pencil"></i></button>
               ${wallets.length > 1 ? `<button class="btn-icon-sm danger" data-action="hapus-wallet" data-idx="${i}"><i data-lucide="trash-2"></i></button>` : ''}
             </div>
@@ -64,7 +64,7 @@ function renderSettings() {
     <!-- KATEGORI -->
     <div class="settings-section">
       <p class="settings-section-label">Kategori</p>
-      <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">
+      <div class="settings-card">
         <div class="settings-item" id="btn-go-kategori">
           <div class="settings-item-left">
             <div class="settings-item-icon">🏷️</div>
@@ -78,16 +78,16 @@ function renderSettings() {
     <!-- TAMPILAN -->
     <div class="settings-section">
       <p class="settings-section-label">Tampilan</p>
-      <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">
+      <div class="settings-card">
         <div class="settings-item">
           <div class="settings-item-left">
             <div class="settings-item-icon">💱</div>
             <div>
               <div class="settings-item-label">Mata Uang</div>
-              <div class="settings-item-sub" style="font-size:10px;">Simbol saja, angka tidak dikonversi</div>
+              <div class="settings-item-sub settings-item-sub--sm">Simbol saja, angka tidak dikonversi</div>
             </div>
           </div>
-          <select id="currency-select" style="border:none;background:transparent;font-size:13px;color:var(--text-secondary);cursor:pointer;outline:none;padding:4px;">
+          <select id="currency-select" class="settings-select">
             ${CURRENCY_OPTIONS.map(c => `<option value="${c.code}" ${(getData(STORAGE_KEYS.CURRENCY,'IDR')===c.code)?'selected':''}>${c.label}</option>`).join('')}
           </select>
         </div>
@@ -97,10 +97,10 @@ function renderSettings() {
             <div class="settings-item-icon">📊</div>
             <div>
               <div class="settings-item-label">Period Budget</div>
-              <div class="settings-item-sub" style="font-size:10px;">Bulanan atau mingguan (Senin–Minggu)</div>
+              <div class="settings-item-sub settings-item-sub--sm">Bulanan atau mingguan (Senin–Minggu)</div>
             </div>
           </div>
-          <select id="budget-period-select" style="border:none;background:transparent;font-size:13px;color:var(--text-secondary);cursor:pointer;outline:none;padding:4px;">
+          <select id="budget-period-select" class="settings-select">
             <option value="monthly" ${getBudgetPeriod()==='monthly'?'selected':''}>Bulanan</option>
             <option value="weekly"  ${getBudgetPeriod()==='weekly' ?'selected':''}>Mingguan</option>
           </select>
@@ -111,8 +111,8 @@ function renderSettings() {
     <!-- DATA -->
     <div class="settings-section">
       <p class="settings-section-label">Data</p>
-      <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">
-        <div class="settings-item" id="btn-export" style="${txList.length === 0 ? 'opacity:0.5;cursor:not-allowed;' : ''}">
+      <div class="settings-card">
+        <div class="settings-item ${txList.length === 0 ? 'settings-item--disabled' : ''}" id="btn-export">
           <div class="settings-item-left">
             <div class="settings-item-icon">📤</div>
             <span class="settings-item-label">Export Data (CSV)</span>
@@ -125,20 +125,19 @@ function renderSettings() {
           </div>
         </div>
       </div>
-      <input type="file" id="import-file-input" accept=".csv" style="display:none;" />
+      <input type="file" id="import-file-input" accept=".csv" class="hidden-input" />
     </div>
 
     <!-- STORAGE INDICATOR -->
     <div class="settings-section">
       <p class="settings-section-label">Penyimpanan</p>
-      <div class="card" style="margin-bottom:0;">
+      <div class="card settings-card-mb0">
         <div class="storage-indicator-header">
           <span class="storage-indicator-label">Digunakan: ${usageKB} KB</span>
           <span class="storage-indicator-label">${usagePct}% dari ~5 MB</span>
         </div>
         <div class="storage-bar-wrap">
-          <div class="storage-bar ${usagePct > 80 ? 'storage-bar--warn' : ''}"
-            style="width:${usagePct}%"></div>
+          <div class="storage-bar ${usagePct > 80 ? 'storage-bar--warn' : ''}" id="storage-bar-fill" data-pct="${usagePct}"></div>
         </div>
         <p class="storage-indicator-hint">
           ${txList.length} catatan tersimpan.
@@ -150,7 +149,7 @@ function renderSettings() {
     <!-- PRIVASI & TENTANG -->
     <div class="settings-section">
       <p class="settings-section-label">Tentang & Privasi</p>
-      <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">
+      <div class="settings-card">
         <div class="settings-item" id="btn-privacy-info">
           <div class="settings-item-left">
             <div class="settings-item-icon">🔒</div>
@@ -158,17 +157,17 @@ function renderSettings() {
           </div>
           <div class="settings-item-arrow"><i data-lucide="chevron-right"></i></div>
         </div>
-        <div class="settings-item" style="cursor:default;">
+        <div class="settings-item settings-item--no-cursor">
           <div class="settings-item-left">
             <div class="settings-item-icon">💰</div>
             <span class="settings-item-label">CatatDuit</span>
           </div>
           <span class="settings-item-value">v3.0.0</span>
         </div>
-        <div class="settings-item" style="cursor:default;">
+        <div class="settings-item settings-item--no-cursor">
           <div class="settings-item-left">
             <div class="settings-item-icon">📱</div>
-            <span class="settings-item-label" style="font-size:13px;color:var(--gray-500);">
+            <span class="settings-item-label settings-item-label--hint">
               Data di HP dan laptop terpisah. Gunakan Export/Import untuk pindah data.
             </span>
           </div>
@@ -179,7 +178,7 @@ function renderSettings() {
     <!-- NOTIFIKASI -->
     <div class="settings-section">
       <p class="settings-section-label">Notifikasi</p>
-      <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">
+      <div class="settings-card">
         <div class="settings-item" id="btn-notif-toggle">
           <div class="settings-item-left">
             <div class="settings-item-icon">🔔</div>
@@ -196,7 +195,7 @@ function renderSettings() {
     <!-- ZONA BAHAYA -->
     <div class="settings-section">
       <p class="settings-section-label">Zona Bahaya</p>
-      <div style="background:var(--white);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">
+      <div class="settings-card">
         <div class="settings-item danger" id="btn-reset">
           <div class="settings-item-left">
             <div class="settings-item-icon"><i data-lucide="trash-2"></i></div>
@@ -207,6 +206,11 @@ function renderSettings() {
     </div>`;
 
   _initSettingsEvents(txList, wallets);
+
+  // Storage bar width (set via JS to avoid CSP inline style block)
+  const storageBarEl = document.getElementById('storage-bar-fill');
+  if (storageBarEl) storageBarEl.style.width = usagePct + '%';
+
   // Notifikasi
   const notifStatus = getNotifPermissionStatus();
   const notifTextEl = document.getElementById('notif-status-text');

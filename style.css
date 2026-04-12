@@ -1149,6 +1149,7 @@ input, select, textarea { font-family: inherit; }
 .ob-custom-wallet-row .onboarding-input { margin-bottom: 0; flex: 1; }
 .ob-confirm-custom {
   flex-shrink: 0;
+  min-width: 72px;
   font-size: 12px;
   font-weight: 600;
   color: var(--teal);
@@ -1404,6 +1405,39 @@ input, select, textarea { font-family: inherit; }
 }
 
 /* ===== SETTINGS WALLET ===== */
+.settings-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.settings-card-flush {
+  margin-bottom: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.settings-card-mb0 { margin-bottom: 0; }
+.settings-avatar-icon { font-size: 20px; }
+.settings-wallet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.settings-select {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--text-secondary, var(--gray-500));
+  cursor: pointer;
+  outline: none;
+  padding: 4px;
+}
+.settings-item--disabled { opacity: 0.5; cursor: not-allowed; }
+.settings-item--no-cursor { cursor: default; }
+.settings-item-label--hint { font-size: 13px; color: var(--gray-500); }
+.settings-item-sub--sm { font-size: 10px; }
+.hidden-input { display: none; }
 .settings-item-sub {
   font-size: 10px; color: var(--gray-400); margin-top: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
