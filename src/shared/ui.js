@@ -70,9 +70,18 @@ function navigateTo(page) {
 
 // ===== BOTTOM NAV =====
 function initBottomNav() {
-  document.getElementById('nav-dashboard')?.addEventListener('click', () => navigateTo('dashboard'));
-  document.getElementById('nav-settings')?.addEventListener('click', () => navigateTo('settings'));
-  document.getElementById('nav-tabungan')?.addEventListener('click', () => navigateTo('tabungan'));
+  document.getElementById('nav-dashboard')?.addEventListener('click', () => {
+    state.fromOnboarding = false;
+    navigateTo('dashboard');
+  });
+  document.getElementById('nav-settings')?.addEventListener('click', () => {
+    state.fromOnboarding = false;
+    navigateTo('settings');
+  });
+  document.getElementById('nav-tabungan')?.addEventListener('click', () => {
+    state.fromOnboarding = false;
+    navigateTo('tabungan');
+  });
   document.getElementById('nav-fab')?.addEventListener('click', () => openInputPage('add'));
 }
 
@@ -253,12 +262,17 @@ function renderOnboardingChecklist(containerId) {
       const nav = el.dataset.nav;
       if (nav === 'tagihan-tab') {
         state.tabunganTab = 'tagihan';
+        state.fromOnboarding = true;
         navigateTo('tabungan');
       } else if (nav === 'tabungan-goal') {
         state.tabunganTab = 'tabungan';
+        state.fromOnboarding = true;
         navigateTo('tabungan');
       } else if (nav === 'input') {
         openInputPage('add');
+      } else if (nav === 'settings') {
+        state.fromOnboarding = true;
+        navigateTo(nav);
       } else {
         navigateTo(nav);
       }

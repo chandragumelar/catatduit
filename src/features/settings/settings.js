@@ -10,8 +10,14 @@ function renderSettings() {
   const usageKB = getStorageUsageKB();
   const usagePct = getStorageUsagePct();
 
-  container.innerHTML = `
+  const backBanner = state.fromOnboarding
+    ? `<div id="onboarding-back-banner" style="display:flex;align-items:center;gap:8px;background:var(--teal-light,#e6f4f1);color:var(--teal);font-size:13px;font-weight:500;padding:10px 16px;cursor:pointer;margin-bottom:4px;border-radius:8px;">
+        <span>←</span><span>Kembali ke Setup CatatDuit</span>
+       </div>`
+    : '';
 
+  container.innerHTML = `
+    ${backBanner}
     <!-- PROFIL -->
     <div class="settings-section">
       <p class="settings-section-label">Profil</p>
@@ -39,7 +45,7 @@ function renderSettings() {
                 <div class="settings-item-sub">Saldo awal: ${formatRupiah(w.saldo_awal || 0)}</div>
               </div>
             </div>
-            <div style="display:flex;gap:6px;align-items:center;">
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center;flex-shrink:0;">
               <button class="btn-icon-sm" data-action="edit-wallet" data-idx="${i}"><i data-lucide="pencil"></i></button>
               ${wallets.length > 1 ? `<button class="btn-icon-sm danger" data-action="hapus-wallet" data-idx="${i}"><i data-lucide="trash-2"></i></button>` : ''}
             </div>
@@ -246,6 +252,12 @@ function renderSettings() {
 }
 
 function _initSettingsEvents(txList, wallets) {
+  // Onboarding back banner
+  document.getElementById('onboarding-back-banner')?.addEventListener('click', () => {
+    state.fromOnboarding = false;
+    navigateTo('dashboard');
+  });
+
   // Nama
   document.getElementById('btn-save-nama')?.addEventListener('click', () => {
     const val   = document.getElementById('settings-nama').value.trim();

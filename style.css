@@ -1173,11 +1173,20 @@ input, select, textarea { font-family: inherit; }
 .btn-text-small {
   background: none;
   border: none;
+  outline: none;
   color: var(--teal);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   padding: 4px 0;
+}
+.btn-text-small:focus {
+  outline: none;
+}
+.btn-text-small:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* ===== WALLET SUMMARY (Dashboard v3) ===== */
@@ -1383,6 +1392,10 @@ input, select, textarea { font-family: inherit; }
 }
 .settings-wallet-item .settings-item-sub {
   font-size: 12px; color: var(--gray-400); margin-top: 2px;
+}
+
+.settings-wallet-item [data-action] + [data-action] {
+  margin-top: 6px;
 }
 
 /* ===== BUDGET ===== */
