@@ -132,10 +132,11 @@ input, select, textarea { font-family: inherit; }
   font-size: 10px;
   color: var(--gray-500);
   line-height: 1.4;
+  margin-bottom: 16px;
 }
 
 .onboarding-step-indicator {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--gray-400);
   text-align: center;
   margin-bottom: 8px;
@@ -143,7 +144,7 @@ input, select, textarea { font-family: inherit; }
 }
 
 .onboarding-hint {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--gray-400);
   margin-top: -4px;
   margin-bottom: 8px;
@@ -1145,6 +1146,20 @@ input, select, textarea { font-family: inherit; }
   margin-bottom: 8px;
 }
 .ob-custom-wallet-row .onboarding-input { margin-bottom: 0; flex: 1; }
+.ob-confirm-custom {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal);
+  background: none;
+  border: 1.5px solid var(--teal);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.ob-confirm-custom:disabled { color: var(--gray-400); border-color: var(--gray-300); cursor: default; }
 
 .ob-saldo-row { margin-bottom: 16px; }
 .ob-saldo-label {

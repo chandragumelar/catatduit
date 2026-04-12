@@ -98,7 +98,7 @@ function _stepNama() {
   el.innerHTML = `
     <p class="onboarding-question">Halo! Siapa namamu?</p>
     <p class="onboarding-trust"><i data-lucide="lock" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;"></i>Semua catatan tersimpan langsung di HP kamu — tidak ada server, tidak ada yang bisa lihat.</p>
-    <input type="text" id="ob-nama" class="onboarding-input" placeholder="Contoh: Budi" maxlength="30" autocomplete="off" />
+    <input type="text" id="ob-nama" class="onboarding-input" placeholder="Contoh: Desi" maxlength="30" autocomplete="off" />
     <p class="onboarding-hint">Nama ini akan muncul di sapaan harian kamu</p>
     <p class="onboarding-error" id="ob-nama-error"></p>
     <button id="ob-btn-nama" class="btn-primary" disabled>Mulai →</button>`;
