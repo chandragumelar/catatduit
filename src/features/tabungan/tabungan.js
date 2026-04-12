@@ -23,7 +23,7 @@ function renderTabunganContent() {
   if (state.fromOnboarding) {
     const banner = document.createElement('div');
     banner.id = 'onboarding-back-banner';
-    banner.style.cssText = 'display:flex;align-items:center;gap:8px;background:var(--teal-light,#e6f4f1);color:var(--teal);font-size:13px;font-weight:500;padding:10px 16px;cursor:pointer;margin-bottom:4px;border-radius:8px;';
+    banner.className = 'onboarding-back-banner';
     banner.innerHTML = '<span>←</span><span>Kembali ke Setup CatatDuit</span>';
     banner.addEventListener('click', () => {
       state.fromOnboarding = false;

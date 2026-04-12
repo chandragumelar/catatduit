@@ -851,7 +851,8 @@ input, select, textarea { font-family: inherit; }
 .kategori-item-icon { font-size: 20px; flex-shrink: 0; }
 .kategori-item-name { flex: 1; font-size: 15px; color: var(--gray-900); }
 
-.btn-icon-sm { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); background: var(--gray-100); border: none; cursor: pointer; color: var(--gray-500); transition: background 0.15s; flex-shrink: 0; }
+.btn-icon-sm { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); background: var(--gray-100); border: none; outline: none; cursor: pointer; color: var(--gray-500); transition: background 0.15s; flex-shrink: 0; }
+.btn-icon-sm:focus { outline: none; }
 .btn-icon-sm:active { background: var(--gray-100); }
 .btn-icon-sm svg { width: 16px; height: 16px; }
 .btn-icon-sm.danger { color: var(--red); background: #FEE2E2; }
@@ -1151,15 +1152,17 @@ input, select, textarea { font-family: inherit; }
   font-size: 12px;
   font-weight: 600;
   color: var(--teal);
-  background: none;
-  border: 1.5px solid var(--teal);
+  background: var(--teal-light, #e6f4f1);
+  border: none;
+  outline: none;
   border-radius: var(--radius-sm);
   padding: 6px 10px;
   cursor: pointer;
   white-space: nowrap;
   transition: opacity 0.15s;
 }
-.ob-confirm-custom:disabled { color: var(--gray-400); border-color: var(--gray-300); cursor: default; }
+.ob-confirm-custom:focus { outline: none; }
+.ob-confirm-custom:disabled { color: var(--gray-400); background: var(--gray-100); cursor: default; }
 
 .ob-saldo-row { margin-bottom: 16px; }
 .ob-saldo-label {
@@ -1384,6 +1387,21 @@ input, select, textarea { font-family: inherit; }
 }
 .storage-bar--warn { background: var(--red); }
 .storage-indicator-hint { font-size: 12px; color: var(--gray-400); }
+
+/* ===== ONBOARDING BACK BANNER ===== */
+.onboarding-back-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e6f4f1;
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 16px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  border-radius: 8px;
+}
 
 /* ===== SETTINGS WALLET ===== */
 .settings-item-sub {

@@ -137,4 +137,5 @@ const state = {
   tabunganTab:      'tabungan',
   chartInstances:   {},
   inputPreserve:    null,
+  fromOnboarding:   false,
 };

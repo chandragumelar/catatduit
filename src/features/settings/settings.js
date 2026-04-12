@@ -11,7 +11,7 @@ function renderSettings() {
   const usagePct = getStorageUsagePct();
 
   const backBanner = state.fromOnboarding
-    ? `<div id="onboarding-back-banner" style="display:flex;align-items:center;gap:8px;background:var(--teal-light,#e6f4f1);color:var(--teal);font-size:13px;font-weight:500;padding:10px 16px;cursor:pointer;margin-bottom:4px;border-radius:8px;">
+    ? `<div id="onboarding-back-banner" class="onboarding-back-banner">
         <span>←</span><span>Kembali ke Setup CatatDuit</span>
        </div>`
     : '';
