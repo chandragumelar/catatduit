@@ -289,11 +289,11 @@ function buildKeuanganCard({
         </div>
         <div class="keuangan-divider"></div>
         <div class="keuangan-row keuangan-row--result keuangan-row--final">
-          <span>Bebas dipakai <span style="font-size:10px;font-weight:400;color:var(--gray-400);display:block;">dari total saldo − tagihan − nabung</span></span>
+          <span>Uang bebas <span style="font-size:10px;font-weight:400;color:var(--gray-400);">· setelah tagihan &amp; nabung</span></span>
           <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
         </div>` : ''}
         ${tagihanBulanIni.length > 0 ? `
-        <p class="tagihan-paid-status">
+        <p class="tagihan-paid-status" style="font-size:10px;color:var(--gray-400);margin-top:4px;">
           ${tagihanSudahBayar.length === tagihanBulanIni.length
             ? '✅ Semua tagihan bulan ini sudah beres!'
             : tagihanSudahBayar.length === 0
@@ -341,7 +341,7 @@ function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
       <p id="chart-week-note" style="display:none;font-size:12px;color:var(--gray-500);margin-top:4px;">Menampilkan 8 minggu terakhir</p>
     </div>
 
-    <div class="chart-block" style="margin-top:16px;">
+    <div class="chart-block" style="margin-top:24px;">
       <p class="chart-label">Cashflow per Bulan</p>
       <div style="position:relative;height:160px;">
         <canvas id="chart-surplus"></canvas>
@@ -349,14 +349,14 @@ function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
     </div>
 
     ${katSorted.length > 0 ? `
-    <div class="chart-block" style="margin-top:16px;">
+    <div class="chart-block" style="margin-top:24px;">
       <p class="chart-label">Pengeluaran per Kategori</p>
       <div style="position:relative;height:${katH}px;">
         <canvas id="chart-kategori"></canvas>
       </div>
     </div>` : ''}
 
-    <div class="chart-block" style="margin-top:16px;">
+    <div class="chart-block" style="margin-top:24px;">
       <p class="chart-label">Tren Kategori</p>
       <select id="tren-kategori-select" class="select-small" style="margin-bottom:8px;">${katOptions}</select>
       <div style="position:relative;height:160px;">
@@ -365,7 +365,7 @@ function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
     </div>
 
     ${borosDay ? `
-    <div class="chart-block" style="margin-top:16px;">
+    <div class="chart-block" style="margin-top:24px;">
       <p class="chart-label">Pengeluaran per Hari</p>
       <div style="position:relative;height:160px;">
         <canvas id="chart-dow"></canvas>

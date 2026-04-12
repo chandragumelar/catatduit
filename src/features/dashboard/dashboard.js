@@ -120,7 +120,7 @@ function renderDashboard() {
   container.innerHTML = '';
   sections.sort((a, b) => a.priority - b.priority).forEach(({ el }) => container.appendChild(el));
 
-  // Priority banner (inserted after greeting)
+  // Priority banner (inserted at very top, above all cards)
   const urgentMsgs = [];
   if (hasBudgetJebol)  urgentMsgs.push('Budget jebol!');
   if (velocityAlert)   urgentMsgs.push(`Belanja ${velocityAlert.spendPct}% dari pemasukan`);
@@ -129,9 +129,7 @@ function renderDashboard() {
     const banner = document.createElement('div');
     banner.className = 'priority-banner';
     banner.innerHTML = `<span>🔔</span><span>${urgentMsgs.join(' · ')}</span>`;
-    const greetNode = container.querySelector('.greeting-section')?.closest('div');
-    if (greetNode?.nextSibling) container.insertBefore(banner, greetNode.nextSibling);
-    else container.appendChild(banner);
+    container.insertBefore(banner, container.firstChild);
   }
 
   // Event listeners

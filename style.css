@@ -1586,7 +1586,7 @@ input, select, textarea { font-family: inherit; }
   font-size: 14px; font-weight: 600; color: var(--gray-800);
 }
 .keuangan-row--final {
-  font-size: 16px; color: var(--gray-900);
+  font-size: 14px; color: var(--gray-900);
 }
 
 .keuangan-divider {
@@ -2140,14 +2140,21 @@ input, select, textarea { font-family: inherit; }
   position: relative;
   margin-top: 8px;
 }
+.chart-block + .chart-block {
+  padding-top: 20px;
+  border-top: 1px solid var(--gray-100);
+}
 .chart-block canvas {
   display: block;
   width: 100% !important;
 }
 .chart-label {
-  font-size: 12px;
-  color: var(--gray-500);
-  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gray-400);
+  margin-bottom: 8px;
 }
 .chart-period-wrap {
   display: flex;
