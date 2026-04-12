@@ -1,6 +1,6 @@
 # CatatDuit v4
 
-PWA expense tracker untuk pasar Indonesia. Privacy-first: semua data di localStorage, tidak ada backend, tidak ada server sync. Dijual sebagai one-time purchase di Shopee via Warung Digital.
+I built CatatDuit because most expense apps are either too complex or require you to trust a server with your financial data. This one does not. It's a PWA — vanilla JS, no framework, no backend — that works offline and keeps everything on your device.
 
 **Live:** [app-catatduit.vercel.app](https://app-catatduit.vercel.app)
 
