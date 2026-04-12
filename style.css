@@ -73,7 +73,7 @@ input, select, textarea { font-family: inherit; }
   width: 72px;
   height: 72px;
   margin: 0 auto 16px;
-  color: var(--primary);
+  color: var(--teal);
   animation: pop 0.4s ease;
 }
 .onboarding-logo svg {
@@ -745,8 +745,8 @@ input, select, textarea { font-family: inherit; }
 .btn-sudah-bayar {
   padding: 6px 12px;
   border-radius: var(--radius-sm);
-  border: 1.5px solid var(--primary);
-  background: var(--primary);
+  border: 1.5px solid var(--teal);
+  background: var(--teal);
   color: #fff;
   font-size: 12px;
   font-weight: 600;
@@ -755,7 +755,7 @@ input, select, textarea { font-family: inherit; }
   transition: background 0.15s, transform 0.1s;
   flex-shrink: 0;
 }
-.btn-sudah-bayar:active { background: var(--primary-dark, #0e9476); transform: scale(0.96); }
+.btn-sudah-bayar:active { background: var(--teal-dark); transform: scale(0.96); }
 .tagihan-nominal { font-size: 14px; font-weight: 600; color: var(--gray-900); }
 
 .btn-add-tagihan {
@@ -1107,7 +1107,7 @@ input, select, textarea { font-family: inherit; }
   color: var(--teal);
   font-weight: 500;
 }
-.wallet-preset-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.wallet-preset-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--teal); }
 .wallet-preset-icon svg { width: 24px; height: 24px; }
 .wallet-preset-nama { font-size: 12px; text-align: center; }
 
@@ -1814,7 +1814,7 @@ input, select, textarea { font-family: inherit; }
   padding: 2px 7px;
   border-radius: 99px;
   background: #0d948820;
-  color: var(--primary);
+  color: var(--teal);
   vertical-align: middle;
   margin-left: 4px;
   text-transform: uppercase;
@@ -1859,8 +1859,8 @@ input, select, textarea { font-family: inherit; }
 }
 
 .budget-period-btn.active {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--teal);
+  background: var(--teal);
   color: #fff;
 }
 
@@ -1982,9 +1982,9 @@ input, select, textarea { font-family: inherit; }
   gap: 5px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--teal);
   background: var(--primary-light, rgba(13,148,136,0.1));
-  border: 1px solid var(--primary);
+  border: 1px solid var(--teal);
   border-radius: 99px;
   padding: 5px 12px;
   cursor: pointer;
@@ -2004,9 +2004,9 @@ input, select, textarea { font-family: inherit; }
 .tf-swap-btn {
   font-size: 12px;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--teal);
   background: none;
-  border: 1px dashed var(--primary);
+  border: 1px dashed var(--teal);
   border-radius: 99px;
   padding: 4px 14px;
   cursor: pointer;

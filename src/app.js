@@ -117,7 +117,7 @@ function _stepWallet() {
   el.className = 'onboarding-card';
   el.innerHTML = `
     <p class="onboarding-question">Dompet mana yang mau dipantau?</p>
-    <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px;">Pilih yang kamu pakai. Boleh lebih dari satu. Boleh diubah nanti.</p>
+    <p style="font-size:12px;color:var(--gray-500);margin-bottom:16px;">Pilih yang kamu pakai. Boleh lebih dari satu. Boleh diubah nanti.</p>
     <div class="wallet-preset-grid" id="ob-wallet-grid"></div>
     <div id="ob-custom-wallets"></div>
     <button class="btn-text-small" id="ob-btn-tambah-wallet" style="margin-top:8px;">+ Tambah dompet lain</button>
@@ -205,7 +205,7 @@ function _stepSaldo() {
   el.className = 'onboarding-card';
   el.innerHTML = `
     <p class="onboarding-question">Berapa isi masing-masing dompet sekarang?</p>
-    <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px;">Boleh perkiraan dulu — ini bisa diubah kapan saja.</p>
+    <p style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">Boleh perkiraan dulu — ini bisa diubah kapan saja.</p>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
       <span style="font-size:12px;color:var(--gray-400);">Simbol mata uang:</span>
       <select id="ob-currency-select" style="font-size:13px;padding:2px 6px;border:1px solid var(--gray-200);border-radius:6px;background:var(--surface);color:var(--text-primary);cursor:pointer;">
