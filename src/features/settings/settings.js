@@ -171,13 +171,6 @@ function renderSettings() {
         </div>
         <div class="settings-item settings-item--no-cursor">
           <div class="settings-item-left">
-            <div class="settings-item-icon">👤</div>
-            <span class="settings-item-label">Built by Chandra Gumelar</span>
-          </div>
-          <a href="https://x.com/win32_icang" target="_blank" class="settings-item-value" style="text-decoration:none;color:inherit;">@win32_icang</a>
-        </div>
-        <div class="settings-item settings-item--no-cursor">
-          <div class="settings-item-left">
             <div class="settings-item-icon">📱</div>
             <span class="settings-item-label settings-item-label--hint">
               Data di HP dan laptop terpisah. Gunakan Export/Import untuk pindah data.

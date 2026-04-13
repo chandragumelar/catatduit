@@ -365,3 +365,35 @@ function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
     </div>` : ''}
   `;
 }
+
+// ===== SUPPORT BANNER CARD =====
+
+function buildSupportBannerCard() {
+  if (!shouldShowSupportBanner()) return null;
+
+  const el = document.createElement('div');
+  el.innerHTML = `
+    <div class="support-banner-card" id="support-banner">
+      <button class="support-banner-close" id="support-banner-close" aria-label="Tutup">✕</button>
+      <div class="support-banner-top">
+        <div class="support-banner-icon">☕</div>
+        <span class="support-banner-title">CatatDuit gratis selamanya</span>
+      </div>
+      <p class="support-banner-body">Kalau app ini berguna, kamu bisa support pengembangannya — tapi ga ada paksaan sama sekali.</p>
+      <div class="support-banner-actions">
+        <a class="support-banner-btn support-banner-btn--primary" href="https://trakteer.id/win32_icang/gift" target="_blank" rel="noopener">Trakteer</a>
+        <a class="support-banner-btn support-banner-btn--secondary" href="https://saweria.co/win32icang" target="_blank" rel="noopener">Saweria</a>
+      </div>
+    </div>`;
+
+  el.querySelector('#support-banner-close').addEventListener('click', () => {
+    dismissSupportBanner();
+    const banner = el.querySelector('#support-banner');
+    banner.style.transition = 'opacity 0.2s, transform 0.2s';
+    banner.style.opacity = '0';
+    banner.style.transform = 'scale(0.97)';
+    setTimeout(() => el.remove(), 220);
+  });
+
+  return el;
+}

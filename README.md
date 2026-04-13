@@ -1,6 +1,6 @@
 # CatatDuit v4
 
-I built CatatDuit because most expense apps are either too complex or require you to trust a server with your financial data. This one does not. It's a PWA — vanilla JS, no framework, no backend — that works offline and keeps everything on your device.
+PWA expense tracker untuk pasar Indonesia. Privacy-first: semua data di localStorage, tidak ada backend, tidak ada server sync. Dijual sebagai one-time purchase di Shopee via Warung Digital.
 
 **Live:** [app-catatduit.vercel.app](https://app-catatduit.vercel.app)
 
@@ -178,11 +178,3 @@ localStorage.setItem('cd_debug', '1'); location.reload();
 ```
 
 To disable: `localStorage.removeItem('cd_debug'); location.reload()`
-
----
-
-## Contributing
-
-Found a bug or have an idea? Open an issue — feedback welcome.
-If you want to contribute code, fork the repo and send a PR.
-No contribution is too small.

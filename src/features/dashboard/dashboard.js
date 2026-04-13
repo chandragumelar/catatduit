@@ -57,6 +57,9 @@ function renderDashboard() {
   // — Greeting
   push(DASHBOARD_CARDS.GREETING, buildGreetingCard(insightText, getNama()), 0);
 
+  // — Support banner (muncul setiap 7 hari, priority 2 = tepat di bawah greeting)
+  push(DASHBOARD_CARDS.SUPPORT, buildSupportBannerCard(), 2);
+
   // — Keuangan Bulan Ini (naik ke priority 1 kalau ada tagihan mendekat)
   const keuanganEl = document.createElement('div');
   keuanganEl.appendChild(buildKeuanganCard({

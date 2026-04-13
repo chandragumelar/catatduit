@@ -22,6 +22,7 @@ const STORAGE_KEYS = {
   // Sprint B2
   BUDGET_PERIOD:  'cd_budget_period',   // 'monthly' | 'weekly'
   CARD_COLLAPSED: 'cd_card_collapsed',  // array of card ids yang di-collapse
+  SUPPORT_BANNER: 'cd_support_banner_dismissed_at', // timestamp dismiss terakhir
 };
 
 const CURRENCY_OPTIONS = [
@@ -113,6 +114,7 @@ const DASHBOARD_CARDS = {
   BOROS:           'card-boros',
   RECENT:          'card-recent',
   ROLLING_INSIGHT: 'card-rolling-insight', // Sprint C #19
+  SUPPORT:         'card-support',
 };
 
 const DEFAULT_WALLET_ID = 'utama';

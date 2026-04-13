@@ -437,6 +437,19 @@ function isCardCollapsed(cardId) {
   return getCardCollapsed().has(cardId);
 }
 
+// ===== SUPPORT BANNER =====
+const SUPPORT_BANNER_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 7 hari
+
+function shouldShowSupportBanner() {
+  const ts = getData(STORAGE_KEYS.SUPPORT_BANNER, null);
+  if (!ts) return true;
+  return (Date.now() - ts) >= SUPPORT_BANNER_INTERVAL_MS;
+}
+
+function dismissSupportBanner() {
+  setData(STORAGE_KEYS.SUPPORT_BANNER, Date.now());
+}
+
 // Kalkulasi urutan prioritas card berdasarkan kondisi hari ini
 // Return: array card ids yang di-promote ke atas
 function calcCardPriority(calc) {
