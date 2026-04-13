@@ -236,16 +236,27 @@
    MULTICURRENCY — Toggle, Rate Chip, Cross-currency info
    ============================================================ */
 
-.currency-toggle-wrap {
+/* Currency toggle area */
+.currency-toggle-section {
+  padding: 4px 0 10px;
+}
+
+.currency-toggle-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.currency-toggle-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 4px 0 8px;
-  background: transparent;
   flex-wrap: wrap;
 }
 
-/* Sliding pill toggle — satu track, thumb bergerak */
+/* Sliding pill toggle */
 .currency-toggle {
   position: relative;
   display: flex;
@@ -255,7 +266,6 @@
   border: 1.5px solid var(--border);
 }
 
-/* Thumb slider — posisi diatur via JS lewat data attribute */
 .currency-toggle::before {
   content: '';
   position: absolute;
@@ -269,13 +279,11 @@
   z-index: 0;
 }
 
-/* Saat toggle aktif di base (kiri) */
 .currency-toggle[data-active="base"]::before {
   left: 3px;
   width: var(--thumb-base-w, 48px);
 }
 
-/* Saat toggle aktif di secondary (kanan) */
 .currency-toggle[data-active="secondary"]::before {
   left: calc(var(--thumb-base-w, 48px) + 3px);
   width: var(--thumb-sec-w, 48px);
@@ -301,12 +309,12 @@
   color: #fff;
 }
 
-/* Rate chip — jelas sebagai tombol edit kurs */
+/* Rate chip */
 .currency-rate-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px 5px 8px;
+  padding: 5px 10px;
   border-radius: 12px;
   border: 1.5px solid var(--border);
   background: var(--surface);
@@ -324,15 +332,10 @@
   background: rgba(13,148,136,0.06);
 }
 
-.currency-rate-chip-icon {
-  font-size: 11px;
-  flex-shrink: 0;
-}
-
-.currency-rate-chip-label {
-  font-size: 11px;
+.currency-rate-chip-ubah {
   font-weight: 600;
-  opacity: 0.7;
+  color: var(--teal);
+  font-size: 11px;
   margin-left: 2px;
 }
 
@@ -437,8 +440,43 @@
 .ob-multicurrency-label {
   display: flex;
   align-items: center;
-  font-size: 13px;
+  gap: 10px;
+  font-size: 14px;
   color: var(--text-primary);
   cursor: pointer;
   font-weight: 500;
+  line-height: 1.4;
+}
+
+.ob-custom-checkbox {
+  position: relative;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.ob-custom-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ob-custom-checkbox-box {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ob-custom-checkbox input:checked ~ .ob-custom-checkbox-box {
+  background: var(--teal);
+  border-color: var(--teal);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 5l3.5 3.5L11 1' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 11px;
 }

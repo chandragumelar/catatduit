@@ -156,9 +156,8 @@ function buildRateChipHTML() {
   const rateStr = rate.toLocaleString('id-ID');
   return `
     <button class="currency-rate-chip" id="btn-rate-chip" title="Ubah kurs manual">
-      <span class="currency-rate-chip-icon">✏️</span>
-      1 ${secSym} = ${baseSym} ${rateStr}
-      <span class="currency-rate-chip-label">Ubah</span>
+      Kurs: 1 ${secSym} = ${baseSym} ${rateStr}
+      <span class="currency-rate-chip-ubah">· Ubah</span>
     </button>`;
 }
 
@@ -171,11 +170,14 @@ function buildCurrencyToggleHTML() {
   const base     = getBaseCurrency();
   const isBase   = isActiveBase();
   return `
-    <div class="currency-toggle-wrap" id="currency-toggle-wrap">
-      <div class="currency-toggle" id="currency-toggle-track" data-active="${isBase ? 'base' : 'secondary'}">
-        <button class="currency-toggle-btn ${isBase ? 'active' : ''}" data-toggle="base">${base}</button>
-        <button class="currency-toggle-btn ${!isBase ? 'active' : ''}" data-toggle="secondary">${sec}</button>
+    <div class="currency-toggle-section" id="currency-toggle-wrap">
+      <div class="currency-toggle-label">Lihat keuangan dalam:</div>
+      <div class="currency-toggle-row">
+        <div class="currency-toggle" id="currency-toggle-track" data-active="${isBase ? 'base' : 'secondary'}">
+          <button class="currency-toggle-btn ${isBase ? 'active' : ''}" data-toggle="base">${base}</button>
+          <button class="currency-toggle-btn ${!isBase ? 'active' : ''}" data-toggle="secondary">${sec}</button>
+        </div>
+        ${buildRateChipHTML()}
       </div>
-      ${buildRateChipHTML()}
     </div>`;
 }

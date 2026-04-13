@@ -246,7 +246,10 @@ function _stepSaldo() {
 
     <div class="ob-multicurrency-opt" id="ob-multicurrency-opt">
       <label class="ob-multicurrency-label">
-        <input type="checkbox" id="ob-multicurrency-check" style="margin-right:6px;" />
+        <span class="ob-custom-checkbox">
+          <input type="checkbox" id="ob-multicurrency-check" />
+          <span class="ob-custom-checkbox-box"></span>
+        </span>
         Punya simpanan atau penghasilan dalam mata uang lain juga
       </label>
       <div id="ob-secondary-wrap" style="display:none;margin-top:10px;">

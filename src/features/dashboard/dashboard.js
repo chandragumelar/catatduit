@@ -122,16 +122,13 @@ function renderDashboard() {
   container.innerHTML = '';
   sections.sort((a, b) => a.priority - b.priority).forEach(({ el }) => container.appendChild(el));
 
-  // Inject currency toggle setelah greeting card (bukan di header)
+  // Inject currency toggle setelah greeting card
   const greetingEl = container.querySelector('.greeting-section');
+  const toggleWrap = document.createElement('div');
+  toggleWrap.id = 'currency-toggle-container';
   if (greetingEl) {
-    const toggleWrap = document.createElement('div');
-    toggleWrap.id = 'currency-toggle-container';
     greetingEl.closest('div')?.after(toggleWrap);
   } else {
-    // Fallback: sisipkan di atas semua konten
-    const toggleWrap = document.createElement('div');
-    toggleWrap.id = 'currency-toggle-container';
     container.insertBefore(toggleWrap, container.firstChild);
   }
 
@@ -209,10 +206,7 @@ function renderDashboard() {
 // ===== CURRENCY TOGGLE =====
 
 function _initCurrencyToggleEvents() {
-  // Container sekarang di-inject ke dalam dashboard-content (setelah greeting)
-  const container = document.getElementById('dashboard-content');
-  const wrap = (container || document).getElementById('currency-toggle-container')
-             || document.getElementById('currency-toggle-container');
+  const wrap = document.getElementById('currency-toggle-container');
   if (!wrap) return;
 
   if (!isMulticurrencyEnabled() || !getSecondaryCurrency()) {
@@ -235,8 +229,8 @@ function _initCurrencyToggleEvents() {
   // Toggle buttons
   wrap.querySelectorAll('.currency-toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const val = btn.dataset.toggle; // 'base' | 'secondary'
-      // Langsung update data-active + active class dulu biar animasi smooth
+      const val = btn.dataset.toggle;
+      // Update data-active + active class dulu biar animasi smooth
       const track = wrap.querySelector('#currency-toggle-track');
       if (track) track.dataset.active = val;
       wrap.querySelectorAll('.currency-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.toggle === val));
@@ -260,7 +254,10 @@ function _openRateEditModal() {
 
   showModal(
     `<div style="text-align:left;">
-      <p style="font-weight:600;margin-bottom:12px;">Update Kurs</p>
+      <p style="font-weight:600;margin-bottom:6px;">Update Kurs</p>
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">
+        Dipakai untuk transfer antar dompet beda mata uang.
+      </p>
       <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
         1 ${secSym} (${sec}) = berapa ${baseSym} (${base})?
       </p>
