@@ -240,63 +240,100 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px 6px;
-  background: var(--bg);
+  padding: 4px 0 8px;
+  background: transparent;
   flex-wrap: wrap;
 }
 
+/* Sliding pill toggle — satu track, thumb bergerak */
 .currency-toggle {
+  position: relative;
   display: flex;
-  gap: 4px;
   background: var(--surface);
   border-radius: 20px;
   padding: 3px;
   border: 1.5px solid var(--border);
 }
 
+/* Thumb slider — posisi diatur via JS lewat data attribute */
+.currency-toggle::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 14px;
+  background: var(--teal);
+  box-shadow: 0 1px 4px rgba(13,148,136,0.35);
+  transition: left 0.2s ease, width 0.2s ease;
+  z-index: 0;
+}
+
+/* Saat toggle aktif di base (kiri) */
+.currency-toggle[data-active="base"]::before {
+  left: 3px;
+  width: var(--thumb-base-w, 48px);
+}
+
+/* Saat toggle aktif di secondary (kanan) */
+.currency-toggle[data-active="secondary"]::before {
+  left: calc(var(--thumb-base-w, 48px) + 3px);
+  width: var(--thumb-sec-w, 48px);
+}
+
 .currency-toggle-btn {
+  position: relative;
+  z-index: 1;
   padding: 5px 16px;
-  border-radius: 16px;
+  border-radius: 14px;
   border: none;
   background: transparent;
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: color 0.2s ease;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .currency-toggle-btn.active {
-  background: var(--teal);
   color: #fff;
-  box-shadow: 0 1px 4px rgba(13,148,136,0.3);
 }
 
+/* Rate chip — jelas sebagai tombol edit kurs */
 .currency-rate-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+  gap: 5px;
+  padding: 5px 10px 5px 8px;
   border-radius: 12px;
-  border: 1.5px dashed var(--border);
+  border: 1.5px solid var(--border);
   background: var(--surface);
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
   white-space: nowrap;
 }
 
 .currency-rate-chip:hover {
   border-color: var(--teal);
   color: var(--teal);
+  background: rgba(13,148,136,0.06);
 }
 
-.currency-rate-chip-edit {
+.currency-rate-chip-icon {
   font-size: 11px;
+  flex-shrink: 0;
+}
+
+.currency-rate-chip-label {
+  font-size: 11px;
+  font-weight: 600;
   opacity: 0.7;
+  margin-left: 2px;
 }
 
 /* Cross-currency transfer info */

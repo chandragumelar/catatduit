@@ -122,6 +122,19 @@ function renderDashboard() {
   container.innerHTML = '';
   sections.sort((a, b) => a.priority - b.priority).forEach(({ el }) => container.appendChild(el));
 
+  // Inject currency toggle setelah greeting card (bukan di header)
+  const greetingEl = container.querySelector('.greeting-section');
+  if (greetingEl) {
+    const toggleWrap = document.createElement('div');
+    toggleWrap.id = 'currency-toggle-container';
+    greetingEl.closest('div')?.after(toggleWrap);
+  } else {
+    // Fallback: sisipkan di atas semua konten
+    const toggleWrap = document.createElement('div');
+    toggleWrap.id = 'currency-toggle-container';
+    container.insertBefore(toggleWrap, container.firstChild);
+  }
+
   // Priority banner (inserted at very top, above all cards)
   // Semua kondisi dikumpulkan lalu dirangkai jadi 1 kalimat natural
   const _bannerParts = [];
@@ -196,7 +209,10 @@ function renderDashboard() {
 // ===== CURRENCY TOGGLE =====
 
 function _initCurrencyToggleEvents() {
-  const wrap = document.getElementById('currency-toggle-container');
+  // Container sekarang di-inject ke dalam dashboard-content (setelah greeting)
+  const container = document.getElementById('dashboard-content');
+  const wrap = (container || document).getElementById('currency-toggle-container')
+             || document.getElementById('currency-toggle-container');
   if (!wrap) return;
 
   if (!isMulticurrencyEnabled() || !getSecondaryCurrency()) {
@@ -206,10 +222,24 @@ function _initCurrencyToggleEvents() {
 
   wrap.innerHTML = buildCurrencyToggleHTML();
 
+  // Set CSS vars untuk lebar thumb sesuai teks label masing-masing btn
+  requestAnimationFrame(() => {
+    const track = wrap.querySelector('#currency-toggle-track');
+    const btns  = wrap.querySelectorAll('.currency-toggle-btn');
+    if (track && btns.length === 2) {
+      track.style.setProperty('--thumb-base-w', btns[0].offsetWidth + 'px');
+      track.style.setProperty('--thumb-sec-w',  btns[1].offsetWidth + 'px');
+    }
+  });
+
   // Toggle buttons
   wrap.querySelectorAll('.currency-toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const val = btn.dataset.toggle; // 'base' | 'secondary'
+      // Langsung update data-active + active class dulu biar animasi smooth
+      const track = wrap.querySelector('#currency-toggle-track');
+      if (track) track.dataset.active = val;
+      wrap.querySelectorAll('.currency-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.toggle === val));
       setActiveCurrencyToggle(val);
       renderDashboard();
     });

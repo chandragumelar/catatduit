@@ -155,9 +155,10 @@ function buildRateChipHTML() {
   const baseSym = getCurrencySymbolByCode(base);
   const rateStr = rate.toLocaleString('id-ID');
   return `
-    <button class="currency-rate-chip" id="btn-rate-chip" title="Ubah kurs">
+    <button class="currency-rate-chip" id="btn-rate-chip" title="Ubah kurs manual">
+      <span class="currency-rate-chip-icon">✏️</span>
       1 ${secSym} = ${baseSym} ${rateStr}
-      <span class="currency-rate-chip-edit">✏️</span>
+      <span class="currency-rate-chip-label">Ubah</span>
     </button>`;
 }
 
@@ -171,7 +172,7 @@ function buildCurrencyToggleHTML() {
   const isBase   = isActiveBase();
   return `
     <div class="currency-toggle-wrap" id="currency-toggle-wrap">
-      <div class="currency-toggle">
+      <div class="currency-toggle" id="currency-toggle-track" data-active="${isBase ? 'base' : 'secondary'}">
         <button class="currency-toggle-btn ${isBase ? 'active' : ''}" data-toggle="base">${base}</button>
         <button class="currency-toggle-btn ${!isBase ? 'active' : ''}" data-toggle="secondary">${sec}</button>
       </div>
