@@ -51,7 +51,7 @@ function renderTagihanTab(container) {
           ${isToday && !isPaid ? '<div class="tagihan-today-badge">⚠️ Jatuh tempo hari ini!</div>' : ''}
         </div>
         <div class="tagihan-right">
-          <div class="tagihan-nominal">${formatRupiah(t.nominal)}</div>
+          <div class="tagihan-nominal">${formatWithCurrency(t.nominal, t.currency || getBaseCurrency())}</div>
           <div class="tagihan-actions">
             ${isThisMonth
               ? isPaid
@@ -117,6 +117,24 @@ function _showTagihanSheet(id = null) {
 
   let recurringVal = t ? t.isRecurring !== false : true;
 
+  const isMulti    = isMulticurrencyEnabled() && getSecondaryCurrency();
+  const tCurrency  = t?.currency || getBaseCurrency();
+  const tSym       = getCurrencySymbolByCode(tCurrency);
+  const baseCode   = getBaseCurrency();
+  const secCode    = getSecondaryCurrency();
+
+  const currencyFieldTagihan = isMulti ? `
+    <div class="bottom-sheet-field">
+      <label class="input-label">Mata uang tagihan</label>
+      <div class="currency-toggle" style="margin-top:4px;">
+        <button type="button" class="currency-toggle-btn ${tCurrency === baseCode ? 'active' : ''}"
+          id="bs-tagihan-cur-base" data-currency="${baseCode}">${baseCode}</button>
+        <button type="button" class="currency-toggle-btn ${tCurrency === secCode ? 'active' : ''}"
+          id="bs-tagihan-cur-sec" data-currency="${secCode}">${secCode}</button>
+      </div>
+      <input type="hidden" id="bs-tagihan-currency" value="${tCurrency}" />
+    </div>` : '';
+
   _openBottomSheet({
     title: isEdit ? 'Edit Tagihan' : 'Tambah Tagihan',
     fields: `
@@ -126,10 +144,11 @@ function _showTagihanSheet(id = null) {
           placeholder="contoh: Netflix, BPJS, Cicilan HP"
           value="${escHtml(t?.nama || '')}" maxlength="50" />
       </div>
+      ${currencyFieldTagihan}
       <div class="bottom-sheet-field">
         <label class="input-label">Nominal</label>
         <div class="nominal-wrap">
-          <span class="nominal-prefix">${getCurrencySymbol()}</span>
+          <span class="nominal-prefix" id="bs-tagihan-prefix">${tSym}</span>
           <input type="text" id="bs-nominal" class="input-nominal"
             placeholder="0"
             value="${t ? formatNominalInput(t.nominal) : ''}"
@@ -165,7 +184,19 @@ function _showTagihanSheet(id = null) {
         const raw = e.target.value.replace(/\D/g, '');
         e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
       });
-      // Date picker button
+
+      // Currency toggle di tagihan sheet
+      document.querySelectorAll('[id^="bs-tagihan-cur-"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[id^="bs-tagihan-cur-"]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const chosenCode = btn.dataset.currency;
+          const hiddenInput = document.getElementById('bs-tagihan-currency');
+          if (hiddenInput) hiddenInput.value = chosenCode;
+          const prefix = document.getElementById('bs-tagihan-prefix');
+          if (prefix) prefix.textContent = getCurrencySymbolByCode(chosenCode);
+        });
+      });
 
       document.getElementById('bs-recurring-ya').addEventListener('click', () => {
         recurringVal = true;
@@ -186,10 +217,11 @@ function _showTagihanSheet(id = null) {
       });
     },
     onConfirm: () => {
-      const rawNama   = document.getElementById('bs-nama').value.trim();
-      const nama      = rawNama.charAt(0).toUpperCase() + rawNama.slice(1);
-      const nominal   = parseNominal(document.getElementById('bs-nominal').value);
+      const rawNama    = document.getElementById('bs-nama').value.trim();
+      const nama       = rawNama.charAt(0).toUpperCase() + rawNama.slice(1);
+      const nominal    = parseNominal(document.getElementById('bs-nominal').value);
       const jatuhTempo = document.getElementById('bs-jatuh-tempo').value || null;
+      const currency   = document.getElementById('bs-tagihan-currency')?.value || getBaseCurrency();
       if (!nama)            return 'Nama tidak boleh kosong.';
       if (!nominal || nominal <= 0) return 'Nominal tidak valid.';
 
@@ -198,11 +230,11 @@ function _showTagihanSheet(id = null) {
 
       if (isEdit) {
         const idx = tagihan.findIndex(x => x.id === id);
-        tagihan[idx] = { ...t, nama, nominal, jatuhTempo, isRecurring: recurringVal, preferred_wallet_id: preferredWallet };
+        tagihan[idx] = { ...t, nama, nominal, currency, jatuhTempo, isRecurring: recurringVal, preferred_wallet_id: preferredWallet };
         saveTagihan(tagihan);
         showToast('Tagihan diperbarui.');
       } else {
-        tagihan.push({ id: generateId(), nama, nominal, jatuhTempo, isRecurring: recurringVal, paidMonths: [], preferred_wallet_id: preferredWallet });
+        tagihan.push({ id: generateId(), nama, nominal, currency, jatuhTempo, isRecurring: recurringVal, paidMonths: [], preferred_wallet_id: preferredWallet });
         saveTagihan(tagihan);
         showToast('Tagihan ditambahkan!');
       }

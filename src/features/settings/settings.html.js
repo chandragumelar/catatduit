@@ -22,13 +22,19 @@ function _buildSettingsProfilHTML(nama) {
 }
 
 function _buildSettingsWalletHTML(wallets) {
-  const items = wallets.map((w, i) => `
+  const isMulti = isMulticurrencyEnabled();
+  const items = wallets.map((w, i) => {
+    const wCurrency  = w.currency || getBaseCurrency();
+    const currBadge  = isMulti
+      ? `<span class="wallet-currency-badge">${wCurrency}</span>`
+      : '';
+    return `
     <div class="settings-item settings-wallet-item" data-idx="${i}">
       <div class="settings-item-left">
         <div class="settings-item-icon">${w.icon}</div>
         <div>
-          <div class="settings-item-label">${escHtml(w.nama)}</div>
-          <div class="settings-item-sub">Saldo awal: ${formatRupiah(w.saldo_awal || 0)}</div>
+          <div class="settings-item-label">${escHtml(w.nama)} ${currBadge}</div>
+          <div class="settings-item-sub">Saldo awal: ${formatWithCurrency(w.saldo_awal || 0, wCurrency)}</div>
         </div>
       </div>
       <div class="settings-wallet-actions">
@@ -36,8 +42,8 @@ function _buildSettingsWalletHTML(wallets) {
         ${wallets.length > 1 ? `<button class="btn-icon-sm danger" data-action="hapus-wallet" data-idx="${i}"><i data-lucide="trash-2"></i></button>` : ''}
       </div>
     </div>
-    ${i < wallets.length - 1 ? '<div class="settings-divider"></div>' : ''}`
-  ).join('');
+    ${i < wallets.length - 1 ? '<div class="settings-divider"></div>' : ''}`;
+  }).join('');
 
   return `
     <div class="settings-section">
@@ -60,6 +66,66 @@ function _buildSettingsTampilanHTML() {
     `<option value="${c.code}" ${getData(STORAGE_KEYS.CURRENCY, 'IDR') === c.code ? 'selected' : ''}>${c.label}</option>`
   ).join('');
 
+  const isMulti      = isMulticurrencyEnabled();
+  const secCode      = getSecondaryCurrency();
+  const currentRate  = getExchangeRate();
+  const baseCode     = getData(STORAGE_KEYS.CURRENCY, 'IDR');
+  const baseSym      = getCurrencySymbolByCode(baseCode);
+
+  // Secondary currency options (exclude base)
+  const secOptions = CURRENCY_OPTIONS
+    .filter(c => c.code !== baseCode)
+    .map(c => `<option value="${c.code}" ${secCode === c.code ? 'selected' : ''}>${c.label}</option>`)
+    .join('');
+
+  const multicurrencySection = `
+    <div class="settings-section" id="settings-multicurrency-section">
+      <p class="settings-section-label">Multicurrency</p>
+      <div class="settings-card">
+        <div class="settings-item">
+          <div class="settings-item-left">
+            <div class="settings-item-icon">🌐</div>
+            <div>
+              <div class="settings-item-label">Aktifkan 2 Mata Uang</div>
+              <div class="settings-item-sub settings-item-sub--sm">Punya penghasilan atau tabungan dalam mata uang lain?</div>
+            </div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="multicurrency-toggle-switch" ${isMulti ? 'checked' : ''} />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        ${isMulti ? `
+        <div class="settings-divider"></div>
+        <div class="settings-item">
+          <div class="settings-item-left">
+            <div class="settings-item-icon">💱</div>
+            <div>
+              <div class="settings-item-label">Mata Uang Kedua</div>
+              <div class="settings-item-sub settings-item-sub--sm">Berbeda dari mata uang utama (${baseCode})</div>
+            </div>
+          </div>
+          <select id="secondary-currency-select" class="settings-select">${secOptions}</select>
+        </div>
+
+        ${secCode ? `
+        <div class="settings-divider"></div>
+        <div class="settings-item" id="settings-rate-item">
+          <div class="settings-item-left">
+            <div class="settings-item-icon">📈</div>
+            <div>
+              <div class="settings-item-label">Kurs Saat Ini</div>
+              <div class="settings-item-sub settings-item-sub--sm">1 ${secCode} = ${baseSym} ${currentRate.toLocaleString('id-ID')}</div>
+            </div>
+          </div>
+          <button class="btn-icon-sm" id="btn-edit-rate-settings">✏️</button>
+        </div>` : ''}
+        ` : ''}
+      </div>
+      ${isMulti && !secCode ? '<p class="settings-hint-text">Pilih mata uang kedua untuk mengaktifkan fitur multicurrency.</p>' : ''}
+    </div>`;
+
   return `
     <div class="settings-section">
       <p class="settings-section-label">Kategori</p>
@@ -81,8 +147,8 @@ function _buildSettingsTampilanHTML() {
           <div class="settings-item-left">
             <div class="settings-item-icon">💱</div>
             <div>
-              <div class="settings-item-label">Mata Uang</div>
-              <div class="settings-item-sub settings-item-sub--sm">Simbol saja, angka tidak dikonversi</div>
+              <div class="settings-item-label">Mata Uang Utama</div>
+              <div class="settings-item-sub settings-item-sub--sm">Simbol dan default semua dompet baru</div>
             </div>
           </div>
           <select id="currency-select" class="settings-select">${currencyOptions}</select>
@@ -102,7 +168,9 @@ function _buildSettingsTampilanHTML() {
           </select>
         </div>
       </div>
-    </div>`;
+    </div>
+
+    ${multicurrencySection}`;
 }
 
 function _buildSettingsDataHTML(txCount) {

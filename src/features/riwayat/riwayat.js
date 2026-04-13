@@ -75,6 +75,13 @@ function renderRiwayatContent() {
   const searchQuery = (state.riwayatFilter.search || '').toLowerCase();
 
   let filtered = getTransaksi();
+
+  // Multicurrency: filter hanya transaksi dari wallet currency yang sedang aktif
+  if (isMulticurrencyEnabled() && getSecondaryCurrency()) {
+    const activeWalletIds = new Set(getActiveWallets().map(w => w.id));
+    filtered = filtered.filter(tx => activeWalletIds.has(tx.wallet_id));
+  }
+
   if (state.riwayatFilter.bulan) filtered = filtered.filter(tx => tx.tanggal.startsWith(state.riwayatFilter.bulan));
   if (state.riwayatFilter.jenis !== 'semua') filtered = filtered.filter(tx => tx.jenis === state.riwayatFilter.jenis);
 

@@ -43,6 +43,8 @@ function init() {
   initQuickCapture();
   initPWA();
   if (typeof checkReEntryNotif === 'function') checkReEntryNotif();
+  // Sync active currency toggle dari storage
+  if (typeof getActiveCurrencyToggle === 'function') getActiveCurrencyToggle();
   if (nav) nav.classList.remove('hidden');
   showApp();
 }
@@ -229,7 +231,7 @@ function _stepSaldo() {
     <p class="onboarding-question">Berapa isi masing-masing dompet sekarang?</p>
     <p class="onboarding-sub" style="margin-bottom:8px;">Boleh perkiraan dulu — ini bisa diubah kapan saja.</p>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
-      <span class="onboarding-label-sm">Simbol mata uang:</span>
+      <span class="onboarding-label-sm">Mata uang utama:</span>
       <select id="ob-currency-select" style="font-size:12px;padding:2px 6px;border:1px solid var(--gray-200);border-radius:6px;background:var(--surface);color:var(--text-primary);cursor:pointer;">
         <option value="IDR">Rp — Rupiah</option>
         <option value="USD">$ — Dollar</option>
@@ -241,6 +243,21 @@ function _stepSaldo() {
     </div>
     <div id="ob-saldo-fields"></div>
     <p class="onboarding-error" id="ob-saldo-error"></p>
+
+    <div class="ob-multicurrency-opt" id="ob-multicurrency-opt">
+      <label class="ob-multicurrency-label">
+        <input type="checkbox" id="ob-multicurrency-check" style="margin-right:6px;" />
+        Punya simpanan atau penghasilan dalam mata uang lain juga
+      </label>
+      <div id="ob-secondary-wrap" style="display:none;margin-top:10px;">
+        <select id="ob-secondary-select" class="input-field" style="font-size:13px;">
+          ${CURRENCY_OPTIONS.filter(c => c.code !== 'IDR').map(c =>
+            `<option value="${c.code}">${c.label}</option>`
+          ).join('')}
+        </select>
+      </div>
+    </div>
+
     <button id="ob-btn-selesai" class="btn-primary" style="margin-top:16px;">Ayo Mulai! 🎉</button>`;
 
   const fieldsWrap = el.querySelector('#ob-saldo-fields');
@@ -260,31 +277,54 @@ function _stepSaldo() {
     fieldsWrap.appendChild(row);
   });
 
-  // R1: Inline currency selector — simpan pilihan langsung, tidak redirect
+  // Currency selector
   el.querySelector('#ob-currency-select')?.addEventListener('change', (e) => {
     setData(STORAGE_KEYS.CURRENCY, e.target.value);
-    // Update prefix labels yang sudah ter-render
     const sym = getCurrencySymbol();
     el.querySelectorAll('.nominal-prefix').forEach(span => { span.textContent = sym; });
+    // Update secondary options — exclude base
+    const secSel = el.querySelector('#ob-secondary-select');
+    if (secSel) {
+      secSel.innerHTML = CURRENCY_OPTIONS
+        .filter(c => c.code !== e.target.value)
+        .map(c => `<option value="${c.code}">${c.label}</option>`)
+        .join('');
+    }
   });
-  // Set default value sesuai setting yang sudah ada (kalau ada)
   const existingCurrency = getData(STORAGE_KEYS.CURRENCY, 'IDR');
   const currencySelect = el.querySelector('#ob-currency-select');
   if (currencySelect) currencySelect.value = existingCurrency;
 
+  // Multicurrency opt-in toggle
+  el.querySelector('#ob-multicurrency-check')?.addEventListener('change', (e) => {
+    const wrap = el.querySelector('#ob-secondary-wrap');
+    if (wrap) wrap.style.display = e.target.checked ? 'block' : 'none';
+  });
+
   el.querySelector('#ob-btn-selesai').addEventListener('click', () => {
-    // Simpan wallets dengan saldo masing-masing
     const wallets = selectedWallets.map(wallet => {
       const input = fieldsWrap.querySelector(`[data-wallet-id="${wallet.id}"]`);
       const saldo = input ? parseNominal(input.value) : 0;
-      return { id: wallet.id, nama: wallet.nama, icon: wallet.icon, saldo_awal: saldo };
+      const baseCurrency = getData(STORAGE_KEYS.CURRENCY, 'IDR');
+      return { id: wallet.id, nama: wallet.nama, icon: wallet.icon, saldo_awal: saldo, currency: baseCurrency, hidden: false };
     });
+
+    // Multicurrency opt-in
+    const multiCheck = el.querySelector('#ob-multicurrency-check');
+    if (multiCheck?.checked) {
+      const secCode = el.querySelector('#ob-secondary-select')?.value;
+      if (secCode) {
+        setMulticurrencyEnabled(true);
+        setSecondaryCurrency(secCode);
+        setExchangeRate(1); // default rate 1, user perlu update
+        setActiveCurrencyToggle('base');
+      }
+    }
 
     saveWallets(wallets);
     setData(STORAGE_KEYS.ONBOARDING, true);
     setData(STORAGE_KEYS.SCHEMA_VERSION, SCHEMA_VERSION);
 
-    // legacy: simpan total saldo awal untuk kompatibilitas
     const totalSaldo = wallets.reduce((s, w) => s + w.saldo_awal, 0);
     saveSaldoAwal(totalSaldo);
 

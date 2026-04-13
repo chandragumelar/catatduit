@@ -6,8 +6,17 @@
 
 
 function renderTabunganTab(container) {
-  const txList = getTransaksi();
+  const allTxList = getTransaksi();
   const { year, month } = getCurrentMonthYear();
+
+  // Multicurrency: filter transaksi nabung hanya dari wallet currency aktif
+  const activeWalletIds = (typeof isMulticurrencyEnabled === 'function' && isMulticurrencyEnabled() && getSecondaryCurrency())
+    ? new Set(getActiveWallets().map(w => w.id))
+    : null;
+
+  const txList = activeWalletIds
+    ? allTxList.filter(tx => activeWalletIds.has(tx.wallet_id))
+    : allTxList;
 
   const txNabungBulanIni = txList.filter(tx => tx.jenis === 'nabung' && isSameMonth(tx.tanggal, year, month));
   const txNabungAll      = txList.filter(tx => tx.jenis === 'nabung');
@@ -20,11 +29,11 @@ function renderTabunganTab(container) {
   summaryEl.innerHTML = `
     <div class="card tabungan-stat">
       <p class="summary-label">Nabung Bulan Ini</p>
-      <p class="summary-value nabung">${formatRupiah(totalBulanIni)}</p>
+      <p class="summary-value nabung">${formatWithActiveCurrency(totalBulanIni)}</p>
     </div>
     <div class="card tabungan-stat">
       <p class="summary-label">Total Nabung</p>
-      <p class="summary-value nabung">${formatRupiah(totalAkumulasi)}</p>
+      <p class="summary-value nabung">${formatWithActiveCurrency(totalAkumulasi)}</p>
     </div>`;
   container.appendChild(summaryEl);
 
@@ -56,7 +65,7 @@ function renderTabunganTab(container) {
         <div class="goal-header">
           <div class="goal-name">${escHtml(goal.nama)}</div>
           <div class="goal-right">
-            <span class="goal-target">${formatRupiah(goal.target)}</span>
+            <span class="goal-target">${formatWithActiveCurrency(goal.target)}</span>
             <button class="btn-icon-sm" data-action="edit-goal" data-idx="${idx}" title="Edit"><i data-lucide="pencil"></i></button>
             <button class="btn-icon-sm danger" data-action="hapus-goal" data-idx="${idx}" title="Hapus"><i data-lucide="trash-2"></i></button>
           </div>
@@ -70,7 +79,7 @@ function renderTabunganTab(container) {
     divider.innerHTML = `
       <div class="goals-total-row">
         <span class="goals-total-label">Total Target</span>
-        <span class="goals-total-value">${formatRupiah(totalTarget)}</span>
+        <span class="goals-total-value">${formatWithActiveCurrency(totalTarget)}</span>
       </div>`;
     goalsCard.appendChild(divider);
 
@@ -81,10 +90,10 @@ function renderTabunganTab(container) {
         <div class="goal-progress-fill" style="width:${progressPct.toFixed(1)}%"></div>
       </div>
       <div class="goal-progress-label">
-        <span>${formatRupiah(totalAkumulasi)} dari ${formatRupiah(totalTarget)}</span>
+        <span>${formatWithActiveCurrency(totalAkumulasi)} dari ${formatWithActiveCurrency(totalTarget)}</span>
         <span>${Math.round(progressPct)}%</span>
       </div>
-      ${estimasi !== null ? `<p class="goal-estimasi">Estimasi tercapai dalam <strong>${estimasi} bulan lagi</strong></p><p class="goal-estimasi-sub">rata-rata ${formatRupiah(totalBulanIni)}/bulan</p>` : ''}`;
+      ${estimasi !== null ? `<p class="goal-estimasi">Estimasi tercapai dalam <strong>${estimasi} bulan lagi</strong></p><p class="goal-estimasi-sub">rata-rata ${formatWithActiveCurrency(totalBulanIni)}/bulan</p>` : ''}`;
     goalsCard.appendChild(progressEl);
   }
 

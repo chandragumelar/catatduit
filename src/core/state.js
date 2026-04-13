@@ -23,6 +23,11 @@ const STORAGE_KEYS = {
   BUDGET_PERIOD:  'cd_budget_period',   // 'monthly' | 'weekly'
   CARD_COLLAPSED: 'cd_card_collapsed',  // array of card ids yang di-collapse
   SUPPORT_BANNER: 'cd_support_banner_dismissed_at', // timestamp dismiss terakhir
+  // Multicurrency
+  SECONDARY_CURRENCY:     'cd_secondary_currency',      // kode currency kedua, null jika single
+  EXCHANGE_RATE:          'cd_exchange_rate',           // rate: 1 secondary = X base
+  ACTIVE_CURRENCY_TOGGLE: 'cd_active_currency_toggle',  // 'base' | 'secondary'
+  MULTICURRENCY_ENABLED:  'cd_multicurrency_enabled',   // boolean
 };
 
 const CURRENCY_OPTIONS = [
@@ -98,7 +103,7 @@ const BULAN_NAMES = [
 
 const MAX_NOMINAL    = 999000000000;
 const MAX_GOALS      = 5;
-const SCHEMA_VERSION = 5; // Sprint C: account transfer UI, rolling insight
+const SCHEMA_VERSION = 6; // Multicurrency support
 
 // Sprint B2 #16: Dashboard card IDs
 const DASHBOARD_CARDS = {
@@ -145,4 +150,6 @@ const state = {
   chartInstances:   {},
   inputPreserve:    null,
   fromOnboarding:   false,
+  // Multicurrency runtime — tidak perlu persist, diambil dari storage saat init
+  activeCurrencyToggle: 'base', // 'base' | 'secondary'
 };

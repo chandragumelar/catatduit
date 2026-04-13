@@ -184,8 +184,82 @@ function renderDashboard() {
   container.querySelector('#btn-share-summary')?.addEventListener('click', () =>
     showShareSummary(getNama(), year, month, totalMasuk, totalKeluar, cashflow, totalNabung, borosList));
 
+  // Multicurrency toggle events
+  _initCurrencyToggleEvents();
+
   setTimeout(() => {
     initDashboardCharts(calc);
     if (window.lucide) lucide.createIcons();
   }, 0);
+}
+
+// ===== CURRENCY TOGGLE =====
+
+function _initCurrencyToggleEvents() {
+  const wrap = document.getElementById('currency-toggle-container');
+  if (!wrap) return;
+
+  if (!isMulticurrencyEnabled() || !getSecondaryCurrency()) {
+    wrap.innerHTML = '';
+    return;
+  }
+
+  wrap.innerHTML = buildCurrencyToggleHTML();
+
+  // Toggle buttons
+  wrap.querySelectorAll('.currency-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.toggle; // 'base' | 'secondary'
+      setActiveCurrencyToggle(val);
+      renderDashboard();
+    });
+  });
+
+  // Rate chip — buka modal edit kurs
+  wrap.querySelector('#btn-rate-chip')?.addEventListener('click', () => {
+    _openRateEditModal();
+  });
+}
+
+function _openRateEditModal() {
+  const sec     = getSecondaryCurrency();
+  const base    = getBaseCurrency();
+  const secSym  = getCurrencySymbolByCode(sec);
+  const baseSym = getCurrencySymbolByCode(base);
+  const current = getExchangeRate();
+
+  showModal(
+    `<div style="text-align:left;">
+      <p style="font-weight:600;margin-bottom:12px;">Update Kurs</p>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
+        1 ${secSym} (${sec}) = berapa ${baseSym} (${base})?
+      </p>
+      <div class="nominal-wrap">
+        <span class="nominal-prefix">${baseSym}</span>
+        <input type="text" id="modal-rate-input" class="input-nominal"
+          placeholder="0" inputmode="decimal" autocomplete="off"
+          value="${current.toLocaleString('id-ID')}" style="font-size:18px;" />
+      </div>
+    </div>`,
+    () => {
+      const raw = document.getElementById('modal-rate-input')?.value || '';
+      const rate = parseFloat(raw.replace(/\./g, '').replace(',', '.'));
+      if (!rate || rate <= 0) { showToast('❌ Kurs tidak valid.'); return; }
+      setExchangeRate(rate);
+      showToast(`✅ Kurs diperbarui: 1 ${sec} = ${baseSym} ${rate.toLocaleString('id-ID')}`);
+      renderDashboard();
+    },
+    'Simpan Kurs'
+  );
+
+  // Format input nominal saat user ketik
+  setTimeout(() => {
+    const inp = document.getElementById('modal-rate-input');
+    if (!inp) return;
+    inp.select();
+    inp.addEventListener('input', () => {
+      const raw = inp.value.replace(/\D/g, '');
+      inp.value = raw ? parseInt(raw, 10).toLocaleString('id-ID') : '';
+    });
+  }, 50);
 }

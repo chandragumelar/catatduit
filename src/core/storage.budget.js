@@ -46,9 +46,17 @@ function calcBudgetStatus() {
 
   const { start, end, period } = getBudgetPeriodRange();
 
-  const txInPeriod = getTransaksi().filter(tx =>
-    tx.jenis === 'keluar' && tx.type !== 'transfer_out' && tx.tanggal >= start && tx.tanggal <= end
-  );
+  // Multicurrency: hanya hitung dari wallet currency aktif
+  const activeWalletIds = (typeof isMulticurrencyEnabled === 'function' && isMulticurrencyEnabled() && getSecondaryCurrency())
+    ? new Set(getActiveWallets().map(w => w.id))
+    : null;
+
+  const txInPeriod = getTransaksi().filter(tx => {
+    if (tx.jenis !== 'keluar' || tx.type === 'transfer_out') return false;
+    if (tx.tanggal < start || tx.tanggal > end) return false;
+    if (activeWalletIds && !activeWalletIds.has(tx.wallet_id)) return false;
+    return true;
+  });
 
   const periodLabel = period === 'weekly'
     ? `Minggu ini (${formatDate(start)} – ${formatDate(end)})`

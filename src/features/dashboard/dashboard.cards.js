@@ -16,9 +16,15 @@ function buildTxItemHTML(tx) {
     ? `<span class="tx-wallet">${wallet.icon} ${escHtml(wallet.nama)}</span>`
     : '';
   const isTransfer  = tx.type === 'transfer_out' || tx.type === 'transfer_in';
+  const isCrossCur  = tx.is_cross_currency === true;
   const transferTag = isTransfer
-    ? `<span class="tx-transfer-badge">${tx.type === 'transfer_out' ? '↗' : '↙'} Transfer</span>`
+    ? `<span class="tx-transfer-badge">${tx.type === 'transfer_out' ? '↗' : '↙'} ${isCrossCur ? '💱 Tukar' : 'Transfer'}</span>`
     : '';
+
+  // Tampilkan nominal dengan currency wallet, bukan active toggle
+  const wCurrency  = wallet ? getWalletCurrency(wallet) : getActiveCurrencyCode();
+  const nominalStr = formatWithCurrency(tx.nominal, wCurrency);
+
   return `<div class="tx-item" data-id="${tx.id}">
     <div class="tx-icon">${k.icon}</div>
     <div class="tx-info">
@@ -26,7 +32,7 @@ function buildTxItemHTML(tx) {
       ${tx.catatan ? `<div class="tx-catatan">${escHtml(tx.catatan)}</div>` : ''}
     </div>
     <div class="tx-right">
-      <div class="tx-nominal ${cls}">${prefix}${formatRupiah(tx.nominal)}</div>
+      <div class="tx-nominal ${cls}">${prefix}${nominalStr}</div>
       <div class="tx-tanggal">${formatDate(tx.tanggal)}</div>
     </div>
   </div>`;

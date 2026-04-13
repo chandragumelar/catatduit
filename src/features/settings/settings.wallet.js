@@ -6,9 +6,12 @@
 
 
 function _showWalletSheet(idx) {
-  const wallets = getWallets();
-  const isEdit  = idx !== null;
-  const w       = isEdit ? wallets[idx] : null;
+  const wallets  = getWallets();
+  const isEdit   = idx !== null;
+  const w        = isEdit ? wallets[idx] : null;
+  const isMulti  = isMulticurrencyEnabled();
+  const baseCode = getBaseCurrency();
+  const secCode  = getSecondaryCurrency();
 
   const presetHTML = !isEdit ? `
     <div class="bottom-sheet-field">
@@ -23,6 +26,23 @@ function _showWalletSheet(idx) {
       </div>
     </div>` : '';
 
+  // Currency selector — hanya tampil jika multicurrency aktif dan ada secondary currency
+  const wCurrency      = w?.currency || baseCode;
+  const currencyField  = (isMulti && secCode) ? `
+    <div class="bottom-sheet-field">
+      <label class="input-label">Mata uang dompet ini</label>
+      <div class="currency-toggle" style="margin-top:4px;">
+        <button type="button" class="currency-toggle-btn ${wCurrency === baseCode ? 'active' : ''}"
+          id="bs-currency-base" data-currency="${baseCode}">${baseCode}</button>
+        <button type="button" class="currency-toggle-btn ${wCurrency === secCode ? 'active' : ''}"
+          id="bs-currency-sec" data-currency="${secCode}">${secCode}</button>
+      </div>
+      <input type="hidden" id="bs-wallet-currency" value="${wCurrency}" />
+    </div>` : '';
+
+  const activeCurrencyForWallet = wCurrency;
+  const activeSym = getCurrencySymbolByCode(activeCurrencyForWallet);
+
   _openBottomSheet({
     title: isEdit ? 'Edit Dompet' : 'Tambah Dompet',
     fields: `
@@ -33,10 +53,11 @@ function _showWalletSheet(idx) {
           placeholder="contoh: BCA, GoPay, Cash"
           value="${escHtml(w?.nama || '')}" maxlength="20" />
       </div>
+      ${currencyField}
       <div class="bottom-sheet-field">
         <label class="input-label">Saldo awal</label>
         <div class="nominal-wrap">
-          <span class="nominal-prefix">${getCurrencySymbol()}</span>
+          <span class="nominal-prefix" id="bs-saldo-prefix">${activeSym}</span>
           <input type="text" id="bs-wallet-saldo" class="input-nominal"
             placeholder="0"
             value="${w ? formatNominalInput(w.saldo_awal || 0) : ''}"
@@ -59,10 +80,24 @@ function _showWalletSheet(idx) {
           document.getElementById('bs-wallet-nama').value = tile.dataset.presetNama;
         });
       });
+
+      // Currency toggle di wallet sheet
+      document.querySelectorAll('[id^="bs-currency-"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[id^="bs-currency-"]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const chosenCode = btn.dataset.currency;
+          const hiddenInput = document.getElementById('bs-wallet-currency');
+          if (hiddenInput) hiddenInput.value = chosenCode;
+          const prefix = document.getElementById('bs-saldo-prefix');
+          if (prefix) prefix.textContent = getCurrencySymbolByCode(chosenCode);
+        });
+      });
     },
     onConfirm: () => {
-      const nama  = document.getElementById('bs-wallet-nama').value.trim();
-      const saldo = parseNominal(document.getElementById('bs-wallet-saldo').value);
+      const nama     = document.getElementById('bs-wallet-nama').value.trim();
+      const saldo    = parseNominal(document.getElementById('bs-wallet-saldo').value);
+      const currency = document.getElementById('bs-wallet-currency')?.value || baseCode;
       if (!nama) return 'Nama dompet tidak boleh kosong.';
 
       const selectedPreset = document.querySelector('#bs-wallet-preset-grid .wallet-preset-tile.selected');
@@ -70,9 +105,9 @@ function _showWalletSheet(idx) {
       const id   = w?.id || selectedPreset?.dataset.presetId || generateId();
 
       if (isEdit) {
-        wallets[idx] = { ...w, nama, icon, saldo_awal: saldo };
+        wallets[idx] = { ...w, nama, icon, saldo_awal: saldo, currency };
       } else {
-        wallets.push({ id, nama, icon, saldo_awal: saldo });
+        wallets.push({ id, nama, icon, saldo_awal: saldo, currency, hidden: false });
       }
 
       saveWallets(wallets);

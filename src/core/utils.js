@@ -11,6 +11,10 @@ function generateId() {
 
 function getCurrencySymbol() {
   try {
+    // Jika multicurrency aktif, gunakan symbol sesuai toggle
+    if (typeof isMulticurrencyEnabled === 'function' && isMulticurrencyEnabled()) {
+      return getActiveCurrencySymbol();
+    }
     const code = getData(STORAGE_KEYS.CURRENCY, 'IDR');
     const opt  = CURRENCY_OPTIONS.find(c => c.code === code);
     return opt ? opt.symbol : 'Rp';
@@ -23,7 +27,6 @@ function formatRupiah(angka) {
   }
   const n   = Number(angka);
   const sym = getCurrencySymbol();
-  // Number formatting tetap id-ID (titik ribuan, koma desimal) — hanya simbol yang berubah
   return (n < 0 ? '-' + sym + ' ' : sym + ' ') + Math.abs(n).toLocaleString('id-ID');
 }
 

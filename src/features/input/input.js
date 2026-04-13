@@ -62,9 +62,12 @@ function renderWalletPicker() {
   const wrap = document.getElementById('input-wallet-wrap');
   if (!wrap) return;
 
-  const wallets = getWallets();
+  // Multicurrency: hanya tampilkan wallet sesuai toggle aktif
+  const allWallets = getWallets().filter(w => !w.hidden);
+  const wallets = (isMulticurrencyEnabled() && getSecondaryCurrency())
+    ? allWallets.filter(w => isWalletMatchesToggle(w))
+    : allWallets;
 
-  // kalau cuma 1 wallet, sembunyikan picker — tidak perlu user pilih
   if (wallets.length <= 1) {
     wrap.style.display = 'none';
     state.inputWalletId = wallets[0]?.id || DEFAULT_WALLET_ID;
@@ -73,7 +76,6 @@ function renderWalletPicker() {
 
   wrap.style.display = 'block';
 
-  // set default wallet kalau belum dipilih
   if (!state.inputWalletId || !wallets.find(w => w.id === state.inputWalletId)) {
     state.inputWalletId = wallets[0].id;
   }
@@ -229,11 +231,20 @@ function openInputPage(mode, id = null) {
     deleteBtn.style.display = 'none';
     state.inputJenis    = 'keluar';
     state.inputKategori = null;
-    state.inputWalletId = getWallets()[0]?.id || DEFAULT_WALLET_ID;
+    // Multicurrency: default ke wallet pertama dari currency aktif
+    const activeWals = (isMulticurrencyEnabled() && getSecondaryCurrency())
+      ? getActiveWallets()
+      : getWallets().filter(w => !w.hidden);
+    state.inputWalletId = activeWals[0]?.id || DEFAULT_WALLET_ID;
 
     document.getElementById('input-nominal').value = '';
     document.getElementById('input-catatan').value = '';
     tanggalInput.value = getTodayStr();
+
+    // Update currency prefix sesuai toggle aktif
+    const pfx = document.getElementById('input-currency-prefix');
+    if (pfx) pfx.textContent = getCurrencySymbol();
+
     setInputJenis('keluar'); // juga trigger renderChips + renderWalletPicker
   } else {
     const tx = getTransaksi().find(t => t.id === id);

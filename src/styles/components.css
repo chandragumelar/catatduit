@@ -231,3 +231,177 @@
 .storage-bar--warn { background: var(--red); }
 .storage-indicator-hint { font-size: 12px; color: var(--gray-400); }
 
+
+/* ============================================================
+   MULTICURRENCY — Toggle, Rate Chip, Cross-currency info
+   ============================================================ */
+
+.currency-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 6px;
+  background: var(--bg);
+  flex-wrap: wrap;
+}
+
+.currency-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 3px;
+  border: 1.5px solid var(--border);
+}
+
+.currency-toggle-btn {
+  padding: 5px 16px;
+  border-radius: 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: 0.3px;
+}
+
+.currency-toggle-btn.active {
+  background: var(--teal);
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(13,148,136,0.3);
+}
+
+.currency-rate-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.currency-rate-chip:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.currency-rate-chip-edit {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* Cross-currency transfer info */
+.tf-cross-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  background: var(--teal-light, rgba(13,148,136,0.06));
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--teal);
+  margin-top: 4px;
+}
+
+.tf-cross-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.tf-cross-rate {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Wallet currency badge */
+.wallet-currency-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--teal-light, rgba(13,148,136,0.1));
+  color: var(--teal);
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+/* Toggle switch (untuk settings multicurrency) */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--gray-300, #d1d5db);
+  border-radius: 24px;
+  transition: 0.2s;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--teal);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* Settings hint text */
+.settings-hint-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 4px 12px 0;
+}
+
+/* Onboarding multicurrency opt-in */
+.ob-multicurrency-opt {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+}
+
+.ob-multicurrency-label {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 500;
+}

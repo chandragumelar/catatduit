@@ -56,10 +56,32 @@ function migrateToV4() {
   invalidateTransaksiCache();
 }
 
+// ===== MIGRATION v4 → v5 =====
+// Assign field `currency` ke semua wallet existing (default: base currency)
+// Toggle multicurrency tidak muncul sampai user aktifkan manual
+
+function migrateToV5() {
+  const currentVersion = getData(STORAGE_KEYS.SCHEMA_VERSION, 0);
+  if (currentVersion >= 5) return;
+
+  const wallets = getData(STORAGE_KEYS.WALLETS, null);
+  if (wallets) {
+    const base    = getData(STORAGE_KEYS.CURRENCY, 'IDR');
+    let changed   = false;
+    wallets.forEach(w => {
+      if (!w.currency) { w.currency = base; changed = true; }
+    });
+    if (changed) setData(STORAGE_KEYS.WALLETS, wallets);
+  }
+
+  setData(STORAGE_KEYS.SCHEMA_VERSION, 5);
+}
+
 // ===== ENTRY POINT =====
 // Panggil ini satu kali dari app.js saat init
 
 function runMigrations() {
   migrateToV3();
   migrateToV4();
+  migrateToV5();
 }
