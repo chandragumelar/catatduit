@@ -100,18 +100,18 @@ input, select, textarea { font-family: inherit; }
   #screen-app, .screen, #screen-onboarding {
     max-width: 480px;
     width: 480px;
+    left: 0;
+    right: 0;
     margin: 0 auto;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
     border-left: 1px solid var(--gray-200);
     border-right: 1px solid var(--gray-200);
   }
   .bottom-nav {
     max-width: 480px;
     width: 480px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
   }
   .toast { max-width: 340px; }
   .nav-fab-btn:hover { transform: scale(1.08); }
