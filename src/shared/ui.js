@@ -19,7 +19,7 @@ function showToast(msg, duration = 2500) {
 // ===== MODAL =====
 function showModal(message, onConfirm, confirmText = 'Ya, Lanjutkan', isDanger = true) {
   const overlay = document.getElementById('modal-overlay');
-  document.getElementById('modal-message').textContent = message;
+  document.getElementById('modal-message').innerHTML = message;
   const btnC = document.getElementById('modal-confirm');
   btnC.textContent = confirmText;
   btnC.style.background = isDanger ? 'var(--red)' : 'var(--teal)';

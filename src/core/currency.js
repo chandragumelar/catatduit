@@ -36,7 +36,7 @@ function setSecondaryCurrency(code) {
 // Contoh: 1 USD = 16200 IDR → simpan 16200
 
 function getExchangeRate() {
-  return getData(STORAGE_KEYS.EXCHANGE_RATE, 1);
+  return getData(STORAGE_KEYS.EXCHANGE_RATE, 17000);
 }
 
 function setExchangeRate(rate) {
@@ -156,7 +156,7 @@ function buildRateChipHTML() {
   const rateStr = rate.toLocaleString('id-ID');
   return `
     <div class="currency-rate-chip">
-      <span class="currency-rate-chip-text">Kurs transfer: 1 ${secSym} = ${baseSym} ${rateStr}</span>
+      <span class="currency-rate-chip-text">1 ${secSym} = ${baseSym} ${rateStr}</span>
       <button class="currency-rate-chip-ubah" id="btn-rate-chip" title="Atur kurs transfer">✏️</button>
     </div>`;
 }
@@ -177,7 +177,10 @@ function buildCurrencyToggleHTML() {
           <button class="currency-toggle-btn ${isBase ? 'active' : ''}" data-toggle="base">${base}</button>
           <button class="currency-toggle-btn ${!isBase ? 'active' : ''}" data-toggle="secondary">${sec}</button>
         </div>
-        ${buildRateChipHTML()}
+        <div class="currency-rate-section">
+          <div class="currency-toggle-label" style="text-align:right;">Kurs transfer:</div>
+          ${buildRateChipHTML()}
+        </div>
       </div>
     </div>`;
 }
