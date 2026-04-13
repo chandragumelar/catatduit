@@ -157,8 +157,9 @@ function buildRateChipHTML() {
   return `
     <div class="currency-rate-chip">
       <span class="currency-rate-chip-text">1 ${secSym} = ${baseSym} ${rateStr}</span>
-      <button class="currency-rate-chip-ubah" id="btn-rate-chip" title="Atur kurs transfer">✏️</button>
-    </div>`;
+      <button class="currency-rate-chip-ubah" id="btn-rate-chip" title="Ubah nilai tukar">✏️</button>
+    </div>
+    <span class="currency-rate-manual-note">Diperbarui manual</span>`;
 }
 
 // ===== TOGGLE HTML =====
@@ -171,14 +172,16 @@ function buildCurrencyToggleHTML() {
   const isBase   = isActiveBase();
   return `
     <div class="currency-toggle-section" id="currency-toggle-wrap">
-      <div class="currency-toggle-label">Lihat keuangan dalam:</div>
-      <div class="currency-toggle-row">
-        <div class="currency-toggle" id="currency-toggle-track" data-active="${isBase ? 'base' : 'secondary'}">
-          <button class="currency-toggle-btn ${isBase ? 'active' : ''}" data-toggle="base">${base}</button>
-          <button class="currency-toggle-btn ${!isBase ? 'active' : ''}" data-toggle="secondary">${sec}</button>
+      <div class="currency-toggle-columns">
+        <div class="currency-toggle-col">
+          <div class="currency-toggle-label">Lihat keuangan dalam:</div>
+          <div class="currency-toggle" id="currency-toggle-track" data-active="${isBase ? 'base' : 'secondary'}">
+            <button class="currency-toggle-btn ${isBase ? 'active' : ''}" data-toggle="base">${base}</button>
+            <button class="currency-toggle-btn ${!isBase ? 'active' : ''}" data-toggle="secondary">${sec}</button>
+          </div>
         </div>
-        <div class="currency-rate-section">
-          <div class="currency-toggle-label" style="text-align:right;">Kurs transfer:</div>
+        <div class="currency-toggle-col currency-toggle-col--right">
+          <div class="currency-toggle-label">Nilai tukar yang kamu tentukan:</div>
           ${buildRateChipHTML()}
         </div>
       </div>

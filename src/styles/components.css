@@ -249,6 +249,25 @@
   letter-spacing: 0.2px;
 }
 
+.currency-toggle-columns {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.currency-toggle-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.currency-toggle-col--right {
+  align-items: flex-end;
+}
+
+/* keep for backward compat */
 .currency-toggle-row {
   display: flex;
   align-items: center;
@@ -310,18 +329,15 @@
   color: var(--teal);
 }
 
+.currency-rate-manual-note {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-align: right;
+  margin-top: 3px;
+  letter-spacing: 0.2px;
+}
+
 /* Rate chip — info teks + tombol edit terpisah */
-.currency-rate-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.currency-rate-section .currency-toggle-label {
-  margin-bottom: 0;
-}
-
 .currency-rate-chip {
   display: inline-flex;
   align-items: center;
