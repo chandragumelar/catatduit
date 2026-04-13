@@ -310,30 +310,37 @@
   color: var(--teal);
 }
 
-/* Rate chip — prominent button, jelas bisa diklik */
+/* Rate chip — info teks + tombol edit terpisah */
 .currency-rate-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
+  gap: 0;
   border-radius: 12px;
   border: 1.5px solid var(--teal);
   background: rgba(13,148,136,0.07);
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  overflow: hidden;
   white-space: nowrap;
+  cursor: default;
 }
 
-.currency-rate-chip:hover {
-  background: rgba(13,148,136,0.14);
+.currency-rate-chip-text {
+  padding: 6px 10px;
 }
 
 .currency-rate-chip-ubah {
+  padding: 6px 10px;
+  border-left: 1.5px solid var(--teal);
+  background: rgba(13,148,136,0.1);
+  cursor: pointer;
   font-size: 13px;
-  opacity: 0.8;
+  transition: background 0.15s;
+}
+
+.currency-rate-chip-ubah:hover {
+  background: rgba(13,148,136,0.22);
 }
 
 /* Cross-currency transfer info */
@@ -463,9 +470,9 @@
   display: block;
   width: 18px;
   height: 18px;
-  border: 2px solid var(--border);
+  border: 2px solid #aaa;
   border-radius: 4px;
-  background: var(--bg);
+  background: #fff;
   transition: border-color 0.15s, background 0.15s;
 }
 
