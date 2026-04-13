@@ -155,9 +155,9 @@ function buildRateChipHTML() {
   const baseSym = getCurrencySymbolByCode(base);
   const rateStr = rate.toLocaleString('id-ID');
   return `
-    <button class="currency-rate-chip" id="btn-rate-chip" title="Ubah kurs manual">
-      Kurs: 1 ${secSym} = ${baseSym} ${rateStr}
-      <span class="currency-rate-chip-ubah">· Ubah</span>
+    <button class="currency-rate-chip" id="btn-rate-chip" title="Atur kurs transfer">
+      Kurs transfer: 1 ${secSym} = ${baseSym} ${rateStr}
+      <span class="currency-rate-chip-ubah">✏️</span>
     </button>`;
 }
 

@@ -254,9 +254,9 @@ function _openRateEditModal() {
 
   showModal(
     `<div style="text-align:left;">
-      <p style="font-weight:600;margin-bottom:6px;">Update Kurs</p>
+      <p style="font-weight:600;margin-bottom:6px;">Atur Kurs Saat Ini</p>
       <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">
-        Dipakai untuk transfer antar dompet beda mata uang.
+        Dipakai saat transfer antar dompet beda mata uang.
       </p>
       <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
         1 ${secSym} (${sec}) = berapa ${baseSym} (${base})?
