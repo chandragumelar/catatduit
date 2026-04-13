@@ -256,14 +256,14 @@
   flex-wrap: wrap;
 }
 
-/* Sliding pill toggle */
+/* Sliding pill toggle — track teal, thumb putih */
 .currency-toggle {
   position: relative;
   display: flex;
-  background: var(--surface);
+  background: var(--teal);
   border-radius: 20px;
   padding: 3px;
-  border: 1.5px solid var(--border);
+  border: none;
 }
 
 .currency-toggle::before {
@@ -273,9 +273,9 @@
   left: 3px;
   height: calc(100% - 6px);
   border-radius: 14px;
-  background: var(--teal);
-  box-shadow: 0 1px 4px rgba(13,148,136,0.35);
-  transition: left 0.2s ease, width 0.2s ease;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  transition: left 0.22s ease, width 0.22s ease;
   z-index: 0;
 }
 
@@ -296,7 +296,7 @@
   border-radius: 14px;
   border: none;
   background: transparent;
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.7);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -306,7 +306,7 @@
 }
 
 .currency-toggle-btn.active {
-  color: #fff;
+  color: var(--teal);
 }
 
 /* Rate chip */
