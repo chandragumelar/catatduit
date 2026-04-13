@@ -1,7 +1,9 @@
 // =============================================================================
 // DASHBOARD.CARDS.JS
-// Tanggung jawab: Renderer kartu-kartu dashboard (saldo, summary keluar/masuk/nabung)
-// Depends on: state.js, storage.js, utils.js
+// Tanggung jawab: Card builders (tx item, collapsible system, greeting, velocity,
+//                cashflow, recent, spending, share, checkin, support banner, charts HTML)
+// Depends on: state.js, storage.*.js, utils.js
+// Note: buildKeuanganCard → dashboard.cards.keuangan.js
 // =============================================================================
 
 
@@ -221,93 +223,6 @@ function buildCheckinCard() {
      </div>
      <button class="checkin-btn" id="btn-checkin-catat">Catat</button>`;
   return el;
-}
-
-// ===== KEUANGAN BULAN INI =====
-
-let _keuanganExpanded = false;
-
-function buildKeuanganCard({
-  wallets, estimasiSaldo, totalNabung, totalTagihanBelumBayar,
-  tagihanSudahBayar, tagihanBulanIni, uangBebas, bebasDipakai, tagihan,
-}) {
-  const hasRincian = totalTagihanBelumBayar > 0 || totalNabung > 0;
-  const heroAngka  = hasRincian ? bebasDipakai : estimasiSaldo;
-  const heroClass  = heroAngka >= 0 ? 'income' : 'expense';
-
-  const card = document.createElement('div');
-  card.className = 'card keuangan-card';
-  card.id = 'keuangan-bulan-ini-card';
-  card.dataset.cardId = DASHBOARD_CARDS.KEUANGAN;
-
-  function render() {
-    card.innerHTML = `
-      <div class="keuangan-collapsed" id="keuangan-toggle">
-        <div class="keuangan-collapsed-left">
-          <p class="summary-label">KEUANGAN BULAN INI</p>
-          <p class="keuangan-hero ${heroClass}">${formatRupiah(heroAngka)}</p>
-          <p class="keuangan-hint">${_keuanganExpanded ? 'Sembunyikan ▴' : 'Lihat rincian ▾'}</p>
-        </div>
-      </div>
-      ${_keuanganExpanded ? `
-      <div class="keuangan-detail">
-        ${wallets.length > 1 ? `
-        <div class="keuangan-section">
-          ${wallets.map(w => {
-            const saldo = getSaldoWallet(w.id);
-            return `<div class="keuangan-row">
-              <span class="keuangan-row-label">${w.icon} ${escHtml(w.nama)}</span>
-              <span class="keuangan-row-val ${saldo >= 0 ? '' : 'expense'}">${formatRupiah(saldo)}</span>
-            </div>`;
-          }).join('')}
-        </div>` : ''}
-        <div class="keuangan-divider"></div>
-        <div class="keuangan-row keuangan-row--sub">
-          <span>Total saldo</span><span>${formatRupiah(estimasiSaldo)}</span>
-        </div>
-        ${totalTagihanBelumBayar > 0 ? `
-        <div class="keuangan-row keuangan-row--minus">
-          <span>Tagihan belum dibayar</span><span>− ${formatRupiah(totalTagihanBelumBayar)}</span>
-        </div>
-        <div class="keuangan-divider"></div>
-        <div class="keuangan-row keuangan-row--result">
-          <span>Setelah tagihan</span>
-          <span class="${uangBebas >= 0 ? 'income' : 'expense'}">${formatRupiah(uangBebas)}</span>
-        </div>` : ''}
-        ${totalNabung > 0 ? `
-        <div class="keuangan-row keuangan-row--minus">
-          <span>Nabung bulan ini</span><span>− ${formatRupiah(totalNabung)}</span>
-        </div>
-        <div class="keuangan-divider"></div>
-        <div class="keuangan-row keuangan-row--result keuangan-row--final">
-          <span>Uang bebas <span style="font-size:10px;font-weight:400;color:var(--gray-400);">· setelah tagihan &amp; nabung</span></span>
-          <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
-        </div>` : ''}
-        ${tagihanBulanIni.length > 0 ? `
-        <p class="tagihan-paid-status keuangan-row--sub" style="margin-top:4px;">
-          ${tagihanSudahBayar.length === tagihanBulanIni.length
-            ? '✅ Semua tagihan bulan ini sudah beres!'
-            : tagihanSudahBayar.length === 0
-              ? `${tagihanBulanIni.length} tagihan bulan ini belum dibayar`
-              : `${tagihanBulanIni.length - tagihanSudahBayar.length} dari ${tagihanBulanIni.length} tagihan belum dibayar`}
-        </p>` : tagihan.length === 0 ? `
-        <button class="btn-text-small" id="btn-goto-tagihan-card" style="margin-top:8px;">
-          + Tambah tagihan rutin
-        </button>` : ''}
-      </div>` : ''}`;
-
-    card.querySelector('#keuangan-toggle')?.addEventListener('click', () => {
-      _keuanganExpanded = !_keuanganExpanded;
-      render();
-    });
-    card.querySelector('#btn-goto-tagihan-card')?.addEventListener('click', () => {
-      state.tabunganTab = 'tagihan';
-      navigateTo('tabungan');
-    });
-  }
-
-  render();
-  return card;
 }
 
 // ===== _buildChartsHTML — HTML untuk section grafik =====

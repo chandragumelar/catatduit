@@ -24,10 +24,6 @@ function openTransferSheet() {
 // ===== RENDER =====
 
 function _renderTransferSheet(wallets) {
-  const walletOptions = wallets
-    .map(w => `<option value="${w.id}">${w.icon} ${escHtml(w.nama)}</option>`)
-    .join('');
-
   // Default: from = wallet[0], to = wallet[1]
   const defaultFrom = wallets[0].id;
   const defaultTo   = wallets[1].id;
@@ -73,7 +69,9 @@ function _renderTransferSheet(wallets) {
 
       <div class="bottom-sheet-field">
         <label class="input-label">Tanggal</label>
+        <div class="date-picker-wrap">
         <input type="date" id="tf-tanggal" class="input-field" value="${getTodayStr()}" />
+        </div>
       </div>
 
       <div class="bottom-sheet-field">
@@ -86,6 +84,7 @@ function _renderTransferSheet(wallets) {
 
     onOpen: () => {
       _initTransferSheetLogic(wallets);
+
     },
 
     onConfirm: () => {

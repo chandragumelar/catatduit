@@ -165,6 +165,8 @@ function _showTagihanSheet(id = null) {
         const raw = e.target.value.replace(/\D/g, '');
         e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
       });
+      // Date picker button
+
       document.getElementById('bs-recurring-ya').addEventListener('click', () => {
         recurringVal = true;
         document.getElementById('bs-recurring-ya').classList.add('active');
@@ -250,8 +252,10 @@ function _showBayarSheet(id) {
       </div>
       <div class="bottom-sheet-field">
         <label class="input-label">Tanggal bayar</label>
-        <input type="date" id="bs-tanggal" class="input-field"
+        <div class="date-picker-wrap">
+          <input type="date" id="bs-tanggal" class="input-field"
           value="${getTodayStr()}" max="${getTodayStr()}" />
+        </div>
       </div>`,
     confirmText: 'Bayar & Catat',
     onOpen: () => {
@@ -259,6 +263,8 @@ function _showBayarSheet(id) {
         const raw = e.target.value.replace(/\D/g, '');
         e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
       });
+      // Date picker button (tanggal bayar)
+
       // Wallet chip toggle
       document.querySelectorAll('#bs-bayar-wallet-chips .wallet-chip').forEach(chip => {
         chip.addEventListener('click', () => {

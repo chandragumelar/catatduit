@@ -41,7 +41,16 @@
     <!-- Lucide Icons -->
     <script src="lib/lucide.min.js"></script>
 
-    <link rel="stylesheet" href="style.css" />
+    <!-- CSS — split by concern (see src/styles/) -->
+    <link rel="stylesheet" href="src/styles/base.css" />
+    <link rel="stylesheet" href="src/styles/layout.css" />
+    <link rel="stylesheet" href="src/styles/onboarding.css" />
+    <link rel="stylesheet" href="src/styles/components.css" />
+    <link rel="stylesheet" href="src/styles/input.css" />
+    <link rel="stylesheet" href="src/styles/tabungan.css" />
+    <link rel="stylesheet" href="src/styles/capture.css" />
+    <link rel="stylesheet" href="src/styles/dashboard.cards.css" />
+    <link rel="stylesheet" href="src/styles/dashboard.sprint.css" />
     <link rel="stylesheet" href="src/features/cerita/cerita.css" />
   </head>
   <body>
@@ -372,7 +381,12 @@
     <!-- ── CORE ──────────────────────────────────────────────────────────── -->
     <script src="src/core/state.js"></script>
     <script src="src/core/utils.js"></script>
-    <script src="src/core/storage.js"></script>
+    <!-- Storage — split by domain (see src/core/storage.*.js) -->
+    <script src="src/core/storage.base.js"></script>
+    <script src="src/core/storage.transaksi.js"></script>
+    <script src="src/core/storage.wallet.js"></script>
+    <script src="src/core/storage.budget.js"></script>
+    <script src="src/core/storage.migration.js"></script>
     <script src="src/core/debug.js"></script>   <!-- DEV: debug panel, no-op in prod -->
 
     <!-- ── SHARED UI ─────────────────────────────────────────────────────── -->
@@ -398,6 +412,7 @@
     <script src="src/features/dashboard/dashboard.calc.js"></script>
     <script src="src/features/dashboard/dashboard.insight.js"></script>
     <script src="src/features/dashboard/dashboard.chart.js"></script>
+    <script src="src/features/dashboard/dashboard.cards.keuangan.js"></script>
     <script src="src/features/dashboard/dashboard.cards.js"></script>
     <script src="src/features/dashboard/dashboard.js"></script>
     <!-- other features -->
@@ -408,6 +423,8 @@
     <script src="src/features/goals/goals.js"></script>
     <script src="src/features/tagihan/tagihan.js"></script>
     <script src="src/features/tabungan/tabungan.js"></script>
+    <script src="src/features/settings/settings.html.js"></script>
+    <script src="src/features/settings/settings.wallet.js"></script>
     <script src="src/features/settings/settings.js"></script>
     <script src="src/features/kategori/kategori.js"></script>
 

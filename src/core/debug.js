@@ -115,7 +115,7 @@
       if (id === 'semua') return 'Semua';
       const w = wallets.find(x => x.id === id);
       return w ? w.nama : id || '—';
-    } catch (e) {
+    } catch {
       return '?';
     }
   }
@@ -123,7 +123,7 @@
   function _getTxCount() {
     try {
       return typeof getTransaksi === 'function' ? getTransaksi().length : '?';
-    } catch (e) {
+    } catch {
       return '?';
     }
   }
@@ -131,7 +131,7 @@
   function _getSchemaVersion() {
     try {
       return localStorage.getItem('cd_schema_v') || '?';
-    } catch (e) {
+    } catch {
       return '?';
     }
   }

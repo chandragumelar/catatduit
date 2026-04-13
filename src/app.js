@@ -26,26 +26,24 @@ function init() {
   }
 
   const nav = document.getElementById('bottom-nav');
-  if (nav) nav.style.display = 'none';
+  if (nav) nav.classList.add('hidden');
 
   if (!getData(STORAGE_KEYS.ONBOARDING, false)) {
     _showScreen('screen-onboarding');
-    migrateToV3();
-    migrateToV4();
+    runMigrations();
     initOnboarding();
     initBottomNav();
     initInputPage();
     return;
   }
 
-  migrateToV3();
-  migrateToV4();
+  runMigrations();
   initBottomNav();
   initInputPage();
   initQuickCapture();
   initPWA();
   if (typeof checkReEntryNotif === 'function') checkReEntryNotif();
-  if (nav) nav.style.display = 'flex';
+  if (nav) nav.classList.remove('hidden');
   showApp();
 }
 
@@ -66,7 +64,7 @@ function showApp() {
 // ===== ONBOARDING CONTROLLER =====
 
 function initOnboarding() {
-  document.getElementById('bottom-nav')?.style.setProperty('display', 'none');
+  document.getElementById('bottom-nav')?.classList.add('hidden');
   _renderOnboardingStep(1);
 }
 
@@ -290,7 +288,7 @@ function _stepSaldo() {
     const totalSaldo = wallets.reduce((s, w) => s + w.saldo_awal, 0);
     saveSaldoAwal(totalSaldo);
 
-    document.getElementById('bottom-nav')?.style.setProperty('display', 'flex');
+    document.getElementById('bottom-nav')?.classList.remove('hidden');
     showApp();
   });
 

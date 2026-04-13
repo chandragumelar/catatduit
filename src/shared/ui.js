@@ -49,7 +49,7 @@ function navigateTo(page) {
 
   const hideNav = PAGES_NO_NAV.includes(page);
   const nav = document.getElementById('bottom-nav');
-  if (nav) nav.style.display = hideNav ? 'none' : 'flex';
+  if (nav) nav.classList.toggle('hidden', hideNav);
 
   // Adjust page bottom padding
   ALL_PAGES.forEach(p => {
@@ -194,14 +194,13 @@ function checkAndShowDonationNudge() {
     };
     btnCancel.onclick = close;
     overlay.onclick = (e) => { if (e.target === overlay) close(); };
-  } catch(e) {}
+  } catch {}
 }
 
 // ===== Item 10: Onboarding Checklist =====
 const CHECKLIST_KEY = STORAGE_KEYS.CHECKLIST_DISMISSED;
 
 function getOnboardingProgress() {
-  const hasBudget  = Object.keys(getBudgets()).length > 0;
   const hasTagihan = getTagihan().length > 0;
   const hasGoal    = getGoals().length > 0;
   const hasMultiWallet = getWallets().length > 1;
@@ -284,3 +283,5 @@ function renderOnboardingChecklist(containerId) {
     });
   });
 }
+
+

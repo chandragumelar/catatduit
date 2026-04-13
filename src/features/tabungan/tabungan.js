@@ -40,7 +40,7 @@ function renderTabunganContent() {
   try {
     if (state.tabunganTab === 'tabungan') renderTabunganTab(container);
     else renderTagihanTab(container);
-  } catch (e) {
+  } catch {
     container.innerHTML = '<p style="padding:24px;color:var(--gray-500);">Terjadi kesalahan. Coba lagi.</p>';
   }
   if (window.lucide) lucide.createIcons();

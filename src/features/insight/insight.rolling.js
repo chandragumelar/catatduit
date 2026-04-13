@@ -142,7 +142,7 @@ function calcRollingInsight(txList) {
   const newCats = categories.filter(c => c.trend === 'new');
   const goneCats = categories.filter(c => c.trend === 'gone');
 
-  const summary = _buildSummary(topUp, topDown, newCats, goneCats, categories);
+  const summary = _buildSummary(topUp, topDown);
 
   return {
     hasData: true,
@@ -168,7 +168,7 @@ function _buildLabel(trend, pct, severity, nama) {
   return `${arrow} ${nama} ${Math.abs(pct)}%`;
 }
 
-function _buildSummary(topUp, topDown, newCats, goneCats, all) {
+function _buildSummary(topUp, topDown) {
   const parts = [];
 
   if (topUp.length > 0) {
@@ -298,7 +298,7 @@ function getRollingInsightText(txList) {
     const insight = calcRollingInsight(txList);
     if (!insight.hasData || (!insight.topUp.length && !insight.newCats.length)) return null;
     return insight.summary;
-  } catch (e) {
+  } catch {
     return null;
   }
 }

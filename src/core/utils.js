@@ -79,7 +79,7 @@ function escHtml(str) {
 
 function destroyChart(key) {
   if (state.chartInstances[key]) {
-    try { state.chartInstances[key].destroy(); } catch (e) {}
+    try { state.chartInstances[key].destroy(); } catch {}
     delete state.chartInstances[key];
   }
 }
@@ -131,49 +131,6 @@ function fallbackCopy(text) {
   catch (e) { showToast('Gagal salin. Screenshot saja ya.'); }
   document.body.removeChild(ta);
 }
-
-// ===== WORKER BRIDGE =====
-// Lazy-init Web Worker untuk kalkulasi berat.
-// Fallback ke main thread kalau Worker tidak tersedia.
-
-const WorkerBridge = (() => {
-  let _worker = null;
-  let _pendingMap = {}; // id → { resolve, reject }
-  let _idCounter = 0;
-  let _workerFailed = false;
-
-  function _getWorker() {
-    if (_workerFailed) return null;
-    if (_worker) return _worker;
-    try {
-      _worker = new Worker('calc.worker.js');
-      _worker.onmessage = (e) => {
-        const { id, ok, result, error } = e.data;
-        const p = _pendingMap[id];
-        if (!p) return;
-        delete _pendingMap[id];
-        ok ? p.resolve(result) : p.reject(new Error(error));
-      };
-      _worker.onerror = () => { _workerFailed = true; _worker = null; };
-      return _worker;
-    } catch {
-      _workerFailed = true;
-      return null;
-    }
-  }
-
-  function run(type, payload) {
-    const w = _getWorker();
-    if (!w) return Promise.resolve(null); // caller falls back to sync
-    return new Promise((resolve, reject) => {
-      const id = ++_idCounter;
-      _pendingMap[id] = { resolve, reject };
-      w.postMessage({ id, type, payload });
-    });
-  }
-
-  return { run };
-})();
 
 // ===== STREAK HELPER =====
 // Berapa hari berturut-turut user mencatat transaksi.

@@ -1380,6 +1380,9 @@ input, select, textarea { font-family: inherit; }
 .bottom-sheet-field:last-child {
   margin-bottom: 0;
 }
+
+/* Date picker styled button */
+
 .bottom-sheet-actions {
   display: flex;
   gap: 10px;

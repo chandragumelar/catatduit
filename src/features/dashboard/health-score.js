@@ -29,8 +29,8 @@ function calcHealthScore() {
   const hariSejakMulai = Math.round((today - oldest) / (1000 * 60 * 60 * 24)) + 1;
   const hariAdaTx = new Set(txBulanIni.map(tx => tx.tanggal)).size;
 
-  if (hariSejakMulai < HEALTH_SCORE_THRESHOLD_DAYS) {
-    return { ready: false, hariAdaTx: hariSejakMulai, threshold: HEALTH_SCORE_THRESHOLD_DAYS };
+  if (hariAdaTx < HEALTH_SCORE_THRESHOLD_DAYS) {
+    return { ready: false, hariAdaTx, threshold: HEALTH_SCORE_THRESHOLD_DAYS };
   }
 
   // --- Komponen 1: Konsistensi catat (20%) ---
@@ -158,7 +158,6 @@ function getHealthActionSentence(scoreData) {
 }
 
 // typo guard
-function _hsClick(a, b) { return _hsPick(a, b); }
 
 // ===== PARAGRAF PENJELASAN =====
 

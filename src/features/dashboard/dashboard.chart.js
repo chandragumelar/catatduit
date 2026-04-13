@@ -6,9 +6,7 @@
 
 
 function initDashboardCharts(calc) {
-  const { txList, rolling, chartLabels, chartMasuk, chartKeluar, chartCashflow, katSorted,
-          spendByDay, borosDay, DAY_NAMES,
-          weeklyLabels, weeklyCashflow, katSortedWeekly } = calc;
+  const { spendByDay, borosDay, DAY_NAMES } = calc;
 
   destroyChart('combo');
   destroyChart('surplus');

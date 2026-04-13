@@ -227,7 +227,7 @@ function getInsightText(calcData) {
     try {
       const result = fn(calcData);
       if (result) return result;
-    } catch (e) {
+    } catch {
       continue;
     }
   }

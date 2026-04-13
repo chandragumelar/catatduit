@@ -29,13 +29,11 @@ function renderDashboard() {
     year, month,
     totalMasuk, totalKeluar, totalNabung, cashflow,
     estimasiSaldo, trendText, trendClass,
-    hariIni,
     tagihan, tagihanBulanIni, tagihanSudahBayar, tagihanBelumBayar,
     totalTagihanBelumBayar, uangBebas, bebasDipakai,
     borosList, katSorted,
     sudahCatatHariIni, recentTx, bigSpending,
     velocityAlert, borosDay,
-    weeklyLabels, weeklyCashflow, katSortedWeekly, borosListWeekly, bigSpendingWeekly,
   } = calc;
 
   const insightText = getInsightText({ ...calc, nama: getNama() });
@@ -70,12 +68,12 @@ function renderDashboard() {
 
   // — Health Score
   const healthEl = document.createElement('div');
-  try { renderHealthScore(healthEl); } catch(e) {}
+  try { renderHealthScore(healthEl); } catch {}
   push(DASHBOARD_CARDS.HEALTH, healthEl, 25);
 
   // — Cerita card
   const ceritaEl = document.createElement('div');
-  try { renderCeritaCard(ceritaEl); } catch(e) {}
+  try { renderCeritaCard(ceritaEl); } catch {}
   push(DASHBOARD_CARDS.CERITA, ceritaEl, 30);
 
   // — Daily check-in
@@ -105,7 +103,7 @@ function renderDashboard() {
 
   // — Budget (naik ke 3 kalau jebol, 5 kalau warning)
   const budgetEl = document.createElement('div');
-  try { renderBudgetSection(budgetEl); } catch(e) {}
+  try { renderBudgetSection(budgetEl); } catch {}
   push(DASHBOARD_CARDS.BUDGET, budgetEl, hasBudgetJebol ? 3 : hasBudgetWarn ? 5 : 60);
 
   // — Charts (collapsible)
