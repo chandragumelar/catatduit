@@ -628,6 +628,10 @@ input, select, textarea { font-family: inherit; }
   border-radius: var(--radius-md);
   overflow: hidden;
 }
+/* 2-way toggle (Ya/Tidak) */
+.jenis-toggle.jenis-toggle--2col {
+  grid-template-columns: 1fr 1fr;
+}
 .jenis-btn {
   padding: 13px 8px;
   font-size: 14px;
@@ -1369,6 +1373,12 @@ input, select, textarea { font-family: inherit; }
 .bottom-sheet-hint {
   font-size: 13px;
   color: var(--gray-500);
+}
+.bottom-sheet-field {
+  margin-bottom: 20px;
+}
+.bottom-sheet-field:last-child {
+  margin-bottom: 0;
 }
 .bottom-sheet-actions {
   display: flex;

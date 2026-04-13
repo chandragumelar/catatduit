@@ -137,22 +137,22 @@ function _showTagihanSheet(id = null) {
         </div>
       </div>
       <div class="bottom-sheet-field">
-        <label class="input-label">Tanggal jatuh tempo</label>
+        <label class="input-label">Jatuh tempo tanggal berapa?</label>
         <input type="date" id="bs-jatuh-tempo" class="input-field"
           value="${t?.jatuhTempo || ''}" />
       </div>
       <div class="bottom-sheet-field">
-        <label class="input-label">Muncul setiap bulan?</label>
-        <p class="bottom-sheet-hint" style="margin-bottom:8px;">Rutin: Netflix, listrik. Sekali: hutang ke teman.</p>
-        <div class="jenis-toggle" style="margin-top:0;">
+        <label class="input-label">Tagihan rutin bulanan?</label>
+        <p class="bottom-sheet-hint" style="margin-top:4px;margin-bottom:10px;">Rutin: Netflix, listrik. Sekali: hutang ke teman.</p>
+        <div class="jenis-toggle jenis-toggle--2col" style="margin-top:0;">
           <button type="button" class="jenis-btn ${recurringVal ? 'active' : ''}" id="bs-recurring-ya">Ya</button>
           <button type="button" class="jenis-btn ${!recurringVal ? 'active' : ''}" id="bs-recurring-tidak">Tidak</button>
         </div>
       </div>
       ${wallets.length > 1 ? `
       <div class="bottom-sheet-field">
-        <label class="input-label">Biasanya bayar dari</label>
-        <p class="bottom-sheet-hint" style="margin-bottom:8px;">Bisa diubah saat bayar nanti.</p>
+        <label class="input-label">Bayar dari wallet mana?</label>
+        <p class="bottom-sheet-hint" style="margin-top:4px;margin-bottom:10px;">Bisa diubah saat bayar nanti.</p>
         <div class="wallet-chip-wrap" id="bs-wallet-chips">
           ${wallets.map(w => `
             <button type="button" class="chip wallet-chip ${(t?.preferred_wallet_id || wallets[0].id) === w.id ? 'active' : ''}"
