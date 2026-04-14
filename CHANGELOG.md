@@ -112,3 +112,19 @@ Format: `## [revN] — tanggal` dengan subsections Fixed / Added / Changed / Rem
 - Tabungan goals tracker (`tabungan.js`)
 - Riwayat with filter bulan + jenis + search (`riwayat.js`)
 - Settings: wallet management, currency, data export (`settings.js`)
+
+## v3.2 — Tagihan filter by currency toggle
+
+### Bug Fix: Count tagihan & banner notifikasi tidak difilter by currency toggle
+**Root cause:** `dashboard.calc.js` — `tagihanBulanIni`, `tagihanBelumBayar`, `tagihanSudahBayar` dideklarasi sebelum filter currency, sehingga jumlah tagihan dan nama tagihan di banner mencakup semua currency.
+
+**Fix:** `src/features/dashboard/dashboard.calc.js`
+- Rename `tagihanBulanIni` → `tagihanBulanIniRaw` (semua tagihan, unfiltered)
+- Tambah intermediate `tagihanBelumBayarAll` dan `tagihanSudahBayarAll` dari raw
+- Deklarasi ulang `tagihanBulanIni`, `tagihanBelumBayar`, `tagihanSudahBayar` **setelah** filter `activeCurCode`
+- Hapus `tagihanBelumBayarActive` (sudah tidak diperlukan, merge ke `tagihanBelumBayar`)
+
+**Efek:** Semua consumer downstream (`dashboard.js` → banner notifikasi, `dashboard.cards.keuangan.js` → teks status tagihan) otomatis terfilter tanpa perlu diubah.
+
+**File yang diubah:**
+- `src/features/dashboard/dashboard.calc.js` ✅

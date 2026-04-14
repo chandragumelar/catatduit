@@ -26,13 +26,8 @@ function calcDashboard() {
   const cashflow     = totalMasuk - totalKeluar;
 
   // Saldo: v3 pakai getSaldoTotal() dari wallet, fallback ke v2 estimasi
-  // wallets = wallet aktif sesuai toggle (untuk display di card)
-  // allWallets = semua wallet (untuk fallback v2 estimasi)
-  const wallets = (typeof isMulticurrencyEnabled === 'function' && isMulticurrencyEnabled())
-    ? getActiveWallets()
-    : getWallets().filter(w => !w.hidden);
-  const allWallets = getWallets();
-  const estimasiSaldo = allWallets.length > 0
+  const wallets = getWallets();
+  const estimasiSaldo = wallets.length > 0
     ? getSaldoTotal()
     : getSaldoAwal()
       + txList.filter(tx => tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
@@ -62,8 +57,8 @@ function calcDashboard() {
 
 
   // Uang bebas
-  const tagihan           = getTagihan();
-  const tagihanBulanIni   = tagihan.filter(t => {
+  const tagihan              = getTagihan();
+  const tagihanBulanIniRaw   = tagihan.filter(t => {
     if (!t.jatuhTempo) return false;
     const d = new Date(t.jatuhTempo + 'T00:00:00');
     if (t.isRecurring === false) return d.getFullYear() === year && d.getMonth() === month;
@@ -72,15 +67,17 @@ function calcDashboard() {
     const startDate   = new Date(d.getFullYear(), d.getMonth(), 1);
     return currentDate >= startDate;
   });
-  const tagihanBelumBayar = tagihanBulanIni.filter(t => !isTagihanPaidThisMonth(t, year, month));
-  const tagihanSudahBayar = tagihanBulanIni.filter(t =>  isTagihanPaidThisMonth(t, year, month));
+  const tagihanBelumBayarAll = tagihanBulanIniRaw.filter(t => !isTagihanPaidThisMonth(t, year, month));
+  const tagihanSudahBayarAll = tagihanBulanIniRaw.filter(t =>  isTagihanPaidThisMonth(t, year, month));
 
-  // Multicurrency: hanya hitung tagihan yang currency-nya sesuai toggle aktif
+  // Multicurrency: filter semua tagihan by currency toggle aktif
   const activeCurCode = (typeof isMulticurrencyEnabled === 'function' && isMulticurrencyEnabled())
     ? getActiveCurrencyCode()
     : getBaseCurrency();
-  const tagihanBelumBayarActive = tagihanBelumBayar.filter(t => (t.currency || getBaseCurrency()) === activeCurCode);
-  const totalTagihanBelumBayar = tagihanBelumBayarActive.reduce((s, t) => s + (t.nominal || 0), 0);
+  const tagihanBulanIni   = tagihanBulanIniRaw.filter(t => (t.currency || getBaseCurrency()) === activeCurCode);
+  const tagihanBelumBayar = tagihanBelumBayarAll.filter(t => (t.currency || getBaseCurrency()) === activeCurCode);
+  const tagihanSudahBayar = tagihanSudahBayarAll.filter(t => (t.currency || getBaseCurrency()) === activeCurCode);
+  const totalTagihanBelumBayar = tagihanBelumBayar.reduce((s, t) => s + (t.nominal || 0), 0);
   const uangBebas    = estimasiSaldo - totalTagihanBelumBayar;
   const bebasDipakai = uangBebas - totalNabung;
 
