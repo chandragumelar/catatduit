@@ -245,7 +245,7 @@
   font-size: 11px;
   color: var(--text-secondary);
   font-weight: 500;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   letter-spacing: 0.2px;
 }
 
@@ -273,7 +273,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  flex-wrap: wrap;
 }
 
 /* Sliding pill toggle — track teal, thumb putih */
@@ -350,14 +349,16 @@
 }
 
 .currency-rate-chip-ubah {
-  padding: 0;
-  margin-left: 2px;
+  padding: 0 0 0 8px;
+  margin-left: 4px;
   border: none;
+  border-left: 1.5px solid var(--gray-300, #d1d5db);
   background: transparent;
   cursor: pointer;
   font-size: 12px;
   opacity: 0.55;
   transition: opacity 0.15s;
+  line-height: 1;
 }
 
 .currency-rate-chip-ubah:hover {

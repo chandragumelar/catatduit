@@ -171,17 +171,13 @@ function buildCurrencyToggleHTML() {
   const isBase   = isActiveBase();
   return `
     <div class="currency-toggle-section" id="currency-toggle-wrap">
-      <div class="currency-toggle-columns">
-        <div class="currency-toggle-col">
-          <div class="currency-toggle-label">Lihat keuangan dalam:</div>
-          <div class="currency-toggle" id="currency-toggle-track" data-active="${isBase ? 'base' : 'secondary'}">
-            <button class="currency-toggle-btn ${isBase ? 'active' : ''}" data-toggle="base">${base}</button>
-            <button class="currency-toggle-btn ${!isBase ? 'active' : ''}" data-toggle="secondary">${sec}</button>
-          </div>
+      <div class="currency-toggle-label">Lihat keuangan dalam:</div>
+      <div class="currency-toggle-row">
+        <div class="currency-toggle" id="currency-toggle-track" data-active="${isBase ? 'base' : 'secondary'}">
+          <button class="currency-toggle-btn ${isBase ? 'active' : ''}" data-toggle="base">${base}</button>
+          <button class="currency-toggle-btn ${!isBase ? 'active' : ''}" data-toggle="secondary">${sec}</button>
         </div>
-        <div class="currency-toggle-col currency-toggle-col--right">
-          ${buildRateChipHTML()}
-        </div>
+        ${buildRateChipHTML()}
       </div>
     </div>`;
 }
