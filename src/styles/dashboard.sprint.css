@@ -165,18 +165,21 @@
 
 .budget-period-toggle {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   margin-top: 6px;
   margin-bottom: 6px;
+  background: var(--gray-100, #f1f5f9);
+  border-radius: var(--radius-sm);
+  padding: 3px;
 }
 
 .budget-period-btn {
   flex: 1;
   min-width: 0;
   padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  border: 1.5px solid var(--border);
-  background: var(--white);
+  border-radius: calc(var(--radius-sm) - 2px);
+  border: none;
+  background: transparent;
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 500;
@@ -188,9 +191,9 @@
 }
 
 .budget-period-btn.active {
-  border-color: var(--teal);
   background: var(--teal);
   color: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 
 .budget-period-hint {
