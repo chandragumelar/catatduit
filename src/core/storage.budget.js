@@ -7,8 +7,36 @@
 
 // ===== BUDGET CRUD =====
 
-function getBudgets()      { return getData(STORAGE_KEYS.BUDGETS, {}); }
-function saveBudgets(data) { return setData(STORAGE_KEYS.BUDGETS, data); }
+// Storage format v6: { "IDR": { katId: limit }, "USD": { katId: limit } }
+// getBudgets() return budget untuk active currency saja
+
+function _getAllBudgets()      { return getData(STORAGE_KEYS.BUDGETS, {}); }
+function _saveAllBudgets(data) { return setData(STORAGE_KEYS.BUDGETS, data); }
+
+function _getActiveBudgetCurrency() {
+  return (typeof isMulticurrencyEnabled === 'function' && isMulticurrencyEnabled())
+    ? getActiveCurrencyCode()
+    : getBaseCurrency();
+}
+
+function getBudgets() {
+  const all = _getAllBudgets();
+  // Safety net: format lama flat (seharusnya sudah dimigrate migrateToV6)
+  const firstKey = Object.keys(all)[0];
+  if (firstKey && typeof all[firstKey] === 'number') return all;
+  const cur = _getActiveBudgetCurrency();
+  return all[cur] || {};
+}
+
+function saveBudgets(data) {
+  const all = _getAllBudgets();
+  const firstKey = Object.keys(all)[0];
+  const isLegacy = firstKey && typeof all[firstKey] === 'number';
+  const base = isLegacy ? {} : { ...all };
+  const cur = _getActiveBudgetCurrency();
+  base[cur] = data;
+  return _saveAllBudgets(base);
+}
 
 // ===== BUDGET PERIOD =====
 

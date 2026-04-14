@@ -77,6 +77,25 @@ function migrateToV5() {
   setData(STORAGE_KEYS.SCHEMA_VERSION, 5);
 }
 
+// ===== MIGRATION v5 → v6 =====
+// Convert budget dari format flat { katId: limit }
+// ke format per-currency { "IDR": { katId: limit } }
+
+function migrateToV6() {
+  const currentVersion = getData(STORAGE_KEYS.SCHEMA_VERSION, 0);
+  if (currentVersion >= 6) return;
+
+  const budgets = getData(STORAGE_KEYS.BUDGETS, {});
+  const firstKey = Object.keys(budgets)[0];
+  // Hanya migrate jika format lama (value adalah number, bukan object)
+  if (firstKey && typeof budgets[firstKey] === 'number') {
+    const base = getData(STORAGE_KEYS.CURRENCY, 'IDR');
+    setData(STORAGE_KEYS.BUDGETS, { [base]: budgets });
+  }
+
+  setData(STORAGE_KEYS.SCHEMA_VERSION, 6);
+}
+
 // ===== ENTRY POINT =====
 // Panggil ini satu kali dari app.js saat init
 
@@ -84,4 +103,5 @@ function runMigrations() {
   migrateToV3();
   migrateToV4();
   migrateToV5();
+  migrateToV6();
 }
