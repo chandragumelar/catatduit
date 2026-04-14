@@ -104,10 +104,12 @@ function renderDashboard() {
     push(DASHBOARD_CARDS.BOROS, buildSpendingCard(calc, 'monthly'), 55);
   }
 
-  // — Budget (naik ke 3 kalau jebol, 5 kalau warning)
+  // — Budget (selalu di bawah card BOROS/priority 55)
+  // Jebol → 56, warning → 57, normal → 60
+  // Tidak boleh naik ke atas card lain meskipun ada kondisi jebol
   const budgetEl = document.createElement('div');
   try { renderBudgetSection(budgetEl); } catch {}
-  push(DASHBOARD_CARDS.BUDGET, budgetEl, hasBudgetJebol ? 3 : hasBudgetWarn ? 5 : 60);
+  push(DASHBOARD_CARDS.BUDGET, budgetEl, hasBudgetJebol ? 56 : hasBudgetWarn ? 57 : 60);
 
   // — Charts (collapsible)
   const chartsEl = _makeCollapsibleCard({
