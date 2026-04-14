@@ -1206,8 +1206,8 @@ input, select, textarea { font-family: inherit; }
   border-radius: 4px;
 }
 
-.btn-kelola {
-  background: var(--teal-light, #e6f4f1);
+button.btn-kelola {
+  background: var(--teal-light, #CCFBF1);
   border: none;
   outline: none;
   color: var(--teal);
@@ -1218,10 +1218,10 @@ input, select, textarea { font-family: inherit; }
   border-radius: 20px;
   transition: background 0.15s ease;
 }
-.btn-kelola:hover {
-  background: var(--teal-light2, #cceae3);
+button.btn-kelola:hover {
+  background: #99f6e4;
 }
-.btn-kelola:focus-visible {
+button.btn-kelola:focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
 }
