@@ -225,147 +225,90 @@ function _stepSaldo() {
     ..._ob.customWallets.filter(Boolean).map((w, i) => ({ id: `custom_${i}`, ...w })),
   ];
 
+  const baseCurrency = getData(STORAGE_KEYS.CURRENCY, 'IDR');
+
   const el = document.createElement('div');
   el.className = 'onboarding-card';
   el.innerHTML = `
     <p class="onboarding-question">Berapa isi masing-masing dompet sekarang?</p>
-    <p class="onboarding-sub" style="margin-bottom:8px;">Boleh perkiraan dulu — ini bisa diubah kapan saja.</p>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
-      <span class="onboarding-label-sm">Mata uang utama:</span>
-      <select id="ob-currency-select" style="font-size:12px;padding:2px 6px;border:1px solid var(--gray-200);border-radius:6px;background:var(--surface);color:var(--text-primary);cursor:pointer;">
-        <option value="IDR">Rp — Rupiah</option>
-        <option value="USD">$ — Dollar</option>
-        <option value="MYR">RM — Ringgit</option>
-        <option value="PHP">₱ — Peso</option>
-        <option value="THB">฿ — Baht</option>
-        <option value="SGD">SGD — Singapore Dollar</option>
-      </select>
-    </div>
+    <p class="onboarding-sub" style="margin-bottom:16px;">Boleh perkiraan dulu — ini bisa diubah kapan saja.</p>
     <div id="ob-saldo-fields"></div>
     <p class="onboarding-error" id="ob-saldo-error"></p>
-
-    <div class="ob-multicurrency-opt" id="ob-multicurrency-opt">
-      <label class="ob-multicurrency-label">
-        <span class="ob-custom-checkbox">
-          <input type="checkbox" id="ob-multicurrency-check" />
-          <span class="ob-custom-checkbox-box"></span>
-        </span>
-        Punya simpanan atau penghasilan dalam mata uang lain juga
-      </label>
-      <div id="ob-secondary-wrap" style="display:none;margin-top:10px;">
-        <select id="ob-secondary-select" class="input-field" style="font-size:13px;">
-          ${CURRENCY_OPTIONS.filter(c => c.code !== 'IDR').map(c =>
-            `<option value="${c.code}">${c.label}</option>`
-          ).join('')}
-        </select>
-        <div class="ob-saldo-row" style="margin-top:10px;">
-          <label class="ob-saldo-label" id="ob-secondary-saldo-label">💵 Dompet baru</label>
-          <div class="nominal-wrap">
-            <span class="nominal-prefix" id="ob-secondary-symbol">$</span>
-            <input type="text" class="input-nominal" id="ob-secondary-saldo-input" placeholder="0" inputmode="numeric" />
-          </div>
-        </div>
-        <p class="onboarding-hint" style="margin-top:4px;">Boleh perkiraan dulu — bisa diubah kapan saja.</p>
-      </div>
-    </div>
-
     <button id="ob-btn-selesai" class="btn-primary" style="margin-top:16px;">Ayo Mulai! 🎉</button>`;
 
   const fieldsWrap = el.querySelector('#ob-saldo-fields');
+
+  // Build currency options HTML (reusable)
+  const currencyOptsHtml = (selectedCode) => CURRENCY_OPTIONS.map(c =>
+    `<option value="${c.code}" ${c.code === selectedCode ? 'selected' : ''}>${c.label}</option>`
+  ).join('');
+
+  // Render each wallet row with its own currency selector
   selectedWallets.forEach(wallet => {
     const row = document.createElement('div');
     row.className = 'ob-saldo-row';
+    row.dataset.walletId = wallet.id;
     row.innerHTML = `
-      <label class="ob-saldo-label">${wallet.icon} ${escHtml(wallet.nama)}</label>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <label class="ob-saldo-label" style="margin:0;">${wallet.icon} ${escHtml(wallet.nama)}</label>
+        <select class="ob-wallet-currency" style="font-size:12px;padding:2px 6px;border:1px solid var(--gray-200);border-radius:6px;background:var(--surface);color:var(--text-primary);cursor:pointer;">
+          ${currencyOptsHtml(baseCurrency)}
+        </select>
+      </div>
       <div class="nominal-wrap">
-        <span class="nominal-prefix">${getCurrencySymbol()}</span>
-        <input type="text" class="input-nominal ob-saldo-input" data-wallet-id="${wallet.id}" placeholder="0" inputmode="numeric" />
+        <span class="nominal-prefix">${getCurrencySymbolByCode(baseCurrency)}</span>
+        <input type="text" class="input-nominal ob-saldo-input" placeholder="0" inputmode="numeric" />
       </div>`;
+
+    // Format nominal input
     row.querySelector('.ob-saldo-input').addEventListener('input', (e) => {
       const raw = e.target.value.replace(/\D/g, '');
       e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
     });
+
+    // Per-wallet currency change → update symbol + enforce max 1 foreign currency
+    row.querySelector('.ob-wallet-currency').addEventListener('change', (e) => {
+      const newCode = e.target.value;
+      const base = getData(STORAGE_KEYS.CURRENCY, 'IDR');
+
+      // If this wallet goes foreign, reset any other foreign wallet back to base
+      if (newCode !== base) {
+        fieldsWrap.querySelectorAll('.ob-saldo-row').forEach(otherRow => {
+          if (otherRow === row) return;
+          const otherSel = otherRow.querySelector('.ob-wallet-currency');
+          if (otherSel && otherSel.value !== base) {
+            otherSel.value = base;
+            otherRow.querySelector('.nominal-prefix').textContent = getCurrencySymbolByCode(base);
+          }
+        });
+      }
+
+      row.querySelector('.nominal-prefix').textContent = getCurrencySymbolByCode(newCode);
+    });
+
     fieldsWrap.appendChild(row);
   });
 
-  // Currency selector
-  el.querySelector('#ob-currency-select')?.addEventListener('change', (e) => {
-    setData(STORAGE_KEYS.CURRENCY, e.target.value);
-    const sym = getCurrencySymbol();
-    el.querySelectorAll('.nominal-prefix').forEach(span => { span.textContent = sym; });
-    // Update secondary options — exclude base
-    const secSel = el.querySelector('#ob-secondary-select');
-    if (secSel) {
-      secSel.innerHTML = CURRENCY_OPTIONS
-        .filter(c => c.code !== e.target.value)
-        .map(c => `<option value="${c.code}">${c.label}</option>`)
-        .join('');
-      updateSecondaryUI();
-    }
-  });
-  const existingCurrency = getData(STORAGE_KEYS.CURRENCY, 'IDR');
-  const currencySelect = el.querySelector('#ob-currency-select');
-  if (currencySelect) currencySelect.value = existingCurrency;
-
-  // Multicurrency opt-in toggle
-  el.querySelector('#ob-multicurrency-check')?.addEventListener('change', (e) => {
-    const wrap = el.querySelector('#ob-secondary-wrap');
-    if (wrap) wrap.style.display = e.target.checked ? 'block' : 'none';
-  });
-
-  // Update secondary symbol + label when secondary currency changes
-  function updateSecondaryUI() {
-    const secSel = el.querySelector('#ob-secondary-select');
-    const secCode = secSel?.value;
-    if (!secCode) return;
-    const sym = getCurrencySymbolByCode(secCode);
-    const label = CURRENCY_OPTIONS.find(c => c.code === secCode)?.label || secCode;
-    const symEl = el.querySelector('#ob-secondary-symbol');
-    const labelEl = el.querySelector('#ob-secondary-saldo-label');
-    if (symEl) symEl.textContent = sym;
-    if (labelEl) labelEl.textContent = `💵 Dompet ${label.split(' — ')[0]}`;
-  }
-
-  el.querySelector('#ob-secondary-select')?.addEventListener('change', updateSecondaryUI);
-
-  // Format input for secondary saldo
-  el.querySelector('#ob-secondary-saldo-input')?.addEventListener('input', (e) => {
-    const raw = e.target.value.replace(/\D/g, '');
-    e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
-  });
-
   el.querySelector('#ob-btn-selesai').addEventListener('click', () => {
-    const wallets = selectedWallets.map(wallet => {
-      const input = fieldsWrap.querySelector(`[data-wallet-id="${wallet.id}"]`);
-      const saldo = input ? parseNominal(input.value) : 0;
-      const baseCurrency = getData(STORAGE_KEYS.CURRENCY, 'IDR');
-      return { id: wallet.id, nama: wallet.nama, icon: wallet.icon, saldo_awal: saldo, currency: baseCurrency, hidden: false };
+    const base = getData(STORAGE_KEYS.CURRENCY, 'IDR');
+    const wallets = [];
+    let foreignCode = null;
+
+    fieldsWrap.querySelectorAll('.ob-saldo-row').forEach(row => {
+      const wid = row.dataset.walletId;
+      const wallet = selectedWallets.find(w => w.id === wid);
+      if (!wallet) return;
+      const saldo = parseNominal(row.querySelector('.ob-saldo-input')?.value || '0');
+      const currency = row.querySelector('.ob-wallet-currency')?.value || base;
+      if (currency !== base) foreignCode = currency;
+      wallets.push({ id: wallet.id, nama: wallet.nama, icon: wallet.icon, saldo_awal: saldo, currency, hidden: false });
     });
 
-    // Multicurrency opt-in
-    const multiCheck = el.querySelector('#ob-multicurrency-check');
-    if (multiCheck?.checked) {
-      const secCode = el.querySelector('#ob-secondary-select')?.value;
-      if (secCode) {
-        setMulticurrencyEnabled(true);
-        setSecondaryCurrency(secCode);
-        setActiveCurrencyToggle('base');
-
-        // Create foreign wallet with saldo
-        const secSaldoInput = el.querySelector('#ob-secondary-saldo-input');
-        const secSaldo = secSaldoInput ? parseNominal(secSaldoInput.value) : 0;
-        const secSymbol = getCurrencySymbolByCode(secCode);
-        const secLabel = CURRENCY_OPTIONS.find(c => c.code === secCode)?.label?.split(' — ')[0] || secCode;
-        const foreignWallet = {
-          id: 'w_foreign_' + Date.now(),
-          nama: secLabel,
-          icon: secCode === 'USD' ? '💵' : secCode === 'EUR' ? '💶' : secCode === 'GBP' ? '💷' : '💰',
-          saldo_awal: secSaldo,
-          currency: secCode,
-          hidden: false,
-        };
-        wallets.push(foreignWallet);
-      }
+    // Auto-enable multicurrency if any wallet has foreign currency
+    if (foreignCode) {
+      setMulticurrencyEnabled(true);
+      setSecondaryCurrency(foreignCode);
+      setActiveCurrencyToggle('base');
     }
 
     saveWallets(wallets);
