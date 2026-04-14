@@ -64,9 +64,8 @@ function renderWalletPicker() {
 
   // Multicurrency: hanya tampilkan wallet sesuai toggle aktif
   const allWallets = getWallets().filter(w => !w.hidden);
-  const wallets = (isMulticurrencyEnabled() && getSecondaryCurrency())
-    ? allWallets.filter(w => isWalletMatchesToggle(w))
-    : allWallets;
+  // Tampilkan semua wallet aktif — toggle hanya untuk view di dashboard, bukan filter input
+  const wallets = allWallets;
 
   if (wallets.length <= 1) {
     wrap.style.display = 'none';
@@ -96,6 +95,9 @@ function renderWalletPicker() {
       state.inputWalletId = w.id;
       chipsWrap.querySelectorAll('.wallet-chip').forEach(c =>
         c.classList.toggle('active', c.dataset.id === w.id));
+      // Update prefix simbol sesuai currency wallet yang dipilih
+      const pfx = document.getElementById('input-currency-prefix');
+      if (pfx) pfx.textContent = getCurrencySymbolByCode(w.currency || getBaseCurrency());
     });
     chipsWrap.appendChild(chip);
   });
@@ -231,19 +233,20 @@ function openInputPage(mode, id = null) {
     deleteBtn.style.display = 'none';
     state.inputJenis    = 'keluar';
     state.inputKategori = null;
-    // Multicurrency: default ke wallet pertama dari currency aktif
-    const activeWals = (isMulticurrencyEnabled() && getSecondaryCurrency())
-      ? getActiveWallets()
-      : getWallets().filter(w => !w.hidden);
+    // Default ke wallet pertama dari semua wallet aktif
+    const activeWals = getWallets().filter(w => !w.hidden);
     state.inputWalletId = activeWals[0]?.id || DEFAULT_WALLET_ID;
 
     document.getElementById('input-nominal').value = '';
     document.getElementById('input-catatan').value = '';
     tanggalInput.value = getTodayStr();
 
-    // Update currency prefix sesuai toggle aktif
+    // Update currency prefix sesuai wallet default
     const pfx = document.getElementById('input-currency-prefix');
-    if (pfx) pfx.textContent = getCurrencySymbol();
+    if (pfx) {
+      const defWallet = getWallets().find(w => w.id === state.inputWalletId);
+      pfx.textContent = getCurrencySymbolByCode(defWallet?.currency || getBaseCurrency());
+    }
 
     setInputJenis('keluar'); // juga trigger renderChips + renderWalletPicker
   } else {
