@@ -26,8 +26,13 @@ function calcDashboard() {
   const cashflow     = totalMasuk - totalKeluar;
 
   // Saldo: v3 pakai getSaldoTotal() dari wallet, fallback ke v2 estimasi
-  const wallets = getWallets();
-  const estimasiSaldo = wallets.length > 0
+  // wallets = wallet aktif sesuai toggle (untuk display di card)
+  // allWallets = semua wallet (untuk fallback v2 estimasi)
+  const wallets = (typeof isMulticurrencyEnabled === 'function' && isMulticurrencyEnabled())
+    ? getActiveWallets()
+    : getWallets().filter(w => !w.hidden);
+  const allWallets = getWallets();
+  const estimasiSaldo = allWallets.length > 0
     ? getSaldoTotal()
     : getSaldoAwal()
       + txList.filter(tx => tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
