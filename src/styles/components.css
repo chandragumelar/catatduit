@@ -238,7 +238,7 @@
 
 /* Currency toggle area */
 .currency-toggle-section {
-  padding: 4px 0 10px;
+  padding: 4px 0 16px;
 }
 
 .currency-toggle-label {
@@ -251,7 +251,7 @@
 
 .currency-toggle-columns {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
@@ -329,45 +329,39 @@
   color: var(--teal);
 }
 
-.currency-rate-manual-note {
-  font-size: 10px;
-  color: var(--text-secondary);
-  text-align: right;
-  margin-top: 3px;
-  letter-spacing: 0.2px;
-}
-
 /* Rate chip — info teks + tombol edit terpisah */
 .currency-rate-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0;
-  border-radius: 12px;
-  border: 1.5px solid var(--teal);
-  background: rgba(13,148,136,0.07);
+  gap: 4px;
+  border-radius: 20px;
+  border: 1.5px solid var(--gray-300, #d1d5db);
+  background: var(--white);
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 500;
-  overflow: hidden;
   white-space: nowrap;
   cursor: default;
+  padding: 5px 10px;
 }
 
 .currency-rate-chip-text {
-  padding: 6px 10px;
+  padding: 0;
 }
 
 .currency-rate-chip-ubah {
-  padding: 6px 10px;
-  border-left: 1.5px solid var(--teal);
-  background: rgba(13,148,136,0.1);
+  padding: 0;
+  margin-left: 2px;
+  border: none;
+  background: transparent;
   cursor: pointer;
-  font-size: 13px;
-  transition: background 0.15s;
+  font-size: 12px;
+  opacity: 0.55;
+  transition: opacity 0.15s;
 }
 
 .currency-rate-chip-ubah:hover {
-  background: rgba(13,148,136,0.22);
+  opacity: 1;
 }
 
 /* Cross-currency transfer info */

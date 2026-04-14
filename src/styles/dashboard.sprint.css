@@ -33,8 +33,8 @@
 /* ===== SUPPORT BANNER ===== */
 .support-banner-card {
   position: relative;
-  background: #CCFBF1;
-  border: 0.5px solid #99F6E4;
+  background: #F8FAFB;
+  border: 0.5px solid #E5E7EB;
   border-radius: var(--radius-md);
   padding: 14px 16px;
   margin-bottom: 12px;
@@ -44,7 +44,7 @@
   top: 10px;
   right: 12px;
   font-size: 13px;
-  color: #0F766E;
+  color: var(--text-secondary, #6b7280);
   cursor: pointer;
   background: none;
   border: none;
@@ -52,7 +52,7 @@
   line-height: 1;
   border-radius: 4px;
 }
-.support-banner-close:hover { background: #99F6E4; }
+.support-banner-close:hover { background: #F0F0F0; }
 .support-banner-top {
   display: flex;
   align-items: center;
@@ -74,11 +74,11 @@
 .support-banner-title {
   font-size: 13px;
   font-weight: 600;
-  color: #134E4A;
+  color: var(--text-primary, #1a1a2e);
 }
 .support-banner-body {
   font-size: 12px;
-  color: #0F766E;
+  color: var(--text-secondary, #6b7280);
   line-height: 1.5;
   margin-bottom: 10px;
 }
@@ -104,10 +104,10 @@
 .support-banner-btn--primary:hover { background: #0F766E; }
 .support-banner-btn--secondary {
   background: transparent;
-  color: #0F766E;
-  border: 0.5px solid #0F766E;
+  color: var(--teal);
+  border: 1px solid var(--teal);
 }
-.support-banner-btn--secondary:hover { background: #99F6E4; }
+.support-banner-btn--secondary:hover { background: #F3F4F6; }
 
 .velocity-alert-card {
   display: flex;

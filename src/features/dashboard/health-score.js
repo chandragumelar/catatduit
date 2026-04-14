@@ -266,7 +266,7 @@ function renderHealthScore(container) {
     const el = document.createElement('div');
     el.className = 'card health-score-card';
     el.innerHTML = `
-      <p class="summary-label">FINANCIAL HEALTH SCORE</p>
+      <p class="summary-label">SKOR KESEHATAN KEUANGAN</p>
       <p class="health-score-warming">${warmupTitle}</p>
       <div class="health-progress-bar-wrap">
         <div class="health-progress-bar" style="width:${pct}%"></div>
@@ -283,7 +283,7 @@ function renderHealthScore(container) {
   const el = document.createElement('div');
   el.className = `card health-score-card`;
   el.innerHTML = `
-    <p class="summary-label">FINANCIAL HEALTH SCORE</p>
+    <p class="summary-label">SKOR KESEHATAN KEUANGAN</p>
     <div class="health-score-main">
       <div class="health-score-circle ${color}">
         <span class="health-score-number">${total}</span>

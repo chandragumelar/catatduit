@@ -158,8 +158,7 @@ function buildRateChipHTML() {
     <div class="currency-rate-chip">
       <span class="currency-rate-chip-text">1 ${secSym} = ${baseSym} ${rateStr}</span>
       <button class="currency-rate-chip-ubah" id="btn-rate-chip" title="Ubah nilai tukar">✏️</button>
-    </div>
-    <span class="currency-rate-manual-note">Diperbarui manual</span>`;
+    </div>`;
 }
 
 // ===== TOGGLE HTML =====
@@ -181,7 +180,6 @@ function buildCurrencyToggleHTML() {
           </div>
         </div>
         <div class="currency-toggle-col currency-toggle-col--right">
-          <div class="currency-toggle-label">Nilai tukar yang kamu tentukan:</div>
           ${buildRateChipHTML()}
         </div>
       </div>
