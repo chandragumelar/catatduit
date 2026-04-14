@@ -130,15 +130,15 @@ function _buildSettingsTampilanHTML() {
     <div class="settings-section">
       <p class="settings-section-label">Tampilan</p>
       <div class="settings-card">
-        <div class="settings-item">
+        <div class="settings-item${isMulti ? ' settings-item--disabled' : ''}">
           <div class="settings-item-left">
             <div class="settings-item-icon">💱</div>
             <div>
               <div class="settings-item-label">Mata Uang Utama</div>
-              <div class="settings-item-sub settings-item-sub--sm">Simbol dan default semua dompet baru</div>
+              <div class="settings-item-sub settings-item-sub--sm">${isMulti ? 'Dikelola per dompet saat multicurrency aktif' : 'Simbol dan default semua dompet baru'}</div>
             </div>
           </div>
-          <select id="currency-select" class="settings-select">${currencyOptions}</select>
+          <select id="currency-select" class="settings-select" ${isMulti ? 'disabled' : ''}>${currencyOptions}</select>
         </div>
         <div class="settings-divider"></div>
         <div class="settings-item">
