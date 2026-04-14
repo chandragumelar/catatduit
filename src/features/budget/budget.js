@@ -38,7 +38,7 @@ function renderBudgetSection(container) {
   card.innerHTML = `
     <div class="section-header">
       <h3 class="section-title">Budget ${periodBadge}</h3>
-      <button class="btn-kelola" id="btn-kelola-budget">Kelola</button>
+      <button class="btn-kelola" id="btn-kelola-budget">✏️ Kelola</button>
     </div>
     <p class="budget-period-label">${escHtml(periodLabel)}</p>
     ${jebol > 0 ? `<p class="budget-alert jebol">🔴 ${jebol} kategori sudah melebihi budget!</p>` : ''}

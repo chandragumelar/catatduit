@@ -1207,19 +1207,20 @@ input, select, textarea { font-family: inherit; }
 }
 
 button.btn-kelola {
-  background: var(--teal-light, #CCFBF1);
-  border: none;
+  background: transparent;
+  border: 1.5px solid var(--teal);
   outline: none;
   color: var(--teal);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  padding: 5px 12px;
+  padding: 4px 12px;
   border-radius: 20px;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 button.btn-kelola:hover {
-  background: #99f6e4;
+  background: var(--teal);
+  color: #fff;
 }
 button.btn-kelola:focus-visible {
   outline: 2px solid var(--teal);
