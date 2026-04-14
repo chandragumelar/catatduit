@@ -1206,26 +1206,7 @@ input, select, textarea { font-family: inherit; }
   border-radius: 4px;
 }
 
-button.btn-kelola {
-  background: transparent;
-  border: 1.5px solid var(--teal);
-  outline: none;
-  color: var(--teal);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 4px 12px;
-  border-radius: 20px;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-button.btn-kelola:hover {
-  background: var(--teal);
-  color: #fff;
-}
-button.btn-kelola:focus-visible {
-  outline: 2px solid var(--teal);
-  outline-offset: 2px;
-}
+/* btn-kelola styles moved to src/styles/dashboard.cards.css */
 
 /* ===== WALLET SUMMARY (Dashboard v3) ===== */
 .wallet-summary-list { margin: 10px 0 4px; }

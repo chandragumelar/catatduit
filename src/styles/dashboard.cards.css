@@ -647,3 +647,25 @@
 }
 .checklist-arrow { font-size: 16px; color: var(--gray-400); }
 
+
+/* ===== BUDGET KELOLA BUTTON ===== */
+button.btn-kelola {
+  background: transparent;
+  border: 1.5px solid var(--teal);
+  outline: none;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 20px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+button.btn-kelola:hover {
+  background: var(--teal);
+  color: #fff;
+}
+button.btn-kelola:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
