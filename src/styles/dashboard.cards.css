@@ -254,6 +254,7 @@
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
+  flex: 1;
 }
 .btn-secondary:active { opacity: 0.7; }
 
