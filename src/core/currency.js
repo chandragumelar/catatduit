@@ -31,31 +31,6 @@ function setSecondaryCurrency(code) {
   setData(STORAGE_KEYS.SECONDARY_CURRENCY, code);
 }
 
-// ===== EXCHANGE RATE =====
-// Rate selalu: 1 secondary = X base
-// Contoh: 1 USD = 16200 IDR → simpan 16200
-
-function getExchangeRate() {
-  return getData(STORAGE_KEYS.EXCHANGE_RATE, 17000);
-}
-
-function setExchangeRate(rate) {
-  const r = parseFloat(rate);
-  if (!r || r <= 0) return false;
-  return setData(STORAGE_KEYS.EXCHANGE_RATE, r);
-}
-
-// Convert secondary → base
-function convertToBase(amountInSecondary) {
-  return amountInSecondary * getExchangeRate();
-}
-
-// Convert base → secondary
-function convertToSecondary(amountInBase) {
-  const rate = getExchangeRate();
-  if (!rate) return 0;
-  return amountInBase / rate;
-}
 
 // ===== TOGGLE =====
 
@@ -142,25 +117,6 @@ function formatWithCurrency(angka, currencyCode) {
   return (n < 0 ? '-' + sym + ' ' : sym + ' ') + Math.abs(n).toLocaleString('id-ID');
 }
 
-// ===== RATE CHIP HTML =====
-// Chip kecil yang tampil di home dekat toggle: "1 USD = Rp 16.200 ✏️"
-
-function buildRateChipHTML() {
-  if (!isMulticurrencyEnabled()) return '';
-  const sec     = getSecondaryCurrency();
-  if (!sec) return '';
-  const base    = getBaseCurrency();
-  const rate    = getExchangeRate();
-  const secSym  = getCurrencySymbolByCode(sec);
-  const baseSym = getCurrencySymbolByCode(base);
-  const rateStr = rate.toLocaleString('id-ID');
-  return `
-    <div class="currency-rate-chip">
-      <span class="currency-rate-chip-text">1 ${secSym} = ${baseSym} ${rateStr}</span>
-      <button class="currency-rate-chip-ubah" id="btn-rate-chip" title="Ubah nilai tukar">✏️</button>
-    </div>`;
-}
-
 // ===== TOGGLE HTML =====
 
 function buildCurrencyToggleHTML() {
@@ -177,7 +133,6 @@ function buildCurrencyToggleHTML() {
           <button class="currency-toggle-btn ${isBase ? 'active' : ''}" data-toggle="base">${base}</button>
           <button class="currency-toggle-btn ${!isBase ? 'active' : ''}" data-toggle="secondary">${sec}</button>
         </div>
-        ${buildRateChipHTML()}
       </div>
     </div>`;
 }

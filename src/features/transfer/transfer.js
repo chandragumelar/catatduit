@@ -4,10 +4,6 @@
 // Depends on: state.js, storage.js, utils.js, ui.js, bottom-sheet.js
 // =============================================================================
 
-// Depends on: storage.js (saveTransferAtomic, getWallets),
-//             bottom-sheet.js (_openBottomSheet),
-//             ui.js (showToast), utils.js (formatRupiah, parseNominal)
-
 // ===== PUBLIC API =====
 
 function openTransferSheet() {
@@ -32,35 +28,20 @@ function openTransferSheet() {
     return;
   }
 
-  // Cek apakah ini cross-currency transfer (ada wallet dari 2 currency berbeda)
-  const isCross = isMulticurrencyEnabled() && getSecondaryCurrency() &&
-    wallets.some(w => getWalletCurrency(w) !== getBaseCurrency());
-
-  _renderTransferSheet(wallets, isCross);
+  _renderTransferSheet(wallets);
 }
 
 // ===== RENDER =====
 
-function _renderTransferSheet(wallets, isCross = false) {
-  // Pisahkan wallet berdasar currency jika multicurrency aktif
-  const activeWallet  = getActiveWallets();
-  const defaultFrom   = isCross
-    ? (activeWallet[0]?.id || wallets[0].id)
-    : wallets[0].id;
-  const defaultTo     = isCross
-    ? (wallets.find(w => w.id !== defaultFrom)?.id || wallets[1].id)
-    : wallets[1].id;
-
-  const fromWallet    = wallets.find(w => w.id === defaultFrom) || wallets[0];
-  const fromCurrency  = getWalletCurrency(fromWallet);
-  const fromSym       = getCurrencySymbolByCode(fromCurrency);
-
-  // Cross-currency info label
-  const crossInfoHTML = isCross ? `
-    <div class="tf-cross-info" id="tf-cross-info"></div>` : '';
+function _renderTransferSheet(wallets) {
+  const defaultFrom  = wallets[0].id;
+  const defaultTo    = wallets[1].id;
+  const fromWallet   = wallets[0];
+  const fromCurrency = getWalletCurrency(fromWallet);
+  const fromSym      = getCurrencySymbolByCode(fromCurrency);
 
   _openBottomSheet({
-    title: isCross ? '↗ Transfer (Tukar Mata Uang)' : '↗ Transfer Antar Dompet',
+    title: '↗ Transfer Antar Dompet',
     fields: `
       <div class="bottom-sheet-field">
         <label class="input-label">Dari dompet</label>
@@ -100,8 +81,6 @@ function _renderTransferSheet(wallets, isCross = false) {
         <div class="tf-saldo-hint" id="tf-nominal-hint"></div>
       </div>
 
-      ${crossInfoHTML}
-
       <div class="bottom-sheet-field">
         <label class="input-label">Tanggal</label>
         <div class="date-picker-wrap">
@@ -118,16 +97,16 @@ function _renderTransferSheet(wallets, isCross = false) {
     confirmText: 'Transfer Sekarang',
 
     onOpen: () => {
-      _initTransferSheetLogic(wallets, isCross);
+      _initTransferSheetLogic(wallets);
     },
 
     onConfirm: () => {
-      return _handleTransferConfirm(wallets, isCross);
+      return _handleTransferConfirm(wallets);
     },
   });
 }
 
-function _initTransferSheetLogic(wallets, isCross = false) {
+function _initTransferSheetLogic(wallets) {
   const fromEl    = document.getElementById('tf-from');
   const toEl      = document.getElementById('tf-to');
   const nominalEl = document.getElementById('tf-nominal');
@@ -141,44 +120,11 @@ function _initTransferSheetLogic(wallets, isCross = false) {
     }
   };
 
-  const _updateCrossInfo = () => {
-    const infoEl = document.getElementById('tf-cross-info');
-    if (!infoEl || !isCross) return;
-    const fromWallet = wallets.find(w => w.id === fromEl.value);
-    const toWallet   = wallets.find(w => w.id === toEl.value);
-    if (!fromWallet || !toWallet) { infoEl.innerHTML = ''; return; }
-
-    const fromCur = getWalletCurrency(fromWallet);
-    const toCur   = getWalletCurrency(toWallet);
-    if (fromCur === toCur) { infoEl.innerHTML = ''; return; }
-
-    const nominal = parseNominal(nominalEl.value);
-    const rate    = getExchangeRate();
-    const base    = getBaseCurrency();
-
-    let converted;
-    if (fromCur !== base) {
-      converted = Math.round(nominal * rate);
-    } else {
-      converted = Math.round(nominal / rate);
-    }
-
-    const fromSym = getCurrencySymbolByCode(fromCur);
-    const toSym   = getCurrencySymbolByCode(toCur);
-
-    infoEl.innerHTML = nominal > 0
-      ? `<span class="tf-cross-label">💱 ${fromSym} ${nominal.toLocaleString('id-ID')} → ${toSym} ${converted.toLocaleString('id-ID')}</span>
-         <span class="tf-cross-rate">Kurs: 1 ${getSecondaryCurrency()} = ${getCurrencySymbolByCode(base)} ${rate.toLocaleString('id-ID')}</span>`
-      : '';
-  };
-
-  // Update saldo hints on wallet change
   const _updateHints = () => {
     _updateSaldoHint('tf-from-saldo', fromEl.value, wallets);
     _updateSaldoHint('tf-to-saldo',   toEl.value,   wallets);
     _validateNominalHint(nominalEl.value, fromEl.value);
     _updateFromCurrencyPrefix();
-    _updateCrossInfo();
   };
 
   fromEl.addEventListener('change', () => {
@@ -201,7 +147,6 @@ function _initTransferSheetLogic(wallets, isCross = false) {
     const raw = nominalEl.value.replace(/\D/g, '');
     nominalEl.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
     _validateNominalHint(nominalEl.value, fromEl.value);
-    _updateCrossInfo();
   });
 
   swapBtn.addEventListener('click', () => {
@@ -219,8 +164,8 @@ function _updateSaldoHint(elId, walletId, wallets) {
   if (!el) return;
   const wallet = wallets.find(w => w.id === walletId);
   if (!wallet) { el.textContent = ''; return; }
-  const saldo   = getSaldoWallet(walletId);
-  const wCur    = getWalletCurrency(wallet);
+  const saldo  = getSaldoWallet(walletId);
+  const wCur   = getWalletCurrency(wallet);
   el.textContent = `Saldo: ${formatWithCurrency(saldo, wCur)}`;
   el.style.color = saldo < 0 ? 'var(--danger)' : 'var(--text-muted)';
 }
@@ -240,7 +185,7 @@ function _validateNominalHint(nominalStr, fromWalletId) {
   }
 }
 
-function _handleTransferConfirm(wallets, isCross = false) {
+function _handleTransferConfirm(wallets) {
   const fromId  = document.getElementById('tf-from')?.value;
   const toId    = document.getElementById('tf-to')?.value;
   const nominal = parseNominal(document.getElementById('tf-nominal')?.value || '');
@@ -255,15 +200,8 @@ function _handleTransferConfirm(wallets, isCross = false) {
   const fromWallet = wallets.find(w => w.id === fromId);
   const toWallet   = wallets.find(w => w.id === toId);
   const fromCur    = getWalletCurrency(fromWallet);
-  const toCur      = getWalletCurrency(toWallet);
-  const isCrossCur = fromCur !== toCur;
 
-  let ok;
-  if (isCrossCur) {
-    ok = saveCrossCurrencyTransfer({ fromWalletId: fromId, toWalletId: toId, nominalFrom: nominal, tanggal, catatan });
-  } else {
-    ok = saveTransferAtomic({ fromWalletId: fromId, toWalletId: toId, nominal, tanggal, catatan });
-  }
+  const ok = saveTransferAtomic({ fromWalletId: fromId, toWalletId: toId, nominal, tanggal, catatan });
 
   if (ok) {
     invalidateTransaksiCache();

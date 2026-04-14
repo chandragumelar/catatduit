@@ -16,9 +16,8 @@ function buildTxItemHTML(tx) {
     ? `<span class="tx-wallet">${wallet.icon} ${escHtml(wallet.nama)}</span>`
     : '';
   const isTransfer  = tx.type === 'transfer_out' || tx.type === 'transfer_in';
-  const isCrossCur  = tx.is_cross_currency === true;
   const transferTag = isTransfer
-    ? `<span class="tx-transfer-badge">${tx.type === 'transfer_out' ? '↗' : '↙'} ${isCrossCur ? '💱 Tukar' : 'Transfer'}</span>`
+    ? `<span class="tx-transfer-badge">${tx.type === 'transfer_out' ? '↗' : '↙'} Transfer</span>`
     : '';
 
   // Tampilkan nominal dengan currency wallet, bukan active toggle

@@ -95,10 +95,6 @@ function _initSettingsEvents(txList, wallets) {
     renderDashboard();
   });
 
-  document.getElementById('btn-edit-rate-settings')?.addEventListener('click', () => {
-    _openRateEditModalFromSettings();
-  });
-
   document.getElementById('btn-export')?.addEventListener('click', () => {
     if (txList.length > 0) exportCSV();
   });
@@ -188,49 +184,6 @@ function _onMulticurrencyToggle(enabled) {
     if (sw) sw.checked = true;
   }
   renderSettings();
-}
-
-function _openRateEditModalFromSettings() {
-  const sec     = getSecondaryCurrency();
-  const base    = getBaseCurrency();
-  const secSym  = getCurrencySymbolByCode(sec);
-  const baseSym = getCurrencySymbolByCode(base);
-  const current = getExchangeRate();
-
-  showModal(
-    `<div style="text-align:left;">
-      <p style="font-weight:600;margin-bottom:12px;">Update Kurs</p>
-      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
-        1 ${secSym} (${sec}) = berapa ${baseSym} (${base})?
-      </p>
-      <div class="nominal-wrap">
-        <span class="nominal-prefix">${baseSym}</span>
-        <input type="text" id="modal-rate-input" class="input-nominal"
-          placeholder="0" inputmode="decimal" autocomplete="off"
-          value="${current.toLocaleString('id-ID')}" style="font-size:18px;" />
-      </div>
-    </div>`,
-    () => {
-      const raw  = document.getElementById('modal-rate-input')?.value || '';
-      const rate = parseFloat(raw.replace(/\./g, '').replace(',', '.'));
-      if (!rate || rate <= 0) { showToast('❌ Kurs tidak valid.'); return; }
-      setExchangeRate(rate);
-      showToast(`✅ Kurs: 1 ${sec} = ${baseSym} ${rate.toLocaleString('id-ID')}`);
-      renderSettings();
-      renderDashboard();
-    },
-    'Simpan Kurs'
-  );
-
-  setTimeout(() => {
-    const inp = document.getElementById('modal-rate-input');
-    if (!inp) return;
-    inp.select();
-    inp.addEventListener('input', () => {
-      const raw = inp.value.replace(/\D/g, '');
-      inp.value = raw ? parseInt(raw, 10).toLocaleString('id-ID') : '';
-    });
-  }, 50);
 }
 
 // ===== NOTIFIKASI =====

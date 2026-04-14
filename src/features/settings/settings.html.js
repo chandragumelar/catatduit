@@ -68,9 +68,7 @@ function _buildSettingsTampilanHTML() {
 
   const isMulti      = isMulticurrencyEnabled();
   const secCode      = getSecondaryCurrency();
-  const currentRate  = getExchangeRate();
   const baseCode     = getData(STORAGE_KEYS.CURRENCY, 'IDR');
-  const baseSym      = getCurrencySymbolByCode(baseCode);
 
   // Secondary currency options (exclude base)
   const secOptions = CURRENCY_OPTIONS
@@ -109,18 +107,7 @@ function _buildSettingsTampilanHTML() {
           <select id="secondary-currency-select" class="settings-select">${secOptions}</select>
         </div>
 
-        ${secCode ? `
-        <div class="settings-divider"></div>
-        <div class="settings-item" id="settings-rate-item">
-          <div class="settings-item-left">
-            <div class="settings-item-icon">📈</div>
-            <div>
-              <div class="settings-item-label">Kurs Saat Ini</div>
-              <div class="settings-item-sub settings-item-sub--sm">1 ${secCode} = ${baseSym} ${currentRate.toLocaleString('id-ID')}</div>
-            </div>
-          </div>
-          <button class="btn-icon-sm" id="btn-edit-rate-settings">✏️</button>
-        </div>` : ''}
+        ${secCode ? `` : ''}
         ` : ''}
       </div>
       ${isMulti && !secCode ? '<p class="settings-hint-text">Pilih mata uang kedua untuk mengaktifkan fitur multicurrency.</p>' : ''}

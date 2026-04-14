@@ -319,7 +319,6 @@ function _stepSaldo() {
       if (secCode) {
         setMulticurrencyEnabled(true);
         setSecondaryCurrency(secCode);
-        setExchangeRate(17000); // default rate, user bisa update
         setActiveCurrencyToggle('base');
       }
     }

@@ -25,7 +25,6 @@ const STORAGE_KEYS = {
   SUPPORT_BANNER: 'cd_support_banner_dismissed_at', // timestamp dismiss terakhir
   // Multicurrency
   SECONDARY_CURRENCY:     'cd_secondary_currency',      // kode currency kedua, null jika single
-  EXCHANGE_RATE:          'cd_exchange_rate',           // rate: 1 secondary = X base
   ACTIVE_CURRENCY_TOGGLE: 'cd_active_currency_toggle',  // 'base' | 'secondary'
   MULTICURRENCY_ENABLED:  'cd_multicurrency_enabled',   // boolean
 };
