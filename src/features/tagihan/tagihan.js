@@ -110,30 +110,16 @@ function _formatJatuhTempo(t, year, month) {
 
 function _showTagihanSheet(id = null) {
   const tagihan = getTagihan();
-  const wallets = getWallets();
+  const wallets = getWallets().filter(w => !w.hidden);
   const isEdit  = id !== null;
   const t       = isEdit ? tagihan.find(x => x.id === id) : null;
   if (isEdit && !t) return;
 
   let recurringVal = t ? t.isRecurring !== false : true;
 
-  const isMulti    = isMulticurrencyEnabled() && getSecondaryCurrency();
-  const tCurrency  = t?.currency || getBaseCurrency();
-  const tSym       = getCurrencySymbolByCode(tCurrency);
-  const baseCode   = getBaseCurrency();
-  const secCode    = getSecondaryCurrency();
-
-  const currencyFieldTagihan = isMulti ? `
-    <div class="bottom-sheet-field">
-      <label class="input-label">Mata uang tagihan</label>
-      <div class="currency-toggle" style="margin-top:4px;">
-        <button type="button" class="currency-toggle-btn ${tCurrency === baseCode ? 'active' : ''}"
-          id="bs-tagihan-cur-base" data-currency="${baseCode}">${baseCode}</button>
-        <button type="button" class="currency-toggle-btn ${tCurrency === secCode ? 'active' : ''}"
-          id="bs-tagihan-cur-sec" data-currency="${secCode}">${secCode}</button>
-      </div>
-      <input type="hidden" id="bs-tagihan-currency" value="${tCurrency}" />
-    </div>` : '';
+  const defaultWalletId = t?.preferred_wallet_id || wallets[0]?.id || DEFAULT_WALLET_ID;
+  const defaultWallet   = wallets.find(w => w.id === defaultWalletId) || wallets[0];
+  const tSym            = getCurrencySymbolByCode(defaultWallet?.currency || getBaseCurrency());
 
   _openBottomSheet({
     title: isEdit ? 'Edit Tagihan' : 'Tambah Tagihan',
@@ -144,7 +130,15 @@ function _showTagihanSheet(id = null) {
           placeholder="contoh: Netflix, BPJS, Cicilan HP"
           value="${escHtml(t?.nama || '')}" maxlength="50" />
       </div>
-      ${currencyFieldTagihan}
+      <div class="bottom-sheet-field">
+        <label class="input-label">Bayar dari wallet mana?</label>
+        <p class="bottom-sheet-hint" style="margin-top:4px;margin-bottom:10px;">Bisa diubah saat bayar nanti.</p>
+        <div class="wallet-chip-wrap" id="bs-wallet-chips">
+          ${wallets.map(w => `
+            <button type="button" class="chip wallet-chip ${w.id === defaultWalletId ? 'active' : ''}"
+              data-wallet-id="${w.id}" data-currency="${w.currency || getBaseCurrency()}">${w.icon} ${escHtml(w.nama)}</button>`).join('')}
+        </div>
+      </div>
       <div class="bottom-sheet-field">
         <label class="input-label">Nominal</label>
         <div class="nominal-wrap">
@@ -167,35 +161,12 @@ function _showTagihanSheet(id = null) {
           <button type="button" class="jenis-btn ${recurringVal ? 'active' : ''}" id="bs-recurring-ya">Ya</button>
           <button type="button" class="jenis-btn ${!recurringVal ? 'active' : ''}" id="bs-recurring-tidak">Tidak</button>
         </div>
-      </div>
-      ${wallets.length > 1 ? `
-      <div class="bottom-sheet-field">
-        <label class="input-label">Bayar dari wallet mana?</label>
-        <p class="bottom-sheet-hint" style="margin-top:4px;margin-bottom:10px;">Bisa diubah saat bayar nanti.</p>
-        <div class="wallet-chip-wrap" id="bs-wallet-chips">
-          ${wallets.map(w => `
-            <button type="button" class="chip wallet-chip ${(t?.preferred_wallet_id || wallets[0].id) === w.id ? 'active' : ''}"
-              data-wallet-id="${w.id}">${w.icon} ${escHtml(w.nama)}</button>`).join('')}
-        </div>
-      </div>` : ''}`,
+      </div>`,
     confirmText: isEdit ? 'Simpan' : 'Tambah Tagihan',
     onOpen: () => {
       document.getElementById('bs-nominal').addEventListener('input', (e) => {
         const raw = e.target.value.replace(/\D/g, '');
         e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
-      });
-
-      // Currency toggle di tagihan sheet
-      document.querySelectorAll('[id^="bs-tagihan-cur-"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('[id^="bs-tagihan-cur-"]').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const chosenCode = btn.dataset.currency;
-          const hiddenInput = document.getElementById('bs-tagihan-currency');
-          if (hiddenInput) hiddenInput.value = chosenCode;
-          const prefix = document.getElementById('bs-tagihan-prefix');
-          if (prefix) prefix.textContent = getCurrencySymbolByCode(chosenCode);
-        });
       });
 
       document.getElementById('bs-recurring-ya').addEventListener('click', () => {
@@ -208,11 +179,14 @@ function _showTagihanSheet(id = null) {
         document.getElementById('bs-recurring-tidak').classList.add('active');
         document.getElementById('bs-recurring-ya').classList.remove('active');
       });
-      // Wallet preferred chips
+
+      // Wallet chips — update prefix nominal sesuai currency wallet
       document.querySelectorAll('#bs-wallet-chips .wallet-chip').forEach(chip => {
         chip.addEventListener('click', () => {
           document.querySelectorAll('#bs-wallet-chips .wallet-chip').forEach(c => c.classList.remove('active'));
           chip.classList.add('active');
+          const pfx = document.getElementById('bs-tagihan-prefix');
+          if (pfx) pfx.textContent = getCurrencySymbolByCode(chip.dataset.currency || getBaseCurrency());
         });
       });
     },
@@ -221,12 +195,12 @@ function _showTagihanSheet(id = null) {
       const nama       = rawNama.charAt(0).toUpperCase() + rawNama.slice(1);
       const nominal    = parseNominal(document.getElementById('bs-nominal').value);
       const jatuhTempo = document.getElementById('bs-jatuh-tempo').value || null;
-      const currency   = document.getElementById('bs-tagihan-currency')?.value || getBaseCurrency();
-      if (!nama)            return 'Nama tidak boleh kosong.';
+      if (!nama)                    return 'Nama tidak boleh kosong.';
       if (!nominal || nominal <= 0) return 'Nominal tidak valid.';
 
-      const preferredWallet = document.querySelector('#bs-wallet-chips .wallet-chip.active')?.dataset.walletId
-        || (wallets.length === 1 ? wallets[0].id : null);
+      const activeChip      = document.querySelector('#bs-wallet-chips .wallet-chip.active');
+      const preferredWallet = activeChip?.dataset.walletId || wallets[0]?.id || null;
+      const currency        = activeChip?.dataset.currency || getBaseCurrency();
 
       if (isEdit) {
         const idx = tagihan.findIndex(x => x.id === id);
