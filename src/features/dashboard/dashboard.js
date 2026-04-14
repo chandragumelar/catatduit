@@ -61,7 +61,7 @@ function renderDashboard() {
   // — Keuangan Bulan Ini (naik ke priority 1 kalau ada tagihan mendekat)
   const keuanganEl = document.createElement('div');
   keuanganEl.appendChild(buildKeuanganCard({
-    wallets: getWallets(), estimasiSaldo, totalNabung, totalTagihanBelumBayar,
+    wallets: (typeof isMulticurrencyEnabled === 'function' && isMulticurrencyEnabled()) ? getActiveWallets() : getWallets().filter(w => !w.hidden), estimasiSaldo, totalNabung, totalTagihanBelumBayar,
     tagihanSudahBayar, tagihanBulanIni, uangBebas, bebasDipakai, tagihan,
   }));
   push(DASHBOARD_CARDS.KEUANGAN, keuanganEl, tagihanMendekat ? 1 : 20);
