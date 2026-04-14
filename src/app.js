@@ -258,6 +258,14 @@ function _stepSaldo() {
             `<option value="${c.code}">${c.label}</option>`
           ).join('')}
         </select>
+        <div class="ob-saldo-row" style="margin-top:10px;">
+          <label class="ob-saldo-label" id="ob-secondary-saldo-label">💵 Dompet baru</label>
+          <div class="nominal-wrap">
+            <span class="nominal-prefix" id="ob-secondary-symbol">$</span>
+            <input type="text" class="input-nominal" id="ob-secondary-saldo-input" placeholder="0" inputmode="numeric" />
+          </div>
+        </div>
+        <p class="onboarding-hint" style="margin-top:4px;">Boleh perkiraan dulu — bisa diubah kapan saja.</p>
       </div>
     </div>
 
@@ -292,6 +300,7 @@ function _stepSaldo() {
         .filter(c => c.code !== e.target.value)
         .map(c => `<option value="${c.code}">${c.label}</option>`)
         .join('');
+      updateSecondaryUI();
     }
   });
   const existingCurrency = getData(STORAGE_KEYS.CURRENCY, 'IDR');
@@ -302,6 +311,27 @@ function _stepSaldo() {
   el.querySelector('#ob-multicurrency-check')?.addEventListener('change', (e) => {
     const wrap = el.querySelector('#ob-secondary-wrap');
     if (wrap) wrap.style.display = e.target.checked ? 'block' : 'none';
+  });
+
+  // Update secondary symbol + label when secondary currency changes
+  function updateSecondaryUI() {
+    const secSel = el.querySelector('#ob-secondary-select');
+    const secCode = secSel?.value;
+    if (!secCode) return;
+    const sym = getCurrencySymbolByCode(secCode);
+    const label = CURRENCY_OPTIONS.find(c => c.code === secCode)?.label || secCode;
+    const symEl = el.querySelector('#ob-secondary-symbol');
+    const labelEl = el.querySelector('#ob-secondary-saldo-label');
+    if (symEl) symEl.textContent = sym;
+    if (labelEl) labelEl.textContent = `💵 Dompet ${label.split(' — ')[0]}`;
+  }
+
+  el.querySelector('#ob-secondary-select')?.addEventListener('change', updateSecondaryUI);
+
+  // Format input for secondary saldo
+  el.querySelector('#ob-secondary-saldo-input')?.addEventListener('input', (e) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
   });
 
   el.querySelector('#ob-btn-selesai').addEventListener('click', () => {
@@ -320,6 +350,21 @@ function _stepSaldo() {
         setMulticurrencyEnabled(true);
         setSecondaryCurrency(secCode);
         setActiveCurrencyToggle('base');
+
+        // Create foreign wallet with saldo
+        const secSaldoInput = el.querySelector('#ob-secondary-saldo-input');
+        const secSaldo = secSaldoInput ? parseNominal(secSaldoInput.value) : 0;
+        const secSymbol = getCurrencySymbolByCode(secCode);
+        const secLabel = CURRENCY_OPTIONS.find(c => c.code === secCode)?.label?.split(' — ')[0] || secCode;
+        const foreignWallet = {
+          id: 'w_foreign_' + Date.now(),
+          nama: secLabel,
+          icon: secCode === 'USD' ? '💵' : secCode === 'EUR' ? '💶' : secCode === 'GBP' ? '💷' : '💰',
+          saldo_awal: secSaldo,
+          currency: secCode,
+          hidden: false,
+        };
+        wallets.push(foreignWallet);
       }
     }
 
