@@ -14,7 +14,21 @@ function openTransferSheet() {
   const wallets = getWallets().filter(w => !w.hidden);
 
   if (wallets.length < 2) {
-    showToast('⚠️ Kamu butuh minimal 2 dompet untuk transfer.');
+    _openBottomSheet({
+      title: 'Pindah Dompet',
+      fields: `
+        <div style="text-align:center; padding: 8px 0 16px;">
+          <div style="font-size: 2rem; margin-bottom: 12px;">💡</div>
+          <p style="margin: 0 0 8px; font-weight: 600; color: var(--text);">Tambah satu dompet lagi</p>
+          <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Fitur transfer bisa dipakai setelah kamu punya minimal 2 dompet.</p>
+        </div>
+      `,
+      confirmText: '+ Tambah Dompet',
+      onConfirm: () => {
+        navigateTo('settings');
+        return null;
+      },
+    });
     return;
   }
 

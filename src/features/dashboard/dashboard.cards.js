@@ -80,16 +80,14 @@ function _makeCollapsibleCard({ id, title, titleRight = '', urgent = false, cont
 // ===== GREETING CARD =====
 
 function buildGreetingCard(insightText, nama) {
-  const wallets = getWallets();
-  const showTransferBtn = wallets.length >= 2;
   const el = document.createElement('div');
   el.innerHTML = `
     <div class="greeting-section">
       <div class="greeting-top">
         <p class="greeting-text">Halo, ${escHtml(nama)}! 👋</p>
-        ${showTransferBtn ? `<button class="btn-transfer-shortcut" id="btn-open-transfer" title="Pindah saldo antar dompet">
+        <button class="btn-transfer-shortcut" id="btn-open-transfer" title="Pindah saldo antar dompet">
           <i data-lucide="arrow-left-right"></i> Pindah Dompet
-        </button>` : ''}
+        </button>
       </div>
     </div>`;
   return el;
