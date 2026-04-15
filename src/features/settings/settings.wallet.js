@@ -13,35 +13,34 @@ function _showWalletSheet(idx) {
   const baseCode = getBaseCurrency();
   const secCode  = getSecondaryCurrency();
 
-  const presetHTML = !isEdit ? `
+  // Preset grid — tampil di tambah & edit
+  // Di edit: pre-select preset yang id-nya match wallet.id
+  const presetHTML = `
     <div class="bottom-sheet-field">
-      <label class="input-label">Pilih preset (opsional)</label>
+      <label class="input-label">Pilih preset${isEdit ? ' / ikon dompet' : ' (opsional)'}</label>
       <div class="wallet-preset-grid" id="bs-wallet-preset-grid">
         ${WALLET_PRESETS.map(p => `
-          <button type="button" class="wallet-preset-tile" data-preset-id="${p.id}"
+          <button type="button" class="wallet-preset-tile${isEdit && w?.id === p.id ? ' selected' : ''}"
+            data-preset-id="${p.id}"
             data-preset-nama="${escHtml(p.nama)}" data-preset-icon="${p.icon}">
             <span class="wallet-preset-icon">${p.icon}</span>
             <span class="wallet-preset-nama">${escHtml(p.nama)}</span>
           </button>`).join('')}
       </div>
-    </div>` : '';
+    </div>`;
 
-  // Currency selector — hanya tampil jika multicurrency aktif dan ada secondary currency
-  const wCurrency      = w?.currency || baseCode;
-  const currencyField  = (isMulti && secCode) ? `
+  // Currency selector — selalu tampil (tidak terikat multicurrency flag)
+  const wCurrency     = w?.currency || baseCode;
+  const currencyField = `
     <div class="bottom-sheet-field">
       <label class="input-label">Mata uang dompet ini</label>
-      <div class="currency-toggle" style="margin-top:4px;">
-        <button type="button" class="currency-toggle-btn ${wCurrency === baseCode ? 'active' : ''}"
-          id="bs-currency-base" data-currency="${baseCode}">${baseCode}</button>
-        <button type="button" class="currency-toggle-btn ${wCurrency === secCode ? 'active' : ''}"
-          id="bs-currency-sec" data-currency="${secCode}">${secCode}</button>
-      </div>
-      <input type="hidden" id="bs-wallet-currency" value="${wCurrency}" />
-    </div>` : '';
+      <select id="bs-wallet-currency" class="ob-wallet-currency" style="width:100%;padding:8px 10px;font-size:14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--surface);color:var(--text-primary);cursor:pointer;">
+        ${CURRENCY_OPTIONS.map(c => `
+          <option value="${c.code}"${c.code === wCurrency ? ' selected' : ''}>${c.label}</option>`).join('')}
+      </select>
+    </div>`;
 
-  const activeCurrencyForWallet = wCurrency;
-  const activeSym = getCurrencySymbolByCode(activeCurrencyForWallet);
+  const activeSym = getCurrencySymbolByCode(wCurrency);
 
   _openBottomSheet({
     title: isEdit ? 'Edit Dompet' : 'Tambah Dompet',
@@ -77,22 +76,21 @@ function _showWalletSheet(idx) {
           document.querySelectorAll('#bs-wallet-preset-grid .wallet-preset-tile')
             .forEach(t => t.classList.remove('selected'));
           tile.classList.add('selected');
-          document.getElementById('bs-wallet-nama').value = tile.dataset.presetNama;
+          // Di mode tambah: auto-isi nama. Di mode edit: hanya ubah icon (nama tetap editable)
+          if (!isEdit) {
+            document.getElementById('bs-wallet-nama').value = tile.dataset.presetNama;
+          }
         });
       });
 
-      // Currency toggle di wallet sheet
-      document.querySelectorAll('[id^="bs-currency-"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('[id^="bs-currency-"]').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const chosenCode = btn.dataset.currency;
-          const hiddenInput = document.getElementById('bs-wallet-currency');
-          if (hiddenInput) hiddenInput.value = chosenCode;
+      // Currency select — update symbol prefix saat user ganti currency
+      const currencySelect = document.getElementById('bs-wallet-currency');
+      if (currencySelect) {
+        currencySelect.addEventListener('change', () => {
           const prefix = document.getElementById('bs-saldo-prefix');
-          if (prefix) prefix.textContent = getCurrencySymbolByCode(chosenCode);
+          if (prefix) prefix.textContent = getCurrencySymbolByCode(currencySelect.value);
         });
-      });
+      }
     },
     onConfirm: () => {
       const nama     = document.getElementById('bs-wallet-nama').value.trim();
