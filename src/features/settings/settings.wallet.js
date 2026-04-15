@@ -109,6 +109,18 @@ function _showWalletSheet(idx) {
       }
 
       saveWallets(wallets);
+
+      // Sync base currency kalau wallet pertama (dominantBase) ganti currency
+      if (isEdit && idx === 0 && currency !== getBaseCurrency()) {
+        setData(STORAGE_KEYS.CURRENCY, currency);
+        // Cegah collision: kalau new base == secondary, matikan multicurrency
+        if (currency === getSecondaryCurrency()) {
+          setSecondaryCurrency(null);
+          setMulticurrencyEnabled(false);
+          setActiveCurrencyToggle('base');
+        }
+      }
+
       showToast(isEdit ? 'Dompet diperbarui.' : 'Dompet ditambahkan!');
       renderSettings();
       return null;
