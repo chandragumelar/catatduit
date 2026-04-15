@@ -123,25 +123,6 @@ function _buildSettingsTampilanHTML() {
       </div>
     </div>
 
-    <div class="settings-section">
-      <p class="settings-section-label">Tampilan</p>
-      <div class="settings-card">
-        <div class="settings-item">
-          <div class="settings-item-left">
-            <div class="settings-item-icon">📊</div>
-            <div>
-              <div class="settings-item-label">Period Budget</div>
-              <div class="settings-item-sub settings-item-sub--sm">Bulanan atau mingguan (Senin–Minggu)</div>
-            </div>
-          </div>
-          <select id="budget-period-select" class="settings-select">
-            <option value="monthly" ${getBudgetPeriod() === 'monthly' ? 'selected' : ''}>Bulanan</option>
-            <option value="weekly"  ${getBudgetPeriod() === 'weekly'  ? 'selected' : ''}>Mingguan</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
     ${multicurrencySection}`;
 }
 

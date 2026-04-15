@@ -71,12 +71,6 @@ function _initSettingsEvents(txList, wallets) {
   document.getElementById('btn-add-wallet')?.addEventListener('click', () => _showWalletSheet(null));
   document.getElementById('btn-go-kategori')?.addEventListener('click', () => navigateTo('kategori'));
 
-  document.getElementById('budget-period-select')?.addEventListener('change', (e) => {
-    saveBudgetPeriod(e.target.value);
-    showToast(e.target.value === 'weekly' ? 'Budget diubah ke mingguan ✓' : 'Budget diubah ke bulanan ✓');
-    renderDashboard();
-  });
-
   // Multicurrency events
   document.getElementById('multicurrency-toggle-switch')?.addEventListener('change', (e) => {
     _onMulticurrencyToggle(e.target.checked);
