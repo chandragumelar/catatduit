@@ -77,10 +77,6 @@ function _initSettingsEvents(txList, wallets) {
     renderDashboard();
   });
 
-  document.getElementById('currency-select')?.addEventListener('change', (e) => {
-    _onCurrencyChange(e.target.value);
-  });
-
   // Multicurrency events
   document.getElementById('multicurrency-toggle-switch')?.addEventListener('change', (e) => {
     _onMulticurrencyToggle(e.target.checked);
@@ -135,24 +131,6 @@ function _onHapusWallet(idx, wallets) {
   }, 'Ya, Hapus');
 }
 
-function _onCurrencyChange(value) {
-  setData(STORAGE_KEYS.CURRENCY, value);
-
-  const pfx = document.getElementById('input-currency-prefix');
-  if (pfx) pfx.textContent = getCurrencySymbol();
-
-  const page = state.currentPage;
-  if (page === 'dashboard') renderDashboard();
-  if (page === 'riwayat')   renderRiwayatContent();
-  if (page === 'tabungan')  renderTabungan();
-  renderSettings();
-
-  document.querySelectorAll('.nominal-prefix, .qc-prefix').forEach(el => {
-    el.textContent = getCurrencySymbol();
-  });
-
-  showToast('Simbol mata uang diubah ✓');
-}
 
 function _onMulticurrencyToggle(enabled) {
   if (enabled) {
