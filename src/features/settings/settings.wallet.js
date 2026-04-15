@@ -13,28 +13,18 @@ function _showWalletSheet(idx) {
   const baseCode = getBaseCurrency();
   const secCode  = getSecondaryCurrency();
 
-  // Preset grid — tampil di tambah & edit
-  // Di edit: pre-select preset yang id-nya match wallet.id
-  const presetHTML = `
-    <div class="bottom-sheet-field">
-      <label class="input-label">Pilih preset${isEdit ? ' / ikon dompet' : ' (opsional)'}</label>
-      <div class="wallet-preset-grid" id="bs-wallet-preset-grid">
-        ${WALLET_PRESETS.map(p => `
-          <button type="button" class="wallet-preset-tile${isEdit && w?.id === p.id ? ' selected' : ''}"
-            data-preset-id="${p.id}"
-            data-preset-nama="${escHtml(p.nama)}" data-preset-icon="${p.icon}">
-            <span class="wallet-preset-icon">${p.icon}</span>
-            <span class="wallet-preset-nama">${escHtml(p.nama)}</span>
-          </button>`).join('')}
-      </div>
-    </div>`;
+  // Datalist untuk nama dompet — suggestion dari WALLET_PRESETS, tetap bisa custom
+  const namaDatalist = `
+    <datalist id="bs-wallet-nama-list">
+      ${WALLET_PRESETS.map(p => `<option value="${escHtml(p.nama)}">`).join('')}
+    </datalist>`;
 
   // Currency selector — selalu tampil (tidak terikat multicurrency flag)
   const wCurrency     = w?.currency || baseCode;
   const currencyField = `
     <div class="bottom-sheet-field">
       <label class="input-label">Mata uang dompet ini</label>
-      <select id="bs-wallet-currency" class="ob-wallet-currency" style="width:100%;padding:8px 10px;font-size:14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--surface);color:var(--text-primary);cursor:pointer;">
+      <select id="bs-wallet-currency" class="bs-wallet-currency-select">
         ${CURRENCY_OPTIONS.map(c => `
           <option value="${c.code}"${c.code === wCurrency ? ' selected' : ''}>${c.label}</option>`).join('')}
       </select>
@@ -45,12 +35,13 @@ function _showWalletSheet(idx) {
   _openBottomSheet({
     title: isEdit ? 'Edit Dompet' : 'Tambah Dompet',
     fields: `
-      ${presetHTML}
+      ${namaDatalist}
       <div class="bottom-sheet-field">
         <label class="input-label">Nama dompet</label>
         <input type="text" id="bs-wallet-nama" class="input-field"
           placeholder="contoh: BCA, GoPay, Cash"
-          value="${escHtml(w?.nama || '')}" maxlength="20" />
+          value="${escHtml(w?.nama || '')}" maxlength="20"
+          list="bs-wallet-nama-list" autocomplete="off" />
       </div>
       ${currencyField}
       <div class="bottom-sheet-field">
@@ -71,17 +62,17 @@ function _showWalletSheet(idx) {
         e.target.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
       });
 
-      document.querySelectorAll('#bs-wallet-preset-grid .wallet-preset-tile').forEach(tile => {
-        tile.addEventListener('click', () => {
-          document.querySelectorAll('#bs-wallet-preset-grid .wallet-preset-tile')
-            .forEach(t => t.classList.remove('selected'));
-          tile.classList.add('selected');
-          // Di mode tambah: auto-isi nama. Di mode edit: hanya ubah icon (nama tetap editable)
-          if (!isEdit) {
-            document.getElementById('bs-wallet-nama').value = tile.dataset.presetNama;
-          }
+      // Datalist nama — resolve icon & id dari preset saat user pilih suggestion
+      const namaInput = document.getElementById('bs-wallet-nama');
+      if (namaInput) {
+        namaInput.addEventListener('input', () => {
+          const match = WALLET_PRESETS.find(
+            p => p.nama.toLowerCase() === namaInput.value.trim().toLowerCase()
+          );
+          namaInput.dataset.resolvedIcon = match ? match.icon : '';
+          namaInput.dataset.resolvedId   = match ? match.id   : '';
         });
-      });
+      }
 
       // Currency select — update symbol prefix saat user ganti currency
       const currencySelect = document.getElementById('bs-wallet-currency');
@@ -98,9 +89,11 @@ function _showWalletSheet(idx) {
       const currency = document.getElementById('bs-wallet-currency')?.value || baseCode;
       if (!nama) return 'Nama dompet tidak boleh kosong.';
 
-      const selectedPreset = document.querySelector('#bs-wallet-preset-grid .wallet-preset-tile.selected');
-      const icon = selectedPreset?.dataset.presetIcon || w?.icon || '💳';
-      const id   = w?.id || selectedPreset?.dataset.presetId || generateId();
+      const matched = WALLET_PRESETS.find(
+        p => p.nama.toLowerCase() === nama.toLowerCase()
+      );
+      const icon = matched?.icon || w?.icon || '💳';
+      const id   = w?.id || matched?.id || generateId();
 
       if (isEdit) {
         wallets[idx] = { ...w, nama, icon, saldo_awal: saldo, currency };

@@ -506,3 +506,16 @@
   background-position: center;
   background-size: 11px;
 }
+
+/* ===== BOTTOM SHEET WALLET FORM ===== */
+.bs-wallet-currency-select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  appearance: auto;
+}
