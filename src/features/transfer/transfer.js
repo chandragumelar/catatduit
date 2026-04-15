@@ -33,9 +33,18 @@ function openTransferSheet() {
 
 // ===== RENDER =====
 
+function _buildToOptions(wallets, fromId) {
+  const fromCur = getWalletCurrency(wallets.find(w => w.id === fromId));
+  const eligible = wallets.filter(w => w.id !== fromId && getWalletCurrency(w) === fromCur);
+  if (!eligible.length) return `<option value="" disabled>Tidak ada dompet dengan mata uang yang sama</option>`;
+  return eligible.map(w => {
+    const sym = getCurrencySymbolByCode(getWalletCurrency(w));
+    return `<option value="${w.id}">${w.icon} ${escHtml(w.nama)} (${sym})</option>`;
+  }).join('');
+}
+
 function _renderTransferSheet(wallets) {
   const defaultFrom  = wallets[0].id;
-  const defaultTo    = wallets[1].id;
   const fromWallet   = wallets[0];
   const fromCurrency = getWalletCurrency(fromWallet);
   const fromSym      = getCurrencySymbolByCode(fromCurrency);
@@ -63,10 +72,7 @@ function _renderTransferSheet(wallets) {
       <div class="bottom-sheet-field">
         <label class="input-label">Ke dompet</label>
         <select id="tf-to" class="input-field">
-          ${wallets.map(w => {
-            const sym = getCurrencySymbolByCode(getWalletCurrency(w));
-            return `<option value="${w.id}" ${w.id === defaultTo ? 'selected' : ''}>${w.icon} ${escHtml(w.nama)} (${sym})</option>`;
-          }).join('')}
+          ${_buildToOptions(wallets, defaultFrom)}
         </select>
         <div class="tf-saldo-hint" id="tf-to-saldo"></div>
       </div>
@@ -123,36 +129,36 @@ function _initTransferSheetLogic(wallets) {
   const _updateHints = () => {
     _updateSaldoHint('tf-from-saldo', fromEl.value, wallets);
     _updateSaldoHint('tf-to-saldo',   toEl.value,   wallets);
-    _validateNominalHint(nominalEl.value, fromEl.value);
+    _validateNominalHint(nominalEl.value, fromEl.value, wallets);
     _updateFromCurrencyPrefix();
   };
 
-  fromEl.addEventListener('change', () => {
-    if (fromEl.value === toEl.value) {
-      const altWallet = wallets.find(w => w.id !== fromEl.value);
-      if (altWallet) toEl.value = altWallet.id;
-    }
+  const _rebuildToOptions = () => {
+    const prevToId = toEl.value;
+    toEl.innerHTML = _buildToOptions(wallets, fromEl.value);
+    if (toEl.querySelector(`option[value="${prevToId}"]`)) toEl.value = prevToId;
     _updateHints();
-  });
+  };
+
+  fromEl.addEventListener('change', _rebuildToOptions);
 
   toEl.addEventListener('change', () => {
-    if (fromEl.value === toEl.value) {
-      const altWallet = wallets.find(w => w.id !== toEl.value);
-      if (altWallet) fromEl.value = altWallet.id;
-    }
     _updateHints();
   });
 
   nominalEl.addEventListener('input', () => {
     const raw = nominalEl.value.replace(/\D/g, '');
     nominalEl.value = raw ? formatNominalInput(Math.min(parseInt(raw, 10), MAX_NOMINAL)) : '';
-    _validateNominalHint(nominalEl.value, fromEl.value);
+    _validateNominalHint(nominalEl.value, fromEl.value, wallets);
   });
 
   swapBtn.addEventListener('click', () => {
-    const tmp = fromEl.value;
-    fromEl.value = toEl.value;
-    toEl.value   = tmp;
+    const prevFrom = fromEl.value;
+    const prevTo   = toEl.value;
+    if (!prevTo) return; // no eligible target, nothing to swap
+    fromEl.value = prevTo;
+    toEl.innerHTML = _buildToOptions(wallets, fromEl.value);
+    if (toEl.querySelector(`option[value="${prevFrom}"]`)) toEl.value = prevFrom;
     _updateHints();
   });
 
@@ -170,17 +176,20 @@ function _updateSaldoHint(elId, walletId, wallets) {
   el.style.color = saldo < 0 ? 'var(--danger)' : 'var(--text-muted)';
 }
 
-function _validateNominalHint(nominalStr, fromWalletId) {
+function _validateNominalHint(nominalStr, fromWalletId, wallets) {
   const hint = document.getElementById('tf-nominal-hint');
   if (!hint) return;
   const nominal = parseNominal(nominalStr);
   if (!nominal) { hint.textContent = ''; return; }
-  const saldo = getSaldoWallet(fromWalletId);
+  const saldo  = getSaldoWallet(fromWalletId);
+  const fromW  = wallets ? wallets.find(w => w.id === fromWalletId) : null;
+  const wCur   = fromW ? getWalletCurrency(fromW) : null;
+  const fmt    = (v) => wCur ? formatWithCurrency(v, wCur) : formatRupiah(v);
   if (nominal > saldo) {
-    hint.textContent = `⚠️ Nominal melebihi saldo (${formatRupiah(saldo)})`;
+    hint.textContent = `⚠️ Nominal melebihi saldo (${fmt(saldo)})`;
     hint.style.color = 'var(--warning)';
   } else {
-    hint.textContent = `Sisa setelah transfer: ${formatRupiah(saldo - nominal)}`;
+    hint.textContent = `Sisa setelah transfer: ${fmt(saldo - nominal)}`;
     hint.style.color = 'var(--text-muted)';
   }
 }
@@ -200,6 +209,9 @@ function _handleTransferConfirm(wallets) {
   const fromWallet = wallets.find(w => w.id === fromId);
   const toWallet   = wallets.find(w => w.id === toId);
   const fromCur    = getWalletCurrency(fromWallet);
+  const toCur      = getWalletCurrency(toWallet);
+
+  if (fromCur !== toCur) return `Transfer hanya bisa antar dompet dengan mata uang yang sama (${fromCur} ≠ ${toCur}).`;
 
   const ok = saveTransferAtomic({ fromWalletId: fromId, toWalletId: toId, nominal, tanggal, catatan });
 
