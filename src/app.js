@@ -225,7 +225,8 @@ function _stepSaldo() {
     ..._ob.customWallets.filter(Boolean).map((w, i) => ({ id: `custom_${i}`, ...w })),
   ];
 
-  const baseCurrency = getData(STORAGE_KEYS.CURRENCY, 'IDR');
+  // Gunakan setting currency yang sudah ada, fallback IDR hanya kalau belum pernah di-set
+  const baseCurrency = getData(STORAGE_KEYS.CURRENCY, null) || 'IDR';
 
   const el = document.createElement('div');
   el.className = 'onboarding-card';
@@ -251,7 +252,7 @@ function _stepSaldo() {
     row.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
         <label class="ob-saldo-label" style="margin:0;">${wallet.icon} ${escHtml(wallet.nama)}</label>
-        <select class="ob-wallet-currency" style="font-size:12px;padding:2px 6px;border:1px solid var(--gray-200);border-radius:6px;background:var(--surface);color:var(--text-primary);cursor:pointer;">
+        <select class="ob-wallet-currency">
           ${currencyOptsHtml(baseCurrency)}
         </select>
       </div>
@@ -269,16 +270,15 @@ function _stepSaldo() {
     // Per-wallet currency change → update symbol + enforce max 1 foreign currency
     row.querySelector('.ob-wallet-currency').addEventListener('change', (e) => {
       const newCode = e.target.value;
-      const base = getData(STORAGE_KEYS.CURRENCY, 'IDR');
 
-      // If this wallet goes foreign, reset any other foreign wallet back to base
-      if (newCode !== base) {
+      // Kalau wallet ini jadi foreign, reset wallet lain yang foreign ke baseCurrency
+      if (newCode !== baseCurrency) {
         fieldsWrap.querySelectorAll('.ob-saldo-row').forEach(otherRow => {
           if (otherRow === row) return;
           const otherSel = otherRow.querySelector('.ob-wallet-currency');
-          if (otherSel && otherSel.value !== base) {
-            otherSel.value = base;
-            otherRow.querySelector('.nominal-prefix').textContent = getCurrencySymbolByCode(base);
+          if (otherSel && otherSel.value !== baseCurrency) {
+            otherSel.value = baseCurrency;
+            otherRow.querySelector('.nominal-prefix').textContent = getCurrencySymbolByCode(baseCurrency);
           }
         });
       }
@@ -290,25 +290,37 @@ function _stepSaldo() {
   });
 
   el.querySelector('#ob-btn-selesai').addEventListener('click', () => {
-    const base = getData(STORAGE_KEYS.CURRENCY, 'IDR');
     const wallets = [];
     let foreignCode = null;
+    const allCurrencies = new Set();
 
     fieldsWrap.querySelectorAll('.ob-saldo-row').forEach(row => {
       const wid = row.dataset.walletId;
       const wallet = selectedWallets.find(w => w.id === wid);
       if (!wallet) return;
       const saldo = parseNominal(row.querySelector('.ob-saldo-input')?.value || '0');
-      const currency = row.querySelector('.ob-wallet-currency')?.value || base;
-      if (currency !== base) foreignCode = currency;
+      const currency = row.querySelector('.ob-wallet-currency')?.value || baseCurrency;
+      allCurrencies.add(currency);
       wallets.push({ id: wallet.id, nama: wallet.nama, icon: wallet.icon, saldo_awal: saldo, currency, hidden: false });
     });
 
-    // Auto-enable multicurrency if any wallet has foreign currency
+    // Tentukan base = currency yang paling banyak, atau pertama jika sama
+    // Simple: anggap semua wallet currency pertama sebagai base
+    const dominantBase = wallets[0]?.currency || 'IDR';
+    const hasBase = wallets.some(w => w.currency === dominantBase);
+
+    // Set base currency ke storage supaya getBaseCurrency() konsisten
+    setData(STORAGE_KEYS.CURRENCY, dominantBase);
+
+    // Auto-enable multicurrency kalau ada lebih dari 1 currency
+    allCurrencies.delete(dominantBase);
+    foreignCode = allCurrencies.size > 0 ? [...allCurrencies][0] : null;
+
     if (foreignCode) {
       setMulticurrencyEnabled(true);
       setSecondaryCurrency(foreignCode);
-      setActiveCurrencyToggle('base');
+      // Toggle ke base hanya kalau ada wallet base, kalau tidak ke secondary
+      setActiveCurrencyToggle(hasBase ? 'base' : 'secondary');
     }
 
     saveWallets(wallets);

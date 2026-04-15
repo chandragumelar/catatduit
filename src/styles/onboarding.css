@@ -210,6 +210,17 @@
 }
 
 
+/* ===== ONBOARDING WALLET CURRENCY SELECT ===== */
+.ob-wallet-currency {
+  font-size: 12px;
+  padding: 2px 6px;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
 /* ===== ONBOARDING BACK BANNER ===== */
 .onboarding-back-banner {
   display: flex;

@@ -104,12 +104,10 @@ function renderDashboard() {
     push(DASHBOARD_CARDS.BOROS, buildSpendingCard(calc, 'monthly'), 55);
   }
 
-  // — Budget (selalu di bawah card BOROS/priority 55)
-  // Jebol → 56, warning → 57, normal → 60
-  // Tidak boleh naik ke atas card lain meskipun ada kondisi jebol
+  // — Budget (naik ke 3 kalau jebol, 5 kalau warning)
   const budgetEl = document.createElement('div');
   try { renderBudgetSection(budgetEl); } catch {}
-  push(DASHBOARD_CARDS.BUDGET, budgetEl, hasBudgetJebol ? 56 : hasBudgetWarn ? 57 : 60);
+  push(DASHBOARD_CARDS.BUDGET, budgetEl, hasBudgetJebol ? 3 : hasBudgetWarn ? 5 : 60);
 
   // — Charts (collapsible)
   const chartsEl = _makeCollapsibleCard({
@@ -216,13 +214,6 @@ function _initCurrencyToggleEvents() {
 
   if (!isMulticurrencyEnabled() || !getSecondaryCurrency()) {
     wrap.innerHTML = '';
-    return;
-  }
-
-  // Kalau tidak ada wallet base, sembunyikan toggle dan paksa ke secondary
-  if (getBaseWallets().length === 0) {
-    wrap.innerHTML = '';
-    setActiveCurrencyToggle('secondary');
     return;
   }
 
