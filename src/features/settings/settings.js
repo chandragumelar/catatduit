@@ -71,20 +71,6 @@ function _initSettingsEvents(txList, wallets) {
   document.getElementById('btn-add-wallet')?.addEventListener('click', () => _showWalletSheet(null));
   document.getElementById('btn-go-kategori')?.addEventListener('click', () => navigateTo('kategori'));
 
-  // Multicurrency events
-  document.getElementById('multicurrency-toggle-switch')?.addEventListener('change', (e) => {
-    _onMulticurrencyToggle(e.target.checked);
-  });
-
-  document.getElementById('secondary-currency-select')?.addEventListener('change', (e) => {
-    setSecondaryCurrency(e.target.value);
-    // Reset toggle ke base saat ganti secondary currency
-    setActiveCurrencyToggle('base');
-    showToast(`Mata uang kedua: ${e.target.value} ✓`);
-    renderSettings();
-    renderDashboard();
-  });
-
   document.getElementById('btn-export')?.addEventListener('click', () => {
     if (txList.length > 0) exportCSV();
   });
@@ -123,39 +109,6 @@ function _onHapusWallet(idx, wallets) {
     showToast('Dompet dihapus.');
     renderSettings();
   }, 'Ya, Hapus');
-}
-
-
-function _onMulticurrencyToggle(enabled) {
-  if (enabled) {
-    setMulticurrencyEnabled(true);
-    showToast('Multicurrency aktif ✓');
-  } else {
-    // Konfirmasi sebelum nonaktifkan — wallet secondary akan disembunyikan
-    const secWallets = getSecondaryWallets();
-    const msg = secWallets.length > 0
-      ? `Nonaktifkan multicurrency? Dompet ${secWallets.map(w => w.nama).join(', ')} akan disembunyikan sementara — data tidak hilang.`
-      : 'Nonaktifkan multicurrency?';
-    showModal(msg, () => {
-      // Hide secondary wallets, tidak dihapus
-      const allWallets = getWallets();
-      allWallets.forEach(w => {
-        if (w.currency && w.currency === getSecondaryCurrency()) {
-          w.hidden = true;
-        }
-      });
-      saveWallets(allWallets);
-      setMulticurrencyEnabled(false);
-      setActiveCurrencyToggle('base');
-      showToast('Multicurrency dinonaktifkan.');
-      renderSettings();
-      renderDashboard();
-    }, 'Ya, Nonaktifkan');
-    // Kembalikan toggle ke posisi ON jika user cancel
-    const sw = document.getElementById('multicurrency-toggle-switch');
-    if (sw) sw.checked = true;
-  }
-  renderSettings();
 }
 
 // ===== NOTIFIKASI =====

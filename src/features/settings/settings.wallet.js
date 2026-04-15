@@ -101,6 +101,19 @@ function _showWalletSheet(idx) {
         wallets.push({ id, nama, icon, saldo_awal: saldo, currency, hidden: false });
       }
 
+      // Validasi max 2 currency — cek sebelum simpan
+      if (!isEdit) {
+        const currentBase = getBaseCurrency();
+        const existingCurrencies = new Set(wallets.slice(0, -1).map(w => w.currency || currentBase));
+        const isNewCurrency = !existingCurrencies.has(currency);
+        const alreadyHasTwoCurrencies = existingCurrencies.size >= 2;
+        if (isNewCurrency && alreadyHasTwoCurrencies) {
+          wallets.pop();
+          const existing = [...existingCurrencies].join(' dan ');
+          return `CatatDuit hanya mendukung 2 mata uang sekaligus. Kamu sudah punya ${existing} — yuk pilih salah satunya untuk dompet ini.`;
+        }
+      }
+
       saveWallets(wallets);
 
       // Auto-enable multicurrency kalau tambah wallet dengan currency berbeda dari base

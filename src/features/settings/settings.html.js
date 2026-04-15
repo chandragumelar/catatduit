@@ -62,52 +62,6 @@ function _buildSettingsWalletHTML(wallets) {
 }
 
 function _buildSettingsTampilanHTML() {
-  const isMulti      = isMulticurrencyEnabled();
-  const secCode      = getSecondaryCurrency();
-  const baseCode     = getData(STORAGE_KEYS.CURRENCY, 'IDR');
-
-  // Secondary currency options (exclude base)
-  const secOptions = CURRENCY_OPTIONS
-    .filter(c => c.code !== baseCode)
-    .map(c => `<option value="${c.code}" ${secCode === c.code ? 'selected' : ''}>${c.label}</option>`)
-    .join('');
-
-  const multicurrencySection = `
-    <div class="settings-section" id="settings-multicurrency-section">
-      <p class="settings-section-label">Multicurrency</p>
-      <div class="settings-card">
-        <div class="settings-item">
-          <div class="settings-item-left">
-            <div class="settings-item-icon">🌐</div>
-            <div>
-              <div class="settings-item-label">Aktifkan 2 Mata Uang</div>
-              <div class="settings-item-sub settings-item-sub--sm">Punya penghasilan atau tabungan dalam mata uang lain?</div>
-            </div>
-          </div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="multicurrency-toggle-switch" ${isMulti ? 'checked' : ''} />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-
-        ${isMulti ? `
-        <div class="settings-divider"></div>
-        <div class="settings-item">
-          <div class="settings-item-left">
-            <div class="settings-item-icon">💱</div>
-            <div>
-              <div class="settings-item-label">Mata Uang Kedua</div>
-              <div class="settings-item-sub settings-item-sub--sm">Berbeda dari mata uang utama (${baseCode})</div>
-            </div>
-          </div>
-          <select id="secondary-currency-select" class="settings-select">${secOptions}</select>
-        </div>
-
-        ${secCode ? `` : ''}
-        ` : ''}
-      </div>
-      ${isMulti && !secCode ? '<p class="settings-hint-text">Pilih mata uang kedua untuk mengaktifkan fitur multicurrency.</p>' : ''}
-    </div>`;
 
   return `
     <div class="settings-section">
@@ -123,7 +77,7 @@ function _buildSettingsTampilanHTML() {
       </div>
     </div>
 
-    ${multicurrencySection}`;
+    `;
 }
 
 function _buildSettingsDataHTML(txCount) {

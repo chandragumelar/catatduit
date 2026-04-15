@@ -329,43 +329,6 @@
   color: var(--teal);
 }
 
-/* Rate chip — info teks + tombol edit terpisah */
-.currency-rate-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-radius: 20px;
-  border: 1.5px solid var(--gray-300, #d1d5db);
-  background: var(--white);
-  color: var(--text-primary);
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: default;
-  padding: 5px 10px;
-}
-
-.currency-rate-chip-text {
-  padding: 0;
-}
-
-.currency-rate-chip-ubah {
-  padding: 0 0 0 8px;
-  margin-left: 4px;
-  border: none;
-  border-left: 1.5px solid var(--gray-300, #d1d5db);
-  background: transparent;
-  cursor: pointer;
-  font-size: 12px;
-  opacity: 0.55;
-  transition: opacity 0.15s;
-  line-height: 1;
-}
-
-.currency-rate-chip-ubah:hover {
-  opacity: 1;
-}
-
 /* Cross-currency transfer info */
 .tf-cross-info {
   display: flex;
@@ -403,52 +366,7 @@
   margin-left: 4px;
 }
 
-/* Toggle switch (untuk settings multicurrency) */
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: var(--gray-300, #d1d5db);
-  border-radius: 24px;
-  transition: 0.2s;
-}
-
-.toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background: white;
-  border-radius: 50%;
-  transition: 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.toggle-switch input:checked + .toggle-slider {
-  background: var(--teal);
-}
-
-.toggle-switch input:checked + .toggle-slider:before {
-  transform: translateX(20px);
-}
-
-/* Settings hint text */
+/* Settings hint text (reserved) */
 .settings-hint-text {
   font-size: 12px;
   color: var(--text-secondary);
