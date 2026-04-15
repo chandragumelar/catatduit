@@ -110,6 +110,19 @@ function _showWalletSheet(idx) {
 
       saveWallets(wallets);
 
+      // Auto-enable multicurrency kalau tambah wallet dengan currency berbeda dari base
+      if (!isEdit) {
+        const currentBase = getBaseCurrency();
+        const allCurrencies = new Set(wallets.map(w => w.currency || currentBase));
+        allCurrencies.delete(currentBase);
+        const foreignCode = allCurrencies.size > 0 ? [...allCurrencies][0] : null;
+        if (foreignCode) {
+          setMulticurrencyEnabled(true);
+          setSecondaryCurrency(foreignCode);
+          setActiveCurrencyToggle('base');
+        }
+      }
+
       // Sync base currency kalau wallet pertama (dominantBase) ganti currency
       if (isEdit && idx === 0 && currency !== getBaseCurrency()) {
         setData(STORAGE_KEYS.CURRENCY, currency);
