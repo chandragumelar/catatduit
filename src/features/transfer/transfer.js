@@ -28,6 +28,15 @@ function openTransferSheet() {
     return;
   }
 
+  const hasSameCurrencyPair = wallets.some(w =>
+    wallets.some(other => other.id !== w.id && getWalletCurrency(other) === getWalletCurrency(w))
+  );
+
+  if (!hasSameCurrencyPair) {
+    showToast('Transfer hanya bisa antar dompet dengan mata uang yang sama. Tambah dompet Rupiah lain untuk bisa transfer antar dompet Rupiah, atau dompet USD lain untuk USD.', 5000);
+    return;
+  }
+
   _renderTransferSheet(wallets);
 }
 
