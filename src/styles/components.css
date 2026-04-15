@@ -211,6 +211,7 @@
 .bottom-sheet-actions .btn-secondary,
 .bottom-sheet-actions .btn-primary {
   flex: 1;
+  width: auto;
 }
 
 /* ===== STORAGE INDICATOR ===== */
