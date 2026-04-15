@@ -219,6 +219,13 @@ function _initCurrencyToggleEvents() {
     return;
   }
 
+  // Kalau tidak ada wallet base, sembunyikan toggle dan paksa ke secondary
+  if (getBaseWallets().length === 0) {
+    wrap.innerHTML = '';
+    setActiveCurrencyToggle('secondary');
+    return;
+  }
+
   wrap.innerHTML = buildCurrencyToggleHTML();
 
   // Set CSS vars untuk lebar thumb sesuai teks label masing-masing btn
