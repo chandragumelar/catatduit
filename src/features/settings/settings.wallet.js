@@ -5,6 +5,31 @@
 // =============================================================================
 
 
+// Re-evaluate dan sync multicurrency state berdasarkan actual wallet list.
+// Dipanggil setelah tambah atau edit wallet — satu-satunya sumber kebenaran.
+function _syncMulticurrencyState(wallets) {
+  const baseCode = getBaseCurrency();
+  const allCurrencies = new Set(wallets.map(w => w.currency || baseCode));
+  allCurrencies.delete(baseCode);
+  const foreignCode = allCurrencies.size > 0 ? [...allCurrencies][0] : null;
+
+  if (foreignCode) {
+    // Ada 2 currency → enable multicurrency
+    const prevSecondary = getSecondaryCurrency();
+    setMulticurrencyEnabled(true);
+    setSecondaryCurrency(foreignCode);
+    // Reset toggle ke base hanya kalau secondary berubah (cegah reset user preference)
+    if (prevSecondary !== foreignCode) {
+      setActiveCurrencyToggle('base');
+    }
+  } else {
+    // Semua wallet pakai 1 currency → disable multicurrency
+    setMulticurrencyEnabled(false);
+    setSecondaryCurrency(null);
+    setActiveCurrencyToggle('base');
+  }
+}
+
 function _showWalletSheet(idx) {
   const wallets  = getWallets();
   const isEdit   = idx !== null;
@@ -116,29 +141,13 @@ function _showWalletSheet(idx) {
 
       saveWallets(wallets);
 
-      // Auto-enable multicurrency kalau tambah wallet dengan currency berbeda dari base
-      if (!isEdit) {
-        const currentBase = getBaseCurrency();
-        const allCurrencies = new Set(wallets.map(w => w.currency || currentBase));
-        allCurrencies.delete(currentBase);
-        const foreignCode = allCurrencies.size > 0 ? [...allCurrencies][0] : null;
-        if (foreignCode) {
-          setMulticurrencyEnabled(true);
-          setSecondaryCurrency(foreignCode);
-          setActiveCurrencyToggle('base');
-        }
-      }
-
       // Sync base currency kalau wallet pertama (dominantBase) ganti currency
       if (isEdit && idx === 0 && currency !== getBaseCurrency()) {
         setData(STORAGE_KEYS.CURRENCY, currency);
-        // Cegah collision: kalau new base == secondary, matikan multicurrency
-        if (currency === getSecondaryCurrency()) {
-          setSecondaryCurrency(null);
-          setMulticurrencyEnabled(false);
-          setActiveCurrencyToggle('base');
-        }
       }
+
+      // Re-evaluate multicurrency state berdasarkan actual wallets setelah save
+      _syncMulticurrencyState(wallets);
 
       showToast(isEdit ? 'Dompet diperbarui.' : 'Dompet ditambahkan!');
       renderSettings();
