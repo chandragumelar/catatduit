@@ -8,13 +8,15 @@
 // Re-evaluate dan sync multicurrency state berdasarkan actual wallet list.
 // Dipanggil setelah tambah, edit, atau hapus wallet — satu-satunya sumber kebenaran.
 function _syncMulticurrencyState(wallets) {
-  const baseCode = getBaseCurrency();
-  // Hitung unique currency dari wallet aktual — tidak asumsi base ada di list
-  const uniqueCurrencies = new Set(wallets.map(w => w.currency || baseCode));
+  // Base selalu = currency wallet pertama yang ada
+  const newBase = wallets[0]?.currency || getBaseCurrency();
+  // Selalu sync cd_currency ke base aktual
+  setData(STORAGE_KEYS.CURRENCY, newBase);
+
+  const uniqueCurrencies = new Set(wallets.map(w => w.currency || newBase));
 
   if (uniqueCurrencies.size >= 2) {
     // Ada 2 currency berbeda → enable multicurrency
-    const newBase = wallets[0]?.currency || baseCode;
     const foreignCode = [...uniqueCurrencies].find(c => c !== newBase) || null;
     const prevSecondary = getSecondaryCurrency();
     setMulticurrencyEnabled(true);
@@ -142,12 +144,8 @@ function _showWalletSheet(idx) {
 
       saveWallets(wallets);
 
-      // Sync base currency kalau wallet pertama (dominantBase) ganti currency
-      if (isEdit && idx === 0 && currency !== getBaseCurrency()) {
-        setData(STORAGE_KEYS.CURRENCY, currency);
-      }
-
       // Re-evaluate multicurrency state berdasarkan actual wallets setelah save
+      // (termasuk sync cd_currency ke wallet[0])
       _syncMulticurrencyState(wallets);
 
       showToast(isEdit ? 'Dompet diperbarui.' : 'Dompet ditambahkan!');
