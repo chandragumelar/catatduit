@@ -6,19 +6,20 @@
 
 
 // Re-evaluate dan sync multicurrency state berdasarkan actual wallet list.
-// Dipanggil setelah tambah atau edit wallet — satu-satunya sumber kebenaran.
+// Dipanggil setelah tambah, edit, atau hapus wallet — satu-satunya sumber kebenaran.
 function _syncMulticurrencyState(wallets) {
   const baseCode = getBaseCurrency();
-  const allCurrencies = new Set(wallets.map(w => w.currency || baseCode));
-  allCurrencies.delete(baseCode);
-  const foreignCode = allCurrencies.size > 0 ? [...allCurrencies][0] : null;
+  // Hitung unique currency dari wallet aktual — tidak asumsi base ada di list
+  const uniqueCurrencies = new Set(wallets.map(w => w.currency || baseCode));
 
-  if (foreignCode) {
-    // Ada 2 currency → enable multicurrency
+  if (uniqueCurrencies.size >= 2) {
+    // Ada 2 currency berbeda → enable multicurrency
+    const newBase = wallets[0]?.currency || baseCode;
+    const foreignCode = [...uniqueCurrencies].find(c => c !== newBase) || null;
     const prevSecondary = getSecondaryCurrency();
     setMulticurrencyEnabled(true);
     setSecondaryCurrency(foreignCode);
-    // Reset toggle ke base hanya kalau secondary berubah (cegah reset user preference)
+    // Reset toggle ke base hanya kalau secondary berubah
     if (prevSecondary !== foreignCode) {
       setActiveCurrencyToggle('base');
     }
