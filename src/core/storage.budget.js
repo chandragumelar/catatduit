@@ -95,7 +95,7 @@ function calcBudgetStatus() {
     if (!limit || limit <= 0) continue;
     const used   = txInPeriod.filter(tx => tx.kategori === katId).reduce((s, tx) => s + tx.nominal, 0);
     const pct    = Math.round((used / limit) * 100);
-    const status = pct >= 100 ? 'jebol' : pct >= 80 ? 'warning' : 'aman';
+    const status = pct > 100 ? 'jebol' : pct === 100 ? 'pas' : pct >= 80 ? 'warning' : 'aman';
     result[katId] = { limit, used, pct, status, period, periodLabel };
   }
   return result;

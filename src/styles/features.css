@@ -324,6 +324,7 @@
   padding: 8px 12px; border-radius: 8px; margin-bottom: 12px;
 }
 .budget-alert.jebol  { background: rgba(226,75,74,0.08);  color: #A32D2D; }
+.budget-alert.pas    { background: rgba(202,138,4,0.08);   color: #92400E; }
 .budget-alert.warning { background: rgba(239,159,39,0.08); color: #854F0B; }
 
 .budget-list { display: flex; flex-direction: column; gap: 14px; }
@@ -336,6 +337,7 @@
 .budget-angka    { font-size: 13px; font-weight: 600; }
 .budget-angka.aman    { color: var(--gray-700); }
 .budget-angka.warning { color: #854F0B; }
+.budget-angka.pas     { color: #92400E; }
 .budget-angka.jebol   { color: #A32D2D; }
 .budget-slash { font-weight: 400; color: var(--gray-400); margin: 0 2px; }
 
@@ -346,6 +348,7 @@
 .budget-bar { height: 100%; border-radius: 3px; transition: width 0.3s; }
 .budget-bar.aman    { background: #1D9E75; }
 .budget-bar.warning { background: #EF9F27; }
+.budget-bar.pas     { background: #CA8A04; }
 .budget-bar.jebol   { background: #E24B4A; }
 
 .budget-row-bottom {
@@ -354,6 +357,7 @@
 .budget-pct  { font-size: 11px; font-weight: 600; }
 .budget-pct.aman    { color: #1D9E75; }
 .budget-pct.warning { color: #EF9F27; }
+.budget-pct.pas     { color: #CA8A04; }
 .budget-pct.jebol   { color: #E24B4A; }
 .budget-sisa { font-size: 11px; color: var(--gray-400); }
 

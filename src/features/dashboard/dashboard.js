@@ -41,6 +41,7 @@ function renderDashboard() {
   // ===== Priority system =====
   const statusMap      = calcBudgetStatus();
   const hasBudgetJebol = Object.values(statusMap).some(s => s.status === 'jebol');
+  const hasBudgetPas   = Object.values(statusMap).some(s => s.status === 'pas');
   const hasBudgetWarn  = Object.values(statusMap).some(s => s.status === 'warning');
   const tomorrow       = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowStr    = tomorrow.toISOString().split('T')[0];
@@ -99,10 +100,6 @@ function renderDashboard() {
   // — Catatan terakhir
   push(DASHBOARD_CARDS.RECENT, buildRecentCard(recentTx), 98);
 
-  // — Kategori terboros / Pengeluaran terbesar (merged card, default monthly)
-  if (borosList.length > 0 || bigSpending.length > 0) {
-    push(DASHBOARD_CARDS.BOROS, buildSpendingCard(calc, 'monthly'), 55);
-  }
 
   // — Budget (naik ke 3 kalau jebol, 5 kalau warning)
   const budgetEl = document.createElement('div');
@@ -143,9 +140,15 @@ function renderDashboard() {
     const jebolNames = Object.entries(statusMap)
       .filter(([, s]) => s.status === 'jebol')
       .map(([id]) => { try { return getKategoriById(id, 'keluar').nama; } catch(e) { return id; } });
-    if (jebolNames.length === 1) _bannerParts.push(`budget ${jebolNames[0]} jebol`);
-    else if (jebolNames.length > 1) _bannerParts.push(`budget ${jebolNames.slice(0,-1).join(', ')} & ${jebolNames[jebolNames.length-1]} jebol`);
-    else _bannerParts.push('budget jebol');
+    if (jebolNames.length === 1) _bannerParts.push(`budget ${jebolNames[0]} terlampaui`);
+    else if (jebolNames.length > 1) _bannerParts.push(`budget ${jebolNames.slice(0,-1).join(', ')} & ${jebolNames[jebolNames.length-1]} terlampaui`);
+    else _bannerParts.push('ada budget yang terlampaui');
+  } else if (hasBudgetPas) {
+    const pasNames = Object.entries(statusMap)
+      .filter(([, s]) => s.status === 'pas')
+      .map(([id]) => { try { return getKategoriById(id, 'keluar').nama; } catch(e) { return id; } });
+    if (pasNames.length === 1) _bannerParts.push(`budget ${pasNames[0]} pas di batas`);
+    else _bannerParts.push(`${pasNames.length} kategori pas di batas budget`);
   }
 
   if (velocityAlert) {

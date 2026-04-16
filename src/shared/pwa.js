@@ -239,7 +239,7 @@ async function _checkBudgetWarningNotif() {
   const alreadySent = notifRecord[monthKey] || [];
 
   const toNotif = Object.entries(statusMap).filter(([katId, s]) =>
-    (s.status === 'warning' || s.status === 'jebol') && !alreadySent.includes(katId)
+    (s.status === 'warning' || s.status === 'pas' || s.status === 'jebol') && !alreadySent.includes(katId)
   );
 
   if (toNotif.length === 0) return;
@@ -249,6 +249,8 @@ async function _checkBudgetWarningNotif() {
       const k = getKategoriById(katId, 'keluar');
       const msg = s.status === 'jebol'
         ? `${k.icon} ${k.nama} sudah melebihi budget bulan ini!`
+        : s.status === 'pas'
+        ? `${k.icon} ${k.nama} pas di batas budget — tidak ada sisa.`
         : `${k.icon} ${k.nama} sudah ${s.pct}% dari budget — hati-hati.`;
       reg.showNotification('⚠️ Budget Alert — CatatDuit', {
         body: msg,

@@ -29,6 +29,7 @@ function renderBudgetSection(container) {
 
   const entries     = Object.entries(statusMap);
   const jebol       = entries.filter(([, s]) => s.status === 'jebol').length;
+  const pas         = entries.filter(([, s]) => s.status === 'pas').length;
   const warning     = entries.filter(([, s]) => s.status === 'warning').length;
   const periodLabel = entries[0]?.[1]?.periodLabel || (period === 'weekly' ? 'Minggu Ini' : 'Bulan Ini');
   const periodBadge = period === 'weekly'
@@ -41,8 +42,9 @@ function renderBudgetSection(container) {
       <button class="btn-kelola" id="btn-kelola-budget">✏️ Kelola</button>
     </div>
     <p class="budget-period-label">${escHtml(periodLabel)}</p>
-    ${jebol > 0 ? `<p class="budget-alert jebol">🔴 ${jebol} kategori sudah melebihi budget!</p>` : ''}
-    ${warning > 0 && jebol === 0 ? `<p class="budget-alert warning">🟠 ${warning} kategori mendekati limit.</p>` : ''}
+    ${jebol > 0 ? `<p class="budget-alert jebol">🔴 ${jebol} kategori melebihi budget!</p>` : ''}
+    ${pas > 0 && jebol === 0 ? `<p class="budget-alert pas">🟡 ${pas} kategori tepat di batas budget.</p>` : ''}
+    ${warning > 0 && jebol === 0 && pas === 0 ? `<p class="budget-alert warning">🟠 ${warning} kategori mendekati limit.</p>` : ''}
     <div class="budget-list" id="budget-list-dashboard">
       ${entries.map(([katId, s]) => _buildBudgetRowHTML(katId, s)).join('')}
     </div>`;
@@ -69,6 +71,8 @@ function _buildBudgetRowHTML(katId, s) {
         <span class="budget-sisa">
           ${s.status === 'jebol'
             ? `Lebih ${formatRupiah(s.used - s.limit)}`
+            : s.status === 'pas'
+            ? `Tidak ada sisa`
             : `Sisa ${formatRupiah(s.limit - s.used)}`}
         </span>
       </div>
@@ -165,8 +169,16 @@ function getBudgetInsight() {
   if (jebol.length > 0) {
     const k = getKategoriById(jebol[0][0], 'keluar');
     return jebol.length === 1
-      ? `Budget ${k.nama} sudah jebol.`
+      ? `Budget ${k.nama} sudah terlampaui.`
       : `${jebol.length} kategori sudah melebihi budget.`;
+  }
+
+  const pas = entries.filter(([, s]) => s.status === 'pas');
+  if (pas.length > 0) {
+    const k = getKategoriById(pas[0][0], 'keluar');
+    return pas.length === 1
+      ? `Budget ${k.nama} pas di batas — tidak ada ruang tersisa.`
+      : `${pas.length} kategori tepat di batas budget.`;
   }
 
   const warning = entries.filter(([, s]) => s.status === 'warning');

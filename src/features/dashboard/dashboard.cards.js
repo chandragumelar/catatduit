@@ -238,7 +238,15 @@ function _buildChartsHTML(calc, katSorted, totalKeluar, borosDay) {
 
   const katH = Math.max(120, katSorted.length * 32);
 
+  // Spending section (Kategori Terboros / Pengeluaran Terbesar) — ikut toggle,
+  // di-wrap dengan data-card-id agar dashboard.chart.js bisa update lewat querySelector
+  const spendingHTML = _buildSpendingCardHTML(calc, 'monthly');
+
   return `
+    <div data-card-id="${DASHBOARD_CARDS.BOROS}" class="chart-block" style="margin-bottom:24px;">
+      ${spendingHTML}
+    </div>
+
     <div class="chart-block">
       <div class="chart-period-wrap">
         <button class="chart-period-btn active" data-period="monthly">Bulanan</button>
