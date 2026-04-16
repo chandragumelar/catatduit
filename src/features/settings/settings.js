@@ -84,6 +84,13 @@ function _initSettingsEvents(txList, wallets) {
 
   document.getElementById('btn-privacy-info')?.addEventListener('click', () => showPrivacyModal());
 
+  document.getElementById('btn-maker-github')?.addEventListener('click', () => {
+    window.open('https://github.com/chandragumelar/catatduit', '_blank', 'noopener');
+  });
+  document.getElementById('btn-maker-x')?.addEventListener('click', () => {
+    window.open('https://x.com/win32_icang', '_blank', 'noopener');
+  });
+
   document.getElementById('btn-reset')?.addEventListener('click', () => {
     showModal('Semua data akan dihapus permanen. Lanjutkan?', () => {
       showModal('Yakin? Tindakan ini tidak bisa dibatalkan.', () => {

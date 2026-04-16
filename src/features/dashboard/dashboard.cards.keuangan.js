@@ -11,8 +11,7 @@ function buildKeuanganCard({
   wallets, estimasiSaldo, totalNabung, totalTagihanBelumBayar,
   tagihanSudahBayar, tagihanBulanIni, uangBebas, bebasDipakai, tagihan,
 }) {
-  const hasRincian = totalTagihanBelumBayar > 0 || totalNabung > 0;
-  const heroAngka  = hasRincian ? bebasDipakai : estimasiSaldo;
+  const heroAngka  = bebasDipakai;
   const heroClass  = heroAngka >= 0 ? 'income' : 'expense';
 
   const card = document.createElement('div');
@@ -71,27 +70,23 @@ function _buildKeuanganHTML({
       </div>`
     : '';
 
-  const tagihanRows = totalTagihanBelumBayar > 0
-    ? `<div class="keuangan-row keuangan-row--minus">
-        <span>Tagihan belum dibayar</span><span>− ${formatRupiah(totalTagihanBelumBayar)}</span>
-      </div>
-      <div class="keuangan-divider"></div>
-      <div class="keuangan-row keuangan-row--result">
-        <span>Setelah tagihan</span>
-        <span class="${uangBebas >= 0 ? 'income' : 'expense'}">${formatRupiah(uangBebas)}</span>
-      </div>`
-    : '';
+  const tagihanRows = `<div class="keuangan-row keuangan-row--minus">
+      <span>Tagihan belum dibayar</span><span>− ${formatRupiah(totalTagihanBelumBayar)}</span>
+    </div>
+    <div class="keuangan-divider"></div>
+    <div class="keuangan-row keuangan-row--result">
+      <span>Setelah tagihan</span>
+      <span class="${uangBebas >= 0 ? 'income' : 'expense'}">${formatRupiah(uangBebas)}</span>
+    </div>`;
 
-  const nabungRows = totalNabung > 0
-    ? `<div class="keuangan-row keuangan-row--minus">
-        <span>Nabung bulan ini</span><span>− ${formatRupiah(totalNabung)}</span>
-      </div>
-      <div class="keuangan-divider"></div>
-      <div class="keuangan-row keuangan-row--result keuangan-row--final">
-        <span>Uang bebas <span style="font-size:10px;font-weight:400;color:var(--gray-400);">· setelah tagihan &amp; nabung</span></span>
-        <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
-      </div>`
-    : '';
+  const nabungRows = `<div class="keuangan-row keuangan-row--minus">
+      <span>Nabung bulan ini</span><span>− ${formatRupiah(totalNabung)}</span>
+    </div>
+    <div class="keuangan-divider"></div>
+    <div class="keuangan-row keuangan-row--result keuangan-row--final">
+      <span>Uang bebas <span style="font-size:10px;font-weight:400;color:var(--gray-400);">· setelah tagihan &amp; nabung</span></span>
+      <span class="${bebasDipakai >= 0 ? 'income' : 'expense'}">${formatRupiah(bebasDipakai)}</span>
+    </div>`;
 
   const tagihanStatus = tagihanBulanIni.length > 0
     ? `<p class="tagihan-paid-status keuangan-row--sub" style="margin-top:4px;">

@@ -149,6 +149,23 @@ function _buildSettingsAboutHTML() {
             </span>
           </div>
         </div>
+        <div class="settings-item" id="btn-maker-github">
+          <div class="settings-item-left">
+            <div class="settings-item-icon">👨‍💻</div>
+            <div>
+              <span class="settings-item-label">Dibuat oleh Chandra Gumelar</span>
+              <span class="settings-item-label--hint" style="display:block;font-size:11px;margin-top:1px;">Lihat source code di GitHub</span>
+            </div>
+          </div>
+          <div class="settings-item-arrow"><i data-lucide="chevron-right"></i></div>
+        </div>
+        <div class="settings-item" id="btn-maker-x">
+          <div class="settings-item-left">
+            <div class="settings-item-icon">𝕏</div>
+            <span class="settings-item-label">@win32_icang</span>
+          </div>
+          <div class="settings-item-arrow"><i data-lucide="chevron-right"></i></div>
+        </div>
       </div>
     </div>`;
 }

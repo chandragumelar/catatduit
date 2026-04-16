@@ -256,13 +256,13 @@ function renderHealthScore(container) {
     const pct = Math.round((scoreData.hariAdaTx / scoreData.threshold) * 100);
     const sisaHari = scoreData.threshold - scoreData.hariAdaTx;
     const warmupTitle = scoreData.hariAdaTx === 0
-      ? 'Financial Health Score butuh beberapa hari data'
+      ? 'Skor keuanganmu lagi warming up ☀️'
       : sisaHari === 1
-        ? 'Skor keuanganmu hampir siap — 1 hari lagi!'
-        : `Skor keuanganmu siap dalam ${sisaHari} hari`;
+        ? 'Skor keuanganmu hampir jadi — 1 hari lagi!'
+        : `Tinggal ${sisaHari} hari lagi buat unlock skor keuanganmu`;
     const warmupSub = scoreData.hariAdaTx === 0
-      ? `Catat transaksi selama ${scoreData.threshold} hari, lalu skor kesehatan keuanganmu akan dihitung otomatis dari cashflow, tabungan, dan tagihan.`
-      : `Catat terus — butuh ${sisaHari} hari lagi supaya datanya cukup untuk menilai cashflow, tabungan, dan tagihan kamu secara akurat.`;
+      ? `Catat transaksi ${scoreData.threshold} hari berturut-turut, nanti CatatDuit otomatis hitung skor dari cashflow, kebiasaan nabung, dan tagihan kamu.`
+      : `Lanjut catat terus ya — data ${sisaHari} hari lagi cukup buat CatatDuit kasih gambaran akurat kondisi keuanganmu.`;
     const el = document.createElement('div');
     el.className = 'card health-score-card';
     el.innerHTML = `
