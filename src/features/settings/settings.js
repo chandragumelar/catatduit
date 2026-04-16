@@ -113,6 +113,7 @@ function _onHapusWallet(idx, wallets) {
   showModal(msg, () => {
     wallets.splice(idx, 1);
     saveWallets(wallets);
+    _syncMulticurrencyState(wallets);
     showToast('Dompet dihapus.');
     renderSettings();
   }, 'Ya, Hapus');
