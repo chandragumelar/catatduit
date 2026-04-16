@@ -96,7 +96,7 @@ function isCardCollapsed(cardId) {
 
 // ===== SUPPORT BANNER =====
 
-const SUPPORT_BANNER_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 7 hari
+const SUPPORT_BANNER_INTERVAL_MS = 3 * 24 * 60 * 60 * 1000; // 3 hari
 
 function shouldShowSupportBanner() {
   const ts = getData(STORAGE_KEYS.SUPPORT_BANNER, null);
