@@ -115,9 +115,16 @@ function _showUpdateBanner(worker) {
 
   document.body.insertAdjacentElement('afterbegin', banner);
 
+  // Daftarkan controllerchange SEBELUM postMessage supaya tidak race condition —
+  // controllerchange bisa fired sangat cepat setelah skipWaiting() dipanggil.
+  navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+
   document.getElementById('pwa-update-confirm')?.addEventListener('click', () => {
-    worker.postMessage({ type: 'SKIP_WAITING' });
-    navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+    // Pakai reg.waiting sebagai fallback kalau referensi worker sudah stale
+    navigator.serviceWorker.ready.then(reg => {
+      const target = reg.waiting || worker;
+      target?.postMessage({ type: 'SKIP_WAITING' });
+    });
   });
 }
 
