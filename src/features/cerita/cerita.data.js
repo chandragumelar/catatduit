@@ -46,7 +46,7 @@ function calcCeritaData(year, month) {
   };
 
   const persona   = getPersona(base);
-  const shareText = buildShareText({ ...base });
+  const shareText = buildShareText({ ...base, persona });
   return { ready: true, ...base, persona, shareText };
 }
 

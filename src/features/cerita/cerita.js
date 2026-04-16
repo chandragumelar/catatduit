@@ -58,7 +58,7 @@ function _buildMonthSelect(year, month) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const y = d.getFullYear(), m = d.getMonth();
     const txCount = getTransaksi().filter(tx => isSameMonth(tx.tanggal, y, m)).length;
-    if (txCount > 0) {
+    if (txCount >= CERITA_MIN_TX) {
       const sel = y === year && m === month ? 'selected' : '';
       options.push(`<option value="${y}-${m}" ${sel}>${BULAN_NAMES[m]} ${y}</option>`);
     }

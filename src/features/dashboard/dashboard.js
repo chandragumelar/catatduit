@@ -67,7 +67,7 @@ function renderDashboard() {
     estimasiSaldo, totalNabung, totalTagihanBelumBayar,
     tagihanSudahBayar, tagihanBulanIni, uangBebas, bebasDipakai, tagihan,
   }));
-  push(DASHBOARD_CARDS.KEUANGAN, keuanganEl, tagihanMendekat ? 1 : 20);
+  push(DASHBOARD_CARDS.KEUANGAN, keuanganEl, 20);
 
   // — Health Score
   const healthEl = document.createElement('div');
@@ -77,7 +77,7 @@ function renderDashboard() {
   // — Cerita card
   const ceritaEl = document.createElement('div');
   try { renderCeritaCard(ceritaEl); } catch {}
-  push(DASHBOARD_CARDS.CERITA, ceritaEl, 30);
+  if (ceritaEl.hasChildNodes()) push(DASHBOARD_CARDS.CERITA, ceritaEl, 30);
 
   // — Daily check-in
   if (!sudahCatatHariIni) {
@@ -90,7 +90,7 @@ function renderDashboard() {
 
   // — Velocity alert (naik ke 2 kalau aktif)
   if (velocityAlert) {
-    push(DASHBOARD_CARDS.VELOCITY, buildVelocityCard(velocityAlert), 2);
+    push(DASHBOARD_CARDS.VELOCITY, buildVelocityCard(velocityAlert), 4);
   }
 
   // — Cashflow summary
@@ -107,7 +107,7 @@ function renderDashboard() {
   // — Budget (naik ke 3 kalau jebol, 5 kalau warning)
   const budgetEl = document.createElement('div');
   try { renderBudgetSection(budgetEl); } catch {}
-  push(DASHBOARD_CARDS.BUDGET, budgetEl, hasBudgetJebol ? 3 : hasBudgetWarn ? 5 : 60);
+  push(DASHBOARD_CARDS.BUDGET, budgetEl, 60);
 
   // — Charts (collapsible)
   const chartsEl = _makeCollapsibleCard({

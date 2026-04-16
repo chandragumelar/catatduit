@@ -297,7 +297,7 @@ function buildSupportBannerCard() {
         <div class="support-banner-icon">☕</div>
         <span class="support-banner-title">CatatDuit gratis selamanya</span>
       </div>
-      <p class="support-banner-body">CatatDuit gratis selamanya. Support kecil dari kamu sangat berarti 🙏</p>
+      <p class="support-banner-body">Support kecil dari kamu sangat berarti — bantu app ini untuk terus berkembang 🙏</p>
       <div class="support-banner-actions">
         <a class="support-banner-btn support-banner-btn--primary" href="https://trakteer.id/win32_icang/gift" target="_blank" rel="noopener">Trakteer</a>
         <a class="support-banner-btn support-banner-btn--secondary" href="https://saweria.co/win32icang" target="_blank" rel="noopener">Saweria</a>
