@@ -21,30 +21,54 @@ function generateShareImage(data, bulanNama, year) {
 }
 
 function _svgToPng(svgStr, filename) {
-  const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
-  const url  = URL.createObjectURL(blob);
-  const img  = new Image();
+  // Gunakan data URI bukan blob URL — lebih reliable untuk SVG→canvas cross-browser
+  const dataUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+  const img     = new Image();
 
   img.onload = () => {
     const canvas  = document.createElement('canvas');
     canvas.width  = SHARE_W;
     canvas.height = SHARE_H;
-    canvas.getContext('2d').drawImage(img, 0, 0);
-    URL.revokeObjectURL(url);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
 
-    canvas.toBlob(pngBlob => {
-      const a   = document.createElement('a');
-      a.href     = URL.createObjectURL(pngBlob);
-      a.download = filename;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-    }, 'image/png');
+    // toBlob lebih efisien, tapi fallback ke toDataURL kalau null (low-memory device)
+    try {
+      canvas.toBlob(pngBlob => {
+        if (!pngBlob) {
+          _downloadViaDataUrl(canvas, filename);
+          return;
+        }
+        const blobUrl = URL.createObjectURL(pngBlob);
+        _triggerDownload(blobUrl, filename);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+      }, 'image/png');
+    } catch (e) {
+      _downloadViaDataUrl(canvas, filename);
+    }
   };
 
   img.onerror = () => {
-    URL.revokeObjectURL(url);
     showToast('Gagal generate gambar. Coba lagi.');
   };
 
-  img.src = url;
+  img.src = dataUri;
+}
+
+function _triggerDownload(href, filename) {
+  const a   = document.createElement('a');
+  a.href     = href;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function _downloadViaDataUrl(canvas, filename) {
+  try {
+    const dataUrl = canvas.toDataURL('image/png');
+    _triggerDownload(dataUrl, filename);
+  } catch (e) {
+    showToast('Gagal generate gambar. Coba lagi.');
+  }
 }

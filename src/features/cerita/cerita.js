@@ -6,6 +6,8 @@
 
 // Dependencies: cerita.data.js, cerita.slides.js, cerita.share.js
 
+const CERITA_ENABLED = false; // set true untuk aktifkan fitur Cerita
+
 function openCerita(year, month) {
   document.getElementById('cerita-overlay')?.remove();
 
@@ -82,6 +84,7 @@ function _renderEmpty(data) {
 // ===== DASHBOARD CARD =====
 
 function renderCeritaCard(container) {
+  if (!CERITA_ENABLED) return;
   const { year, month } = getCurrentMonthYear();
   const txBulanIni = getTransaksi().filter(tx => isSameMonth(tx.tanggal, year, month));
   if (txBulanIni.length < CERITA_MIN_TX) return;
