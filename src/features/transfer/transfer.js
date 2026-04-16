@@ -10,13 +10,17 @@ function openTransferSheet() {
   const wallets = getWallets().filter(w => !w.hidden);
 
   if (wallets.length < 2) {
+    const onlyWallet = wallets[0];
+    const onlyCur    = onlyWallet ? getWalletCurrency(onlyWallet) : null;
+    const onlySym    = onlyCur ? getCurrencySymbolByCode(onlyCur) : '';
+    const curLabel   = onlyCur ? `${onlyCur} (${onlySym})` : 'mata uang yang sama';
     _openBottomSheet({
       title: 'Pindah Dompet',
       fields: `
         <div style="text-align:center; padding: 8px 0 16px;">
-          <div style="font-size: 2rem; margin-bottom: 12px;">💡</div>
+          <div style="font-size: 2rem; margin-bottom: 12px;">&#128161;</div>
           <p style="margin: 0 0 8px; font-weight: 600; color: var(--text);">Tambah satu dompet lagi</p>
-          <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Fitur transfer bisa dipakai setelah kamu punya minimal 2 dompet.</p>
+          <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Fitur transfer hanya bisa antar dompet dengan mata uang yang sama. Tambah dompet <strong>${curLabel}</strong> lain untuk mulai pakai fitur ini.</p>
         </div>
       `,
       confirmText: '+ Tambah Dompet',
@@ -33,7 +37,26 @@ function openTransferSheet() {
   );
 
   if (!hasSameCurrencyPair) {
-    showToast('Transfer hanya bisa antar dompet dengan mata uang yang sama. Tambah dompet Rupiah lain untuk bisa transfer antar dompet Rupiah, atau dompet USD lain untuk USD.', 5000);
+    const currencies = [...new Set(wallets.map(w => {
+      const cur = getWalletCurrency(w);
+      const sym = getCurrencySymbolByCode(cur);
+      return `${cur} (${sym})`;
+    }))].join(' dan ');
+    _openBottomSheet({
+      title: 'Pindah Dompet',
+      fields: `
+        <div style="text-align:center; padding: 8px 0 16px;">
+          <div style="font-size: 2rem; margin-bottom: 12px;">&#128260;</div>
+          <p style="margin: 0 0 8px; font-weight: 600; color: var(--text);">Dompetmu beda mata uang</p>
+          <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Transfer hanya bisa antar dompet dengan mata uang yang sama. Kamu punya dompet ${currencies} — tambah dompet dengan mata uang yang sama untuk pakai fitur ini.</p>
+        </div>
+      `,
+      confirmText: '+ Tambah Dompet',
+      onConfirm: () => {
+        navigateTo('settings');
+        return null;
+      },
+    });
     return;
   }
 
