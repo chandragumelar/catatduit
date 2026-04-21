@@ -1,5 +1,5 @@
 // ===== SERVICE WORKER — CatatDuit v3 =====
-const CACHE_NAME = 'catatduit-v4.0.0'; // auto-generated — jangan edit manual
+const CACHE_NAME = 'catatduit-v4.0.1'; // bumped: fix skipWaiting flow
 
 const ASSETS_CORE = [
   '/',
@@ -55,8 +55,10 @@ self.addEventListener('install', (event) => {
         ...ASSETS_OPTIONAL.map(url =>
           cache.add(url).catch(() => {})),
       ]))
-      .then(() => self.skipWaiting())
   );
+  // Tidak ada self.skipWaiting() di sini — SW baru harus menunggu di
+  // "waiting" state sampai user klik tombol Perbarui, yang akan
+  // mengirim postMessage { type: 'SKIP_WAITING' }.
 });
 
 // ===== ACTIVATE — hapus cache lama =====

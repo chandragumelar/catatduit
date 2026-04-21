@@ -117,7 +117,7 @@ function _showUpdateBanner(worker) {
 
   // Daftarkan controllerchange SEBELUM postMessage supaya tidak race condition —
   // controllerchange bisa fired sangat cepat setelah skipWaiting() dipanggil.
-  navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+  navigator.serviceWorker.addEventListener('controllerchange', () => location.reload(), { once: true });
 
   document.getElementById('pwa-update-confirm')?.addEventListener('click', () => {
     // Pakai reg.waiting sebagai fallback kalau referensi worker sudah stale
