@@ -1020,9 +1020,9 @@
   width: 100%;
   background: var(--bg-surface);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom));
   animation: slideUp var(--duration-slow) ease-out;
-  max-height: 90dvh;
+  max-height: calc(100dvh - var(--bottom-nav-height));
   display: flex;
   flex-direction: column;
 }
