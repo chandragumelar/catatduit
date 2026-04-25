@@ -1,0 +1,132 @@
+/* =============================================================================
+   components/ui/ChecklistCard.module.css
+   ============================================================================= */
+
+.card {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.header {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.headerTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2) 0;
+}
+
+/* ── Row ──────────────────────────────────────────────────────────────────── */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  transition: background var(--duration-fast);
+  animation: fadeIn var(--duration-normal) ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row { animation: none; }
+}
+
+.rowDone {
+  opacity: 0.5;
+}
+
+/* ── Checkbox ─────────────────────────────────────────────────────────────── */
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--duration-fast), background var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+}
+
+.checkbox:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.checkboxDone {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  cursor: default;
+}
+
+/* ── Label ────────────────────────────────────────────────────────────────── */
+
+.label {
+  flex: 1;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.label:disabled {
+  cursor: default;
+}
+
+.labelDone {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+/* ── Dismiss ──────────────────────────────────────────────────────────────── */
+
+.dismissBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color var(--duration-fast), background var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+}
+
+.dismissBtn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface-2);
+}

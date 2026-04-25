@@ -1,0 +1,595 @@
+/* =============================================================================
+   features/home/HomePage.module.css
+   ============================================================================= */
+
+/* ── Page ─────────────────────────────────────────────────────────────────── */
+
+.page {
+  background: var(--bg-base);
+  min-height: 100%;
+  padding-bottom: var(--space-12);
+}
+
+/* ── Greeting ─────────────────────────────────────────────────────────────── */
+
+.greeting {
+  padding: var(--space-4) var(--page-padding-x) var(--space-2);
+}
+
+.greetingName {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+.greetingDate {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+  display: block;
+}
+
+/* ── Section ──────────────────────────────────────────────────────────────── */
+
+.section {
+  padding: var(--space-3) var(--page-padding-x) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Card base ────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--card-padding);
+}
+
+.cardTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cardBody {
+  padding: 0 var(--card-padding) var(--card-padding);
+}
+
+.cardDivider {
+  height: 1px;
+  background: var(--border-default);
+  margin: 0 var(--card-padding);
+}
+
+/* ── Collapse button ──────────────────────────────────────────────────────── */
+
+.collapseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration-fast), background var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+}
+
+.collapseBtn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface-2);
+}
+
+/* ── Hero Number ──────────────────────────────────────────────────────────── */
+
+.heroCard {
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--card-padding);
+}
+
+.heroLabel {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  font-weight: 500;
+}
+
+.heroSublabel {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 2px;
+}
+
+.heroAmount {
+  font-size: 32px;
+  font-weight: 600;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  margin-top: var(--space-2);
+  line-height: 1.1;
+}
+
+.heroAmountNegative {
+  color: #ffb3b3;
+}
+
+/* ── Card Keuangan rows ───────────────────────────────────────────────────── */
+
+.keuanganRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.keuanganRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--card-padding);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.keuanganRow:last-child {
+  border-bottom: none;
+}
+
+.keuanganRowLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.keuanganRowIcon {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.keuanganRowAmount {
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.keuanganRowAmountDanger {
+  color: var(--money-out);
+}
+
+.keuanganRowAmountAccent {
+  color: var(--accent);
+}
+
+.keuanganRowSublabel {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.walletBadge {
+  font-size: 11px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-2);
+  color: var(--text-secondary);
+  margin-left: var(--space-2);
+}
+
+/* ── Cashflow ─────────────────────────────────────────────────────────────── */
+
+.cashflowDesc {
+  padding: 0 var(--card-padding) var(--space-3);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.cashflowGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: 0 var(--card-padding) var(--card-padding);
+}
+
+.cashflowItem {
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.cashflowItemLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.cashflowItemAmount {
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-top: var(--space-1);
+}
+
+.cashflowIn {
+  color: var(--money-in);
+}
+
+.cashflowOut {
+  color: var(--money-out);
+}
+
+.cashflowNet {
+  padding: var(--space-3) var(--card-padding) var(--card-padding);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cashflowNetLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.cashflowNetAmount {
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.cashflowNetPositive {
+  color: var(--money-in);
+}
+
+.cashflowNetNegative {
+  color: var(--money-out);
+}
+
+.cashflowNetNeutral {
+  color: var(--money-neutral);
+}
+
+/* ── Bar Chart ────────────────────────────────────────────────────────────── */
+
+.chartWrap {
+  padding: 0 var(--card-padding) var(--card-padding);
+}
+
+.chartEmpty {
+  text-align: center;
+  padding: var(--space-6) 0;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+/* ── Budget ───────────────────────────────────────────────────────────────── */
+
+.budgetRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--card-padding) var(--card-padding);
+}
+
+.budgetRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.budgetRowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.budgetRowLabel {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.budgetRowAmounts {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.budgetBar {
+  height: 4px;
+  background: var(--border-default);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.budgetBarFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width var(--duration-normal) ease;
+  background: var(--accent);
+}
+
+.budgetBarFillDanger {
+  background: var(--status-danger);
+}
+
+/* ── Goals ────────────────────────────────────────────────────────────────── */
+
+.goalRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--card-padding) var(--card-padding);
+}
+
+.goalRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.goalRowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.goalRowLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.goalIcon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.goalName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.goalPercent {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.goalProgressBar {
+  height: 6px;
+  background: var(--border-default);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.goalProgressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  transition: width var(--duration-normal) ease;
+}
+
+.goalAmounts {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Catatan Terakhir ─────────────────────────────────────────────────────── */
+
+.transaksiList {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaksiItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--card-padding);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.transaksiItem:last-child {
+  border-bottom: none;
+}
+
+.transaksiIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.transaksiInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.transaksiKategori {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaksiCatatan {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.transaksiRight {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.transaksiNominal {
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.transaksiNominalKeluar {
+  color: var(--money-out);
+}
+
+.transaksiNominalMasuk {
+  color: var(--money-in);
+}
+
+.transaksiNominalNabung {
+  color: var(--money-neutral);
+}
+
+.transaksiTanggal {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* ── CTA Link ─────────────────────────────────────────────────────────────── */
+
+.ctaLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-3) var(--card-padding);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border-default);
+  cursor: pointer;
+  font-family: var(--font-family);
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--duration-fast);
+}
+
+.ctaLink:hover {
+  background: var(--accent-subtle);
+}
+
+/* ── Support Card ─────────────────────────────────────────────────────────── */
+
+.supportCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--card-padding);
+  position: relative;
+}
+
+.supportDismiss {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration-fast), background var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+}
+
+.supportDismiss:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface-2);
+}
+
+.supportTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-right: var(--space-8);
+}
+
+.supportDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+.supportActions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.supportBtn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-family: var(--font-family);
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--duration-fast);
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.supportBtn:hover {
+  background: var(--bg-surface-2);
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+
+.emptyState {
+  padding: var(--space-6) var(--card-padding);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
