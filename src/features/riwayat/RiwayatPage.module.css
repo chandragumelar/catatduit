@@ -1,0 +1,293 @@
+/* =============================================================================
+   features/riwayat/RiwayatPage.module.css
+   ============================================================================= */
+
+.page {
+  background: var(--bg-base);
+  min-height: 100%;
+  padding-bottom: var(--space-12);
+}
+
+/* ── Search ───────────────────────────────────────────────────────────────── */
+
+.searchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: var(--space-4) var(--page-padding-x) 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--duration-fast);
+}
+
+.searchWrap:focus-within {
+  border-color: var(--accent);
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--text-tertiary);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--space-3) var(--space-3) var(--space-3) calc(var(--space-3) + 16px + var(--space-2));
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  min-height: 44px;
+}
+
+.searchInput::placeholder {
+  color: var(--text-tertiary);
+}
+
+.searchClear {
+  position: absolute;
+  right: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--duration-fast);
+}
+
+.searchClear:hover {
+  color: var(--text-secondary);
+}
+
+/* ── Month chips ──────────────────────────────────────────────────────────── */
+
+.chipList {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--page-padding-x);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chipList::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--duration-fast), background var(--duration-fast), border-color var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+  min-height: 36px;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chipActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.chipActive:hover {
+  color: #ffffff;
+}
+
+/* ── Summary strip ────────────────────────────────────────────────────────── */
+
+.summaryStrip {
+  display: flex;
+  align-items: center;
+  margin: 0 var(--page-padding-x) var(--space-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.summaryItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+}
+
+.summaryLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summaryAmount {
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.summaryIn {
+  color: var(--money-in);
+}
+
+.summaryOut {
+  color: var(--money-out);
+}
+
+.summaryDivider {
+  width: 1px;
+  height: 36px;
+  background: var(--border-default);
+  flex-shrink: 0;
+}
+
+/* ── List ─────────────────────────────────────────────────────────────────── */
+
+.listWrap {
+  padding: 0 var(--page-padding-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Group ────────────────────────────────────────────────────────────────── */
+
+.group {
+  display: flex;
+  flex-direction: column;
+}
+
+.dateHeader {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 0 var(--space-2);
+}
+
+/* ── Transaction item ─────────────────────────────────────────────────────── */
+
+.txItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-2);
+  transition: background var(--duration-fast);
+}
+
+.txItem:last-child {
+  margin-bottom: 0;
+}
+
+.txItem:active {
+  background: var(--bg-surface-2);
+}
+
+.txIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.txInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.txKategori {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.txMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.txCatatan {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.txWallet {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  padding: 1px var(--space-2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.txRight {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.txNominal {
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.txNominalKeluar { color: var(--money-out); }
+.txNominalMasuk  { color: var(--money-in); }
+.txNominalNabung { color: var(--money-neutral); }
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+
+.emptyState {
+  padding: var(--space-10) 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
