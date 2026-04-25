@@ -343,20 +343,161 @@ export default function HomePage() {
     return lines.join('\n')
   }
 
-  function buildShareTeaser(): string {
+  function buildRingkasanNarasi(): string {
     if (!hasMasuk && !hasKeluar && !hasNabung) {
-      return 'Belum ada catatan bulan ini. Tambah transaksi pertamamu, nanti ringkasannya bisa kamu bagikan di sini.'
+      return 'Belum ada catatan bulan ini. Mulai catat transaksi pertamamu — nanti di sini kamu bisa lihat cerita keuanganmu selama sebulan penuh.'
     }
-    const keluarStr = fmt(totalKeluarFiltered)
-    const nabungStr = fmt(totalNabungFiltered)
-    const bebasStr = fmt(uangBebas)
-    if (hasKeluar && hasNabung) {
-      return `Bulan ini keluar ${keluarStr} dan nabung ${nabungStr}. Uang bebasmu tersisa ${bebasStr}.`
+
+    const paragraphs: string[] = []
+
+    // ── Paragraf 1: Interpretasi cashflow ───────────────────────────────────
+    const topKeluar = cashflowByKategori.keluar[0]
+    const topMasuk = cashflowByKategori.masuk[0]
+    const secondKeluar = cashflowByKategori.keluar[1]
+
+    if (hasMasuk && hasKeluar) {
+      const ratio = totalKeluarFiltered / totalMasukFiltered
+      const pctLabel = `${Math.round(ratio * 100)}%`
+      let p1 = ''
+      if (ratio < 0.5) {
+        p1 = `Pengeluaran bulan ini hanya ${pctLabel} dari pemasukan — bulan yang cukup hemat.`
+      } else if (ratio < 0.8) {
+        p1 = `Pengeluaran bulan ini sekitar ${pctLabel} dari pemasukan — masih terkontrol.`
+      } else if (ratio < 1) {
+        p1 = `Pengeluaran sudah mencapai ${pctLabel} dari pemasukan — hampir impas, hati-hati sisa bulan ini.`
+      } else {
+        p1 = `Pengeluaran bulan ini melampaui pemasukan yang tercatat.`
+      }
+      if (topKeluar && secondKeluar) {
+        p1 += ` ${topKeluar.nama} dan ${secondKeluar.nama} jadi dua pos terbesar bulan ini.`
+      } else if (topKeluar) {
+        p1 += ` ${topKeluar.nama} jadi pos pengeluaran terbesar bulan ini.`
+      }
+      paragraphs.push(p1)
+    } else if (hasMasuk && !hasKeluar) {
+      let p1 = `Bulan ini ada pemasukan tapi belum ada pengeluaran yang tercatat.`
+      if (topMasuk) p1 += ` Sumbernya dari ${topMasuk.nama}.`
+      paragraphs.push(p1)
+    } else if (!hasMasuk && hasKeluar) {
+      let p1 = `Bulan ini ada pengeluaran tapi belum ada pemasukan yang tercatat.`
+      if (topKeluar) p1 += ` Pos terbesar di ${topKeluar.nama}.`
+      paragraphs.push(p1)
     }
-    if (hasKeluar) {
-      return `Bulan ini keluar ${keluarStr}. Uang bebasmu tersisa ${bebasStr}.`
+
+    // ── Paragraf 2: Budget ───────────────────────────────────────────────────
+    if (budgetRows.length > 0) {
+      const jebols = budgetRows.filter(r => r.pct >= 1)
+      const warns = budgetRows.filter(r => r.pct >= 0.75 && r.pct < 1)
+      const amans = budgetRows.filter(r => r.pct < 0.75)
+      if (jebols.length === 0 && warns.length === 0) {
+        paragraphs.push(`Semua budget aman — ${amans.length} kategori masih di bawah 75% dari limitnya.`)
+      } else if (jebols.length > 0 && warns.length === 0) {
+        const namaJebol = jebols.map(r => r.nama).join(' dan ')
+        paragraphs.push(`Budget ${namaJebol} sudah jebol. Perlu dicermati kalau masih ada rencana pengeluaran di sana sampai akhir bulan.`)
+      } else if (jebols.length === 0 && warns.length > 0) {
+        const namaWarn = warns.map(r => r.nama).join(' dan ')
+        paragraphs.push(`${namaWarn} sudah di atas 75% budget — masih aman, tapi perlu hati-hati kalau bulan belum habis.`)
+      } else {
+        const namaJebol = jebols.map(r => r.nama).join(' dan ')
+        paragraphs.push(`Budget ${namaJebol} sudah jebol. Beberapa kategori lain juga mendekati batas — cek card Budget di atas untuk detailnya.`)
+      }
     }
-    return `Uang bebasmu bulan ini ${bebasStr}.`
+
+    // ── Paragraf 3: Tabungan & goals ────────────────────────────────────────
+    if (hasNabung || goals.length > 0) {
+      const goalsNearTarget = goals.filter(g => g.target > 0 && g.terkumpul / g.target >= 0.9 && g.terkumpul < g.target)
+      const goalsDone = goals.filter(g => g.target > 0 && g.terkumpul >= g.target)
+      let p3 = ''
+      if (hasNabung) {
+        p3 = `Bulan ini kamu berhasil menyisihkan sebagian untuk ditabung.`
+      }
+      if (goalsDone.length > 0) {
+        p3 += ` ${goalsDone.map(g => g.nama).join(' dan ')} sudah mencapai target — selamat!`
+      } else if (goalsNearTarget.length > 0) {
+        p3 += ` ${goalsNearTarget.map(g => g.nama).join(' dan ')} sudah hampir tercapai, tinggal sedikit lagi.`
+      } else if (!hasNabung && goals.length > 0) {
+        p3 = `Progress tabungan berjalan — cek card Target Menabung di atas untuk lihat posisi masing-masing goal.`
+      }
+      if (p3) paragraphs.push(p3)
+    }
+
+    // ── Paragraf 4: Uang bebas — penutup ────────────────────────────────────
+    let p4 = ''
+    if (isDefisit) {
+      p4 = hasTagihan
+        ? `Setelah dipotong tagihan, uang bebas masih minus. Perlu ada penyesuaian supaya bulan ini bisa selesai dengan nyaman.`
+        : `Uang bebas saat ini masih minus. Perlu ada penyesuaian di sisa bulan ini.`
+    } else {
+      p4 = hasTagihan
+        ? `Setelah tagihan dipotong, masih ada ruang gerak. Jaga pengeluaran sampai akhir bulan supaya nggak terkikis.`
+        : `Masih ada ruang gerak di uang bebas. Pantau terus supaya tetap sesuai rencana sampai akhir bulan.`
+    }
+    paragraphs.push(p4)
+
+    return paragraphs.join('\n\n')
+  }
+
+  function buildShareTeaser(): JSX.Element {
+    const isEmpty = !hasMasuk && !hasKeluar && !hasNabung
+
+    if (isEmpty) {
+      return (
+        <p className={styles.ringkasanNarasi}>
+          {buildRingkasanNarasi()}
+        </p>
+      )
+    }
+
+    const narasi = buildRingkasanNarasi()
+    const narasiParagraphs = narasi.split('\n\n').filter(Boolean)
+
+    return (
+      <>
+        {/* Data block ringkas */}
+        <div className={styles.ringkasanDataBlock}>
+          {hasMasuk && (
+            <div className={styles.ringkasanDataRow}>
+              <span className={styles.ringkasanDataLabel}>Masuk</span>
+              <span className={[styles.ringkasanDataVal, styles.ringkasanIn].join(' ')}>{fmt(totalMasukFiltered)}</span>
+            </div>
+          )}
+          {hasKeluar && (
+            <div className={styles.ringkasanDataRow}>
+              <span className={styles.ringkasanDataLabel}>Keluar</span>
+              <span className={[styles.ringkasanDataVal, styles.ringkasanOut].join(' ')}>{fmt(totalKeluarFiltered)}</span>
+            </div>
+          )}
+          {hasNabung && (
+            <div className={styles.ringkasanDataRow}>
+              <span className={styles.ringkasanDataLabel}>Ditabung</span>
+              <span className={[styles.ringkasanDataVal, styles.ringkasanSavings].join(' ')}>{fmt(totalNabungFiltered)}</span>
+            </div>
+          )}
+          {hasTagihan && (
+            <div className={styles.ringkasanDataRow}>
+              <span className={styles.ringkasanDataLabel}>Tagihan</span>
+              <span className={[styles.ringkasanDataVal, styles.ringkasanOut].join(' ')}>{fmt(tagihanBulanIni)}</span>
+            </div>
+          )}
+          <div className={styles.ringkasanDataDivider} />
+          <div className={styles.ringkasanDataRow}>
+            <span className={styles.ringkasanDataLabelBold}>Uang bebas</span>
+            <span className={[
+              styles.ringkasanDataVal,
+              styles.ringkasanDataValBold,
+              isDefisit ? styles.ringkasanOut : styles.ringkasanIn,
+            ].join(' ')}>{fmt(uangBebas)}</span>
+          </div>
+        </div>
+
+        {/* Narasi panjang */}
+        <div className={styles.ringkasanNarasiBlock}>
+          {narasiParagraphs.map((p, i) => (
+            <p key={i} className={styles.ringkasanNarasi}>{p}</p>
+          ))}
+        </div>
+      </>
+    )
   }
 
   function handleShare() {
@@ -832,7 +973,9 @@ export default function HomePage() {
             <span className={styles.cardTitle}>Ringkasan Bulan Ini</span>
           </div>
           <div className={styles.shareTeaser}>
-            {buildShareTeaser()}
+            <div className={styles.shareTeaserInner}>
+              {buildShareTeaser()}
+            </div>
           </div>
           {!isShareEmpty && (
             <div className={styles.shareActions}>

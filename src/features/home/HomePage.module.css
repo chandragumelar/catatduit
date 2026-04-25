@@ -777,9 +777,76 @@
 
 .shareTeaser {
   padding: 0 var(--card-padding) var(--space-4);
+}
+
+.shareTeaserInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Data block ringkas */
+.ringkasanDataBlock {
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.ringkasanDataRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 3px 0;
+}
+
+.ringkasanDataLabel {
   font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.6;
+}
+
+.ringkasanDataLabelBold {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ringkasanDataVal {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.ringkasanDataValBold {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ringkasanDataDivider {
+  height: 1px;
+  background: var(--border-default);
+  margin: var(--space-1) 0;
+}
+
+.ringkasanIn  { color: var(--money-in); }
+.ringkasanOut { color: var(--money-out); }
+.ringkasanSavings { color: #3b82f6; }
+
+/* Narasi paragraphs */
+.ringkasanNarasiBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ringkasanNarasi {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+  padding: 0;
 }
 
 .shareActions {
