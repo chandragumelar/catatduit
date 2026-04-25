@@ -140,6 +140,13 @@ Jenis: Keluar / Masuk / Transfer
 Fields: nominal, kategori, wallet, tanggal, catatan
 Flag opsional "Bayar dari tabungan" — dipilih manual user, sistem tidak otomatis mendeteksi.
 
+**Transfer — Constraint Kurs:**
+- Transfer antar dompet hanya boleh dilakukan antar dompet dengan currency yang sama
+- Dropdown wallet tujuan hanya menampilkan wallet dengan currency yang sama dengan wallet asal
+- Jika tidak ada wallet tujuan yang valid → tampil pesan: "Tidak ada dompet lain dengan mata uang yang sama."
+- Label shortcut di header: "⇄ Antar Dompet" (bukan "Pindah Dompet" yang ambigu, bukan "Transfer" yang berkonotasi m-banking)
+- Fitur ini belum diimplementasi — menunggu sprint `features/input/`
+
 ### INSIGHT
 
 Vertikal, tidak ada tab di dalam Insight:

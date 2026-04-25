@@ -1,0 +1,42 @@
+/* =============================================================================
+   components/layout/BottomNav.module.css
+   ============================================================================= */
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-height);
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  z-index: 100;
+  padding: 0 var(--space-2);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.navItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+
+.navItemActive {
+  color: var(--accent);
+}
+
+/* FAB slot — 80px dead zone kanan, FAB tidak di-squeeze oleh nav items */
+.fabSlot {
+  width: calc(var(--fab-size) + 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

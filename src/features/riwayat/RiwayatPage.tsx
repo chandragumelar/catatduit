@@ -3,7 +3,8 @@
 // =============================================================================
 
 import { useState, useMemo, useRef, useEffect } from 'react'
-import { Search, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Search, X, ArrowLeft } from 'lucide-react'
 
 import { useTransaksiStore } from '@/store/transaksi.store'
 import { useWalletStore } from '@/store/wallet.store'
@@ -38,6 +39,7 @@ function formatDateHeader(dateStr: string): string {
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function RiwayatPage() {
+  const navigate = useNavigate()
   const transaksi = useTransaksiStore(s => s.transaksi)
   const wallets = useWalletStore(s => s.wallets)
   const activeWalletId = useWalletStore(s => s.activeWalletId)
@@ -155,6 +157,18 @@ export default function RiwayatPage() {
 
   return (
     <div className={styles.page}>
+
+      {/* Header */}
+      <div className={styles.header}>
+        <button
+          className={styles.backBtn}
+          onClick={() => navigate(-1)}
+          aria-label="Kembali"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <span className={styles.headerTitle}>Semua Catatan</span>
+      </div>
 
       {/* Search bar */}
       <div className={styles.searchWrap}>

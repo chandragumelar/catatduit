@@ -585,6 +585,78 @@
   background: var(--bg-surface-2);
 }
 
+/* ── Empty state (card-level) ─────────────────────────────────────────────── */
+
+.cardEmptyState {
+  padding: var(--space-4) var(--card-padding) var(--card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cardEmptyText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.cardEmptyCta {
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-4);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--accent);
+  background: var(--accent-subtle);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--duration-fast);
+}
+
+.cardEmptyCta:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+}
+
+/* ── Share Ringkasan ──────────────────────────────────────────────────────── */
+
+.shareTeaser {
+  padding: 0 var(--card-padding) var(--space-4);
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.shareActions {
+  padding: 0 var(--card-padding) var(--card-padding);
+}
+
+.shareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--accent);
+  background: var(--accent-subtle);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--duration-fast);
+}
+
+.shareBtn:hover {
+  background: var(--accent-subtle);
+  outline: 1px solid var(--accent);
+}
+
 /* ── Empty state ──────────────────────────────────────────────────────────── */
 
 .emptyState {

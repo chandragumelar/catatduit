@@ -15,6 +15,8 @@ import {
   Sparkles,
   TrendingUp,
   TrendingDown,
+  Share2,
+  Check,
 } from 'lucide-react'
 import {
   BarChart,
@@ -88,6 +90,7 @@ export default function HomePage() {
   const [collapsedCards, setCollapsedCards] = useState<Set<string>>(
     () => new Set(getCardCollapsed())
   )
+  const [shareCopied, setShareCopied] = useState(false)
 
   // ── Data derivations ───────────────────────────────────────────────────────
 
@@ -263,6 +266,97 @@ export default function HomePage() {
   function getKategoriInfo(id: string) {
     return allKategori.find(k => k.id === id)
   }
+
+  // ── Share Ringkasan ────────────────────────────────────────────────────────
+
+  const bulanLabel = getMonthLabel()
+  const hasNabung = totalNabungFiltered > 0
+  const hasTagihan = tagihanBulanIni > 0
+  const hasMasuk = totalMasukFiltered > 0
+  const hasKeluar = totalKeluarFiltered > 0
+  const isDefisit = uangBebas < 0
+
+  function buildShareText(): string {
+    const masukStr = fmt(totalMasukFiltered)
+    const keluarStr = fmt(totalKeluarFiltered)
+    const nabungStr = fmt(totalNabungFiltered)
+    const tagihanStr = fmt(tagihanBulanIni)
+    const bebasStr = fmt(Math.abs(uangBebas))
+
+    // Skenario 8: semua nol — tidak seharusnya dipanggil, tapi safeguard
+    if (!hasMasuk && !hasKeluar && !hasNabung && !hasTagihan) {
+      return `Keuangan ${bulanLabel}\n\nBelum ada catatan bulan ini.\n\nDicatat pakai CatatDuit.`
+    }
+
+    const lines: string[] = [`Keuangan ${bulanLabel}`, '']
+
+    // Kalimat pertama: pemasukan + pengeluaran
+    if (hasMasuk && hasKeluar) {
+      lines.push(`Bulan ini kamu mendapat pemasukan sebesar ${masukStr} dan mengeluarkan ${keluarStr}.`)
+    } else if (hasMasuk && !hasKeluar) {
+      lines.push(`Bulan ini kamu mendapat pemasukan sebesar ${masukStr} tanpa ada pengeluaran yang tercatat.`)
+    } else if (!hasMasuk && hasKeluar) {
+      lines.push(`Bulan ini kamu mengeluarkan ${keluarStr} tanpa ada pemasukan yang tercatat.`)
+    }
+
+    // Kalimat kedua: nabung (opsional)
+    if (hasNabung) {
+      lines.push(`Kamu juga menyisihkan ${nabungStr} untuk ditabung.`)
+    }
+
+    lines.push('')
+
+    // Kalimat ketiga: uang bebas
+    if (isDefisit) {
+      if (hasTagihan) {
+        lines.push(`Setelah dipotong tagihan ${tagihanStr}, pengeluaran bulan ini melebihi saldo sebesar ${bebasStr}.`)
+      } else {
+        lines.push(`Pengeluaran bulan ini melebihi saldo sebesar ${bebasStr}.`)
+      }
+    } else {
+      if (hasTagihan) {
+        lines.push(`Setelah dipotong tagihan ${tagihanStr}, uang bebas yang masih bisa kamu gunakan adalah ${fmt(uangBebas)}.`)
+      } else {
+        lines.push(`Uang bebas yang masih bisa kamu gunakan bulan ini adalah ${fmt(uangBebas)}.`)
+      }
+    }
+
+    lines.push('', 'Dicatat pakai CatatDuit.')
+    return lines.join('\n')
+  }
+
+  function buildShareTeaser(): string {
+    if (!hasMasuk && !hasKeluar && !hasNabung) {
+      return 'Belum ada catatan bulan ini. Tambah transaksi pertamamu, nanti ringkasannya bisa kamu bagikan di sini.'
+    }
+    const keluarStr = fmt(totalKeluarFiltered)
+    const nabungStr = fmt(totalNabungFiltered)
+    const bebasStr = fmt(uangBebas)
+    if (hasKeluar && hasNabung) {
+      return `Bulan ini keluar ${keluarStr} dan nabung ${nabungStr}. Uang bebasmu tersisa ${bebasStr}.`
+    }
+    if (hasKeluar) {
+      return `Bulan ini keluar ${keluarStr}. Uang bebasmu tersisa ${bebasStr}.`
+    }
+    return `Uang bebasmu bulan ini ${bebasStr}.`
+  }
+
+  async function handleShare() {
+    const text = buildShareText()
+    if (navigator.share) {
+      try {
+        await navigator.share({ text })
+      } catch {
+        // user cancel — no-op
+      }
+    } else {
+      await navigator.clipboard.writeText(text)
+      setShareCopied(true)
+      setTimeout(() => setShareCopied(false), 2000)
+    }
+  }
+
+  const isShareEmpty = !hasMasuk && !hasKeluar && !hasNabung && !hasTagihan
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -510,12 +604,24 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Card Budget — conditional */}
-        {budgetRows.length > 0 && (
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>Budget Bulan Ini</span>
+        {/* Card Budget — selalu tampil */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardTitle}>Budget Bulan Ini</span>
+          </div>
+          {budgetRows.length === 0 ? (
+            <div className={styles.cardEmptyState}>
+              <span className={styles.cardEmptyText}>
+                Belum ada budget. Atur limit per kategori biar pengeluaran lebih terkontrol.
+              </span>
+              <button
+                className={styles.cardEmptyCta}
+                onClick={() => navigate('/planning')}
+              >
+                Atur Budget
+              </button>
             </div>
+          ) : (
             <div className={styles.budgetRows}>
               {budgetRows.map(row => (
                 <div key={row.id} className={styles.budgetRow}>
@@ -539,15 +645,27 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Card Progress Nabung — conditional */}
-        {goals.length > 0 && (
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>Target Menabung</span>
+        {/* Card Progress Nabung — selalu tampil */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardTitle}>Target Menabung</span>
+          </div>
+          {goals.length === 0 ? (
+            <div className={styles.cardEmptyState}>
+              <span className={styles.cardEmptyText}>
+                Belum ada target. Tambah tujuan menabung biar lebih terarah.
+              </span>
+              <button
+                className={styles.cardEmptyCta}
+                onClick={() => navigate('/planning')}
+              >
+                Tambah Target
+              </button>
             </div>
+          ) : (
             <div className={styles.goalRows}>
               {goals.map(goal => {
                 const pct = goal.target > 0
@@ -580,8 +698,8 @@ export default function HomePage() {
                 )
               })}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Card Catatan Terakhir — paling bawah */}
         <div className={styles.card}>
@@ -636,6 +754,29 @@ export default function HomePage() {
             Lihat semua catatan
             <ArrowRight size={14} />
           </button>
+        </div>
+
+        {/* Card Bagikan Ringkasan — fix paling bawah */}
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardTitle}>Ringkasan Bulan Ini</span>
+          </div>
+          <div className={styles.shareTeaser}>
+            {buildShareTeaser()}
+          </div>
+          {!isShareEmpty && (
+            <div className={styles.shareActions}>
+              <button
+                className={styles.shareBtn}
+                onClick={handleShare}
+              >
+                {shareCopied
+                  ? <><Check size={16} /> Disalin</>
+                  : <><Share2 size={16} /> Bagikan</>
+                }
+              </button>
+            </div>
+          )}
         </div>
 
       </div>
