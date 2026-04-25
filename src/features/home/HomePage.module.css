@@ -821,44 +821,37 @@
 
 /* ── Cashflow table layout ────────────────────────────────────────────────── */
 
-.cfSummary {
-  margin: 0 var(--card-padding) var(--space-1);
-  border: 0.5px solid var(--border-default);
-  border-radius: var(--radius-md);
-  overflow: hidden;
+.cfMetrics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--card-padding) var(--space-3);
 }
 
-.cfSummaryRow {
+.cfMetricCard {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
-  border-top: 0.5px solid var(--border-default);
-}
-
-.cfSummaryRow:first-child {
-  border-top: none;
-}
-
-.cfSummaryRowNet {
   background: var(--bg-surface-2);
+  border-radius: var(--radius-md);
+  padding: 11px 14px;
 }
 
-.cfSummaryLabel {
-  font-size: 13px;
+.cfMetricLabel {
+  font-size: 12px;
   color: var(--text-secondary);
 }
 
-.cfSummaryLabelNet {
-  font-size: 13px;
+.cfMetricLabelNet {
   font-weight: 500;
   color: var(--text-primary);
 }
 
-.cfSummaryAmount {
+.cfMetricAmount {
   font-size: 15px;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .cfTable {

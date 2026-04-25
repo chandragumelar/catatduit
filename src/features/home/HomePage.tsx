@@ -559,22 +559,19 @@ export default function HomePage() {
             <span className={styles.cardTitle}>Cashflow — {getMonthLabel()}</span>
           </div>
 
-          {/* Summary 3 baris */}
-          <div className={styles.cfSummary}>
-            <div className={styles.cfSummaryRow}>
-              <span className={styles.cfSummaryLabel}>Uang masuk</span>
-              <span className={[styles.cfSummaryAmount, styles.cashflowIn].join(' ')} style={{ whiteSpace: 'nowrap' }}>{fmt(totalMasukFiltered)}</span>
+          {/* Summary 3 metric cards */}
+          <div className={styles.cfMetrics}>
+            <div className={styles.cfMetricCard}>
+              <span className={styles.cfMetricLabel}>Uang masuk</span>
+              <span className={[styles.cfMetricAmount, styles.cashflowIn].join(' ')}>{fmt(totalMasukFiltered)}</span>
             </div>
-            <div className={styles.cfSummaryRow}>
-              <span className={styles.cfSummaryLabel}>Uang keluar</span>
-              <span className={[styles.cfSummaryAmount, styles.cashflowOut].join(' ')} style={{ whiteSpace: 'nowrap' }}>{fmt(totalKeluarFiltered)}</span>
+            <div className={styles.cfMetricCard}>
+              <span className={styles.cfMetricLabel}>Uang keluar</span>
+              <span className={[styles.cfMetricAmount, styles.cashflowOut].join(' ')}>{fmt(totalKeluarFiltered)}</span>
             </div>
-            <div className={[styles.cfSummaryRow, styles.cfSummaryRowNet].join(' ')}>
-              <span className={[styles.cfSummaryLabel, styles.cfSummaryLabelNet].join(' ')}>Uang bersih</span>
-              <span className={[
-                styles.cfSummaryAmount,
-                netBulanIni >= 0 ? styles.cashflowIn : styles.cashflowOut
-              ].join(' ')} style={{ whiteSpace: 'nowrap' }}>
+            <div className={styles.cfMetricCard}>
+              <span className={[styles.cfMetricLabel, styles.cfMetricLabelNet].join(' ')}>Uang bersih</span>
+              <span className={[styles.cfMetricAmount, netBulanIni >= 0 ? styles.cashflowIn : styles.cashflowOut].join(' ')}>
                 {netBulanIni >= 0 ? '+' : ''}{fmt(netBulanIni)}
               </span>
             </div>
