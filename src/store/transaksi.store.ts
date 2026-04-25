@@ -4,12 +4,13 @@
 
 import { create } from 'zustand'
 import type { Transaksi } from '@/types'
-import { getTransaksi, addTransaksi, updateTransaksi, deleteTransaksi } from '@/storage'
+import { getTransaksi, addTransaksi, updateTransaksi, deleteTransaksi, addTransferPair } from '@/storage'
 
 interface TransaksiStore {
   transaksi: Transaksi[]
   hydrate: () => void
   add: (tx: Transaksi) => void
+  addPair: (out: Transaksi, ins: Transaksi) => void
   update: (id: string, patch: Partial<Transaksi>) => void
   remove: (id: string) => void
 }
@@ -21,6 +22,11 @@ export const useTransaksiStore = create<TransaksiStore>((set) => ({
 
   add: (tx) => {
     addTransaksi(tx)
+    set({ transaksi: getTransaksi() })
+  },
+
+  addPair: (out, ins) => {
+    addTransferPair(out, ins)
     set({ transaksi: getTransaksi() })
   },
 

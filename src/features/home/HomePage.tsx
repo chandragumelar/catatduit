@@ -9,10 +9,8 @@ import {
   ChevronUp,
   X,
   ArrowRight,
-  Wallet,
-  Receipt,
-  PiggyBank,
-  Sparkles,
+  ArrowLeftRight,
+  Settings,
   TrendingUp,
   TrendingDown,
   Share2,
@@ -30,6 +28,7 @@ import {
 import { useTransaksiStore } from '@/store/transaksi.store'
 import { useWalletStore } from '@/store/wallet.store'
 import { useComputed } from '@/store/computed.store'
+import { useTransferStore } from '@/store/transfer.store'
 import { ChecklistCard } from '@/components/ui/ChecklistCard'
 
 import {
@@ -81,6 +80,7 @@ function isSupportVisible(): boolean {
 
 export default function HomePage() {
   const navigate = useNavigate()
+  const openTransfer = useTransferStore(s => s.open)
   const nama = getNama()
   const transaksi = useTransaksiStore(s => s.transaksi)
   const wallets = useWalletStore(s => s.wallets)
@@ -365,7 +365,16 @@ export default function HomePage() {
 
       {/* Greeting */}
       <div className={styles.greeting}>
-        <span className={styles.greetingName}>Halo, {nama || 'kamu'}</span>
+        <div className={styles.greetingRow}>
+          <span className={styles.greetingName}>Halo, {nama || 'kamu'}</span>
+          <button
+            className={styles.settingsBtn}
+            onClick={() => navigate('/settings')}
+            aria-label="Pengaturan"
+          >
+            <Settings size={20} strokeWidth={1.5} />
+          </button>
+        </div>
         <span className={styles.greetingDate}>{getGreetingDate()}</span>
       </div>
 
@@ -425,90 +434,94 @@ export default function HomePage() {
 
         {/* Card Keuangan */}
         <div className={styles.card}>
-          <div className={styles.cardHeader}>
+          {/* Header: judul + Antar Dompet + collapse */}
+          <div className={styles.kasHeader}>
             <span className={styles.cardTitle}>Keuangan</span>
-            <button
-              className={styles.collapseBtn}
-              onClick={() => toggleCollapse('keuangan')}
-              aria-label={isCollapsed('keuangan') ? 'Buka' : 'Tutup'}
-            >
-              {isCollapsed('keuangan')
-                ? <ChevronDown size={16} />
-                : <ChevronUp size={16} />
-              }
-            </button>
+            <div className={styles.kasHeaderRight}>
+              <button className={styles.kasAntarBtn} onClick={openTransfer}>
+                <ArrowLeftRight size={13} strokeWidth={1.5} />
+                Antar Dompet
+              </button>
+              <button
+                className={styles.collapseBtn}
+                onClick={() => toggleCollapse('keuangan')}
+                aria-label={isCollapsed('keuangan') ? 'Buka' : 'Tutup'}
+              >
+                {isCollapsed('keuangan')
+                  ? <ChevronDown size={16} />
+                  : <ChevronUp size={16} />
+                }
+              </button>
+            </div>
           </div>
 
           {!isCollapsed('keuangan') && (
-            <div className={styles.keuanganRows}>
-              {/* Saldo aktif wallet */}
-              <div className={styles.keuanganRow}>
-                <div className={styles.keuanganRowLabel}>
-                  <Wallet size={16} className={styles.keuanganRowIcon} />
-                  {activeWallet
-                    ? <>{activeWallet.icon} {activeWallet.nama}</>
-                    : 'Dompet'
-                  }
-                </div>
-                <div className={styles.keuanganRowAmount}>
-                  {fmt(activeWalletSaldo)}
-                </div>
-              </div>
+            <div className={styles.kasBody}>
 
-              {/* Total semua dompet — hanya tampil kalau ada >1 wallet dengan currency sama */}
+              {/* Daftar wallet — semua relevantWallets */}
+              {relevantWallets.map(wallet => {
+                const masuk = transaksi.filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
+                const keluar = transaksi.filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0)
+                const saldo = wallet.saldo_awal + masuk - keluar
+                return (
+                  <div key={wallet.id} className={styles.kasRow}>
+                    <span className={styles.kasSymPlus}>+</span>
+                    <span className={styles.kasLabel}>{wallet.icon} {wallet.nama}</span>
+                    <span className={styles.kasAmountIn}>{fmt(saldo)}</span>
+                  </div>
+                )
+              })}
+
+              {/* Garis + total — hanya kalau >1 wallet */}
               {relevantWallets.length > 1 && (
-                <div className={styles.keuanganRow}>
-                  <div className={styles.keuanganRowLabel}>
-                    <Wallet size={16} className={styles.keuanganRowIcon} />
-                    Total semua dompet
-                    <span className={styles.walletBadge}>{relevantWallets.length}</span>
+                <>
+                  <div className={styles.kasSepSingle} />
+                  <div className={styles.kasRow}>
+                    <span />
+                    <span className={styles.kasTotalLabel}>Total saldo</span>
+                    <span className={styles.kasTotalAmount}>{fmt(totalSaldoFiltered)}</span>
                   </div>
-                  <div className={styles.keuanganRowAmount}>
-                    {fmt(totalSaldoFiltered)}
-                  </div>
-                </div>
+                </>
               )}
 
-              {/* Tagihan bulan ini */}
-              <div className={styles.keuanganRow}>
-                <div className={styles.keuanganRowLabel}>
-                  <Receipt size={16} className={styles.keuanganRowIcon} />
-                  Tagihan bulan ini
-                </div>
-                <div className={[
-                  styles.keuanganRowAmount,
-                  tagihanBulanIni > 0 ? styles.keuanganRowAmountDanger : ''
+              <div className={styles.kasDivider} />
+
+              {/* Tagihan */}
+              <div className={styles.kasRow}>
+                <span className={styles.kasSymMinus}>−</span>
+                <span className={styles.kasLabel}>Tagihan bulan ini</span>
+                <span className={[
+                  styles.kasAmountNeutral,
+                  tagihanBulanIni > 0 ? styles.kasAmountDanger : ''
                 ].join(' ')}>
                   {fmt(tagihanBulanIni)}
-                </div>
+                </span>
               </div>
 
-              {/* Nabung bulan ini */}
-              <div className={styles.keuanganRow}>
-                <div className={styles.keuanganRowLabel}>
-                  <PiggyBank size={16} className={styles.keuanganRowIcon} />
-                  Nabung bulan ini
-                </div>
-                <div className={styles.keuanganRowAmount}>
-                  {fmt(totalNabungFiltered)}
-                </div>
+              {/* Nabung */}
+              <div className={styles.kasRow}>
+                <span className={styles.kasSymMinus}>−</span>
+                <span className={styles.kasLabel}>Nabung bulan ini</span>
+                <span className={styles.kasAmountSavings}>{fmt(totalNabungFiltered)}</span>
               </div>
 
-              {/* Uang bebas */}
-              <div className={styles.keuanganRow}>
-                <div className={styles.keuanganRowLabel}>
-                  <Sparkles size={16} className={styles.keuanganRowIcon} />
-                  Uang bebas
+              {/* Double underline + uang bebas */}
+              <div className={styles.kasSepDouble} />
+
+              <div className={styles.kasBebasWrap}>
+                <div className={styles.kasBebasRow}>
+                  <span className={styles.kasBebasDot} />
+                  <span className={styles.kasBebasLabel}>Uang bebas</span>
+                  <span className={[
+                    styles.kasBebasAmount,
+                    uangBebas < 0 ? styles.kasBebasAmountDanger : ''
+                  ].join(' ')}>
+                    {fmt(uangBebas)}
+                  </span>
                 </div>
-                <div className={[
-                  styles.keuanganRowAmount,
-                  uangBebas >= 0
-                    ? styles.keuanganRowAmountAccent
-                    : styles.keuanganRowAmountDanger
-                ].join(' ')}>
-                  {fmt(uangBebas)}
-                </div>
+                <p className={styles.kasBebasSub}>yang bisa kamu pakai untuk kebutuhan sehari-hari</p>
               </div>
+
             </div>
           )}
         </div>

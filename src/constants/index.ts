@@ -31,7 +31,7 @@ export const DEFAULT_WALLET_ID = 'utama'
 export const MAX_NOMINAL = 999_000_000_000
 export const MAX_GOALS = 5
 export const CURRENT_SCHEMA_VERSION = 6
-export const SUPPORT_BANNER_COOLDOWN_DAYS = 3
+export const SUPPORT_BANNER_COOLDOWN_DAYS = 2
 
 // Kategori ID yang hardcoded — jangan rename
 export const HARDCODED_KATEGORI_IDS = [

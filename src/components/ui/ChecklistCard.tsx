@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { getChecklistDone, saveChecklistDone } from '@/storage'
 import { useWalletStore } from '@/store/wallet.store'
 import { useTransaksiStore } from '@/store/transaksi.store'
+import { useInputStore } from '@/store/input.store'
 import styles from './ChecklistCard.module.css'
 
 // ── Item definitions ──────────────────────────────────────────────────────────
@@ -30,6 +31,7 @@ interface ChecklistItem {
 
 export function ChecklistCard() {
   const navigate = useNavigate()
+  const openInput = useInputStore(s => s.open)
   const wallets = useWalletStore(s => s.wallets)
   const transaksi = useTransaksiStore(s => s.transaksi)
 
@@ -59,10 +61,7 @@ export function ChecklistCard() {
     {
       id: 'catat_pertama',
       label: 'Catat pengeluaran pertamamu',
-      action: () => {
-        // Trigger FAB — broadcast event, FAB listen
-        window.dispatchEvent(new CustomEvent('catatduit:open-input'))
-      },
+      action: () => openInput('keluar'),
     },
     {
       id: 'tambah_dompet',

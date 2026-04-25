@@ -7,6 +7,7 @@ import { Outlet } from 'react-router-dom'
 import { BottomNav } from './BottomNav'
 import { PriorityBanner } from '@/components/ui/PriorityBanner'
 import { InputBottomSheet } from '@/features/input/InputBottomSheet'
+import { TransferBottomSheet } from '@/features/transfer/TransferBottomSheet'
 
 interface PageLayoutProps {
   updateAvailable: boolean
@@ -26,8 +27,9 @@ export function PageLayout({ updateAvailable, onApplyUpdate }: PageLayoutProps) 
         <Outlet />
       </main>
       <BottomNav />
-      {/* Input sheet — render di luar <main> agar z-index tidak terjepit */}
+      {/* Bottom sheets — render di luar <main> agar z-index tidak terjepit */}
       <InputBottomSheet />
+      <TransferBottomSheet />
     </div>
   )
 }

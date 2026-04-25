@@ -33,3 +33,8 @@ export function deleteTransaksi(id: string): boolean {
   }
   return saveTransaksi(existing.filter(t => t.id !== id))
 }
+
+export function addTransferPair(out: import('@/types').Transaksi, ins: import('@/types').Transaksi): boolean {
+  const existing = getTransaksi()
+  return saveTransaksi([...existing, out, ins])
+}

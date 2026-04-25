@@ -163,6 +163,19 @@ function StepDompet({
         </button>
       </div>
 
+      {/* Custom wallets — tampilkan sebagai chip aktif terpisah */}
+      {selected.filter(w => w.presetId === null).length > 0 && (
+        <div className={styles.customWalletList}>
+          {selected.filter(w => w.presetId === null).map((w, i) => (
+            <div key={i} className={styles.customWalletChip}>
+              <span>{w.icon}</span>
+              <span className={styles.customWalletNama}>{w.nama}</span>
+              <Check size={14} strokeWidth={2.5} className={styles.presetCheck} />
+            </div>
+          ))}
+        </div>
+      )}
+
       {selected.length > 0 && (
         <p className={styles.selectedCount}>{selected.length} dompet dipilih</p>
       )}

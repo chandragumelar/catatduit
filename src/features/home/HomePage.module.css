@@ -16,6 +16,32 @@
   padding: var(--space-4) var(--page-padding-x) var(--space-2);
 }
 
+.greetingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settingsBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.settingsBtn:active {
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+}
+
 .greetingName {
   font-size: 20px;
   font-weight: 600;
@@ -132,13 +158,9 @@
 
 /* ── Card Keuangan rows ───────────────────────────────────────────────────── */
 
-.keuanganRows {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
+/* ── Card Keuangan — buku kas ─────────────────────────────────────────────── */
 
-.keuanganRow {
+.kasHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -146,51 +168,175 @@
   border-bottom: 1px solid var(--border-default);
 }
 
-.keuanganRow:last-child {
-  border-bottom: none;
-}
-
-.keuanganRowLabel {
+.kasHeaderRight {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+.kasAntarBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+  white-space: nowrap;
+}
+
+.kasAntarBtn:active {
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+}
+
+.kasBody {
+  padding: var(--space-3) var(--card-padding) var(--space-2);
+}
+
+.kasRow {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.kasSymPlus {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--money-in);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.kasSymMinus {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.kasLabel {
   font-size: 14px;
   color: var(--text-primary);
 }
 
-.keuanganRowIcon {
-  color: var(--text-tertiary);
-  flex-shrink: 0;
+.kasAmountIn {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--money-in);
+  text-align: right;
+  white-space: nowrap;
 }
 
-.keuanganRowAmount {
+.kasAmountNeutral {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
+  text-align: right;
+  white-space: nowrap;
 }
 
-.keuanganRowAmountDanger {
+.kasAmountDanger {
   color: var(--money-out);
 }
 
-.keuanganRowAmountAccent {
-  color: var(--accent);
+.kasAmountSavings {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--status-success);
+  text-align: right;
+  white-space: nowrap;
 }
 
-.keuanganRowSublabel {
+.kasSepSingle {
+  height: 1px;
+  background: var(--border-strong);
+  margin: 4px 0 4px 24px;
+}
+
+.kasTotalLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.kasTotalAmount {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.kasDivider {
+  height: 0;
+  border-top: 1px solid var(--border-default);
+  margin: var(--space-2) 0;
+}
+
+.kasSepDouble {
+  height: 4px;
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 3px double var(--border-strong);
+  margin: var(--space-2) 0 0;
+}
+
+.kasBebasWrap {
+  padding: var(--space-2) 0 var(--space-1);
+}
+
+.kasBebasRow {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.kasBebasDot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  justify-self: center;
+}
+
+.kasBebasLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.kasBebasAmount {
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.kasBebasAmountDanger {
+  color: var(--money-out);
+}
+
+.kasBebasSub {
   font-size: 12px;
   color: var(--text-tertiary);
-}
-
-.walletBadge {
-  font-size: 11px;
-  background: var(--bg-surface-2);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-full);
-  padding: 2px var(--space-2);
-  color: var(--text-secondary);
-  margin-left: var(--space-2);
+  font-style: italic;
+  margin: 3px 0 0 24px;
+  padding: 0;
 }
 
 /* ── Cashflow ─────────────────────────────────────────────────────────────── */
@@ -507,8 +653,8 @@
 /* ── Support Card ─────────────────────────────────────────────────────────── */
 
 .supportCard {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
+  background: linear-gradient(135deg, #fff8ed 0%, #fff3e0 100%);
+  border: 1px solid #f5c842;
   border-radius: var(--radius-lg);
   padding: var(--space-4) var(--card-padding);
   position: relative;
@@ -525,7 +671,7 @@
   height: 28px;
   border: none;
   background: transparent;
-  color: var(--text-tertiary);
+  color: #b07a20;
   cursor: pointer;
   border-radius: var(--radius-sm);
   transition: color var(--duration-fast), background var(--duration-fast);
@@ -534,14 +680,14 @@
 }
 
 .supportDismiss:hover {
-  color: var(--text-secondary);
-  background: var(--bg-surface-2);
+  color: #7a5210;
+  background: rgba(245, 200, 66, 0.15);
 }
 
 .supportTitle {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #7a5210;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -550,7 +696,7 @@
 
 .supportDesc {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #a06820;
   margin-top: var(--space-1);
 }
 
@@ -566,9 +712,9 @@
   font-size: 13px;
   font-weight: 500;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-strong);
-  background: transparent;
-  color: var(--text-primary);
+  border: 1.5px solid #f5c842;
+  background: rgba(255, 255, 255, 0.7);
+  color: #7a5210;
   cursor: pointer;
   font-family: var(--font-family);
   -webkit-tap-highlight-color: transparent;
@@ -582,7 +728,7 @@
 }
 
 .supportBtn:hover {
-  background: var(--bg-surface-2);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 /* ── Empty state (card-level) ─────────────────────────────────────────────── */
