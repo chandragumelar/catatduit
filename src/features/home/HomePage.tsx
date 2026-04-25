@@ -12,8 +12,6 @@ import {
   ArrowRight,
   ArrowLeftRight,
   Settings,
-  TrendingUp,
-  TrendingDown,
   Share2,
   Check,
 } from 'lucide-react'
@@ -51,11 +49,6 @@ import { formatRupiah, getCurrentMonthKey } from '@/lib/format'
 import styles from './HomePage.module.css'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function getDayLabel(dateStr: string): string {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('id-ID', { day: 'numeric' })
-}
 
 function getMonthLabel(): string {
   return new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
@@ -209,7 +202,7 @@ export default function HomePage() {
     return { masuk, keluar }
   }, [txBulanIni, kategoriMap])
 
-  // Bar chart — keluar per hari bulan ini
+  // Bar chart — semua tanggal di bulan ini, hari tanpa tx = 0
   const chartData = useMemo(() => {
     const map: Record<string, number> = {}
     txBulanIni
@@ -217,10 +210,16 @@ export default function HomePage() {
       .forEach(tx => {
         map[tx.tanggal] = (map[tx.tanggal] ?? 0) + tx.nominal
       })
-    return Object.entries(map)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([tanggal, total]) => ({ tanggal, label: getDayLabel(tanggal), total }))
-  }, [txBulanIni])
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth()
+    const daysInMonth = new Date(year, month + 1, 0).getDate()
+    return Array.from({ length: daysInMonth }, (_, i) => {
+      const day = i + 1
+      const tanggal = `${currentMonth}-${String(day).padStart(2, '0')}`
+      return { tanggal, label: String(day), total: map[tanggal] ?? 0 }
+    })
+  }, [txBulanIni, currentMonth])
 
   // Budget bulan ini
   const budgetRows = useMemo(() => {
@@ -560,65 +559,63 @@ export default function HomePage() {
             <span className={styles.cardTitle}>Cashflow — {getMonthLabel()}</span>
           </div>
 
-          {/* Uang Masuk section */}
-          {hasMasuk && (
-            <>
-              <div className={styles.cashflowSectionHeader}>
-                <TrendingUp size={12} />
-                <span>Uang masuk</span>
-                <span className={[styles.cashflowSectionTotal, styles.cashflowIn].join(' ')}>{fmt(totalMasukFiltered)}</span>
-              </div>
-              {cashflowByKategori.masuk.map(k => (
-                <div key={k.nama} className={styles.cashflowKatRow}>
-                  <span className={styles.cashflowKatIcon}>{k.icon}</span>
-                  <span className={styles.cashflowKatNama}>{k.nama}</span>
-                  <span className={[styles.cashflowKatAmount, styles.cashflowIn].join(' ')}>{fmt(k.total)}</span>
-                </div>
-              ))}
-            </>
-          )}
+          {/* Summary 3 baris */}
+          <div className={styles.cfSummary}>
+            <div className={styles.cfSummaryRow}>
+              <span className={styles.cfSummaryLabel}>Uang masuk</span>
+              <span className={[styles.cfSummaryAmount, styles.cashflowIn].join(' ')} style={{ whiteSpace: 'nowrap' }}>{fmt(totalMasukFiltered)}</span>
+            </div>
+            <div className={styles.cfSummaryRow}>
+              <span className={styles.cfSummaryLabel}>Uang keluar</span>
+              <span className={[styles.cfSummaryAmount, styles.cashflowOut].join(' ')} style={{ whiteSpace: 'nowrap' }}>{fmt(totalKeluarFiltered)}</span>
+            </div>
+            <div className={[styles.cfSummaryRow, styles.cfSummaryRowNet].join(' ')}>
+              <span className={[styles.cfSummaryLabel, styles.cfSummaryLabelNet].join(' ')}>Uang bersih</span>
+              <span className={[
+                styles.cfSummaryAmount,
+                netBulanIni >= 0 ? styles.cashflowIn : styles.cashflowOut
+              ].join(' ')} style={{ whiteSpace: 'nowrap' }}>
+                {netBulanIni >= 0 ? '+' : ''}{fmt(netBulanIni)}
+              </span>
+            </div>
+          </div>
 
-          {hasMasuk && hasKeluar && <div className={styles.cardDivider} />}
-
-          {/* Uang Keluar section */}
-          {hasKeluar && (
-            <>
-              <div className={styles.cashflowSectionHeader}>
-                <TrendingDown size={12} />
-                <span>Uang keluar</span>
-                <span className={[styles.cashflowSectionTotal, styles.cashflowOut].join(' ')}>{fmt(totalKeluarFiltered)}</span>
-              </div>
-              {cashflowByKategori.keluar.map(k => (
-                <div key={k.nama} className={styles.cashflowKatRow}>
-                  <span className={styles.cashflowKatIcon}>{k.icon}</span>
-                  <span className={styles.cashflowKatNama}>{k.nama}</span>
-                  <span className={[styles.cashflowKatAmount, styles.cashflowOut].join(' ')}>{fmt(k.total)}</span>
-                </div>
-              ))}
-            </>
+          {/* Table detail */}
+          {(hasMasuk || hasKeluar) && (
+            <table className={styles.cfTable}>
+              <tbody>
+                {hasMasuk && (
+                  <tr className={styles.cfTableSection}>
+                    <td colSpan={3} className={styles.cfTableSectionLabel}>Masuk</td>
+                  </tr>
+                )}
+                {cashflowByKategori.masuk.map(k => (
+                  <tr key={k.nama} className={styles.cfTableRow}>
+                    <td className={styles.cfTableIcon}>{k.icon}</td>
+                    <td className={styles.cfTableNama}>{k.nama}</td>
+                    <td className={[styles.cfTableAmount, styles.cashflowIn].join(' ')}>{fmt(k.total)}</td>
+                  </tr>
+                ))}
+                {hasKeluar && (
+                  <tr className={[styles.cfTableSection, hasMasuk ? styles.cfTableSectionBorderTop : ''].join(' ')}>
+                    <td colSpan={3} className={styles.cfTableSectionLabel}>Keluar</td>
+                  </tr>
+                )}
+                {cashflowByKategori.keluar.map(k => (
+                  <tr key={k.nama} className={styles.cfTableRow}>
+                    <td className={styles.cfTableIcon}>{k.icon}</td>
+                    <td className={styles.cfTableNama}>{k.nama}</td>
+                    <td className={[styles.cfTableAmount, styles.cashflowOut].join(' ')}>{fmt(k.total)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
 
           {!hasMasuk && !hasKeluar && (
             <div className={styles.cardEmptyState}>
               <p className={styles.cardEmptyText}>Belum ada transaksi bulan ini.</p>
             </div>
-          )}
-
-          {(hasMasuk || hasKeluar) && (
-            <>
-              <div className={styles.cardDivider} />
-              <div className={styles.cashflowNet}>
-                <span className={styles.cashflowNetLabel}>Uang bersih bulan ini</span>
-                <span className={[
-                  styles.cashflowNetAmount,
-                  netBulanIni > 0 ? styles.cashflowNetPositive :
-                  netBulanIni < 0 ? styles.cashflowNetNegative :
-                  styles.cashflowNetNeutral,
-                ].join(' ')}>
-                  {netBulanIni >= 0 ? '+' : ''}{fmt(netBulanIni)}
-                </span>
-              </div>
-            </>
           )}
         </div>
 
@@ -690,27 +687,36 @@ export default function HomePage() {
             </div>
           ) : (
             <div className={styles.budgetRows}>
-              {budgetRows.map(row => (
+              {budgetRows.map(row => {
+                const isOver = row.pct >= 1
+                const isWarn = !isOver && row.pct >= 0.75
+                const barColor = isOver ? 'var(--status-danger)' : isWarn ? '#EF9F27' : 'var(--accent)'
+                const pctLabel = isOver ? `${Math.round(row.pct * 100)}%` : `${Math.round(row.pct * 100)}%`
+                const pctColor = isOver ? 'var(--status-danger)' : isWarn ? '#854F0B' : 'var(--accent)'
+                const overAmount = isOver ? row.spent - row.limit : 0
+                return (
                 <div key={row.id} className={styles.budgetRow}>
                   <div className={styles.budgetRowTop}>
                     <span className={styles.budgetRowLabel}>
                       {row.icon} {row.nama}
                     </span>
-                    <span className={styles.budgetRowAmounts}>
-                      {fmt(row.spent)} / {fmt(row.limit)}
-                    </span>
+                    <span className={styles.budgetRowPct} style={{ color: pctColor }}>{pctLabel}</span>
                   </div>
                   <div className={styles.budgetBar}>
                     <div
-                      className={[
-                        styles.budgetBarFill,
-                        row.pct >= 1 ? styles.budgetBarFillDanger : ''
-                      ].join(' ')}
-                      style={{ width: `${row.pct * 100}%` }}
+                      className={styles.budgetBarFill}
+                      style={{ width: `${Math.min(row.pct, 1) * 100}%`, background: barColor }}
                     />
                   </div>
+                  <div className={styles.budgetRowMeta} style={{ color: isOver ? 'var(--status-danger)' : 'var(--text-tertiary)' }}>
+                    {isOver
+                      ? `${fmt(row.spent)} dari ${fmt(row.limit)} · jebol ${fmt(overAmount)}`
+                      : `${fmt(row.spent)} dari ${fmt(row.limit)}`
+                    }
+                  </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

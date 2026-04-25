@@ -451,7 +451,13 @@
   font-weight: 500;
 }
 
-.budgetRowAmounts {
+.budgetRowMeta {
+  font-size: 11px;
+  margin-top: 3px;
+  padding-left: 2px;
+}
+
+.budgetRowPct {
   font-size: 12px;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
@@ -813,53 +819,95 @@
 }
 
 
-/* ── Cashflow detail by kategori ─────────────────────────────────────────── */
+/* ── Cashflow table layout ────────────────────────────────────────────────── */
 
-.cashflowSectionHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--card-padding) var(--space-1);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.cfSummary {
+  margin: 0 var(--card-padding) var(--space-1);
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
-.cashflowSectionTotal {
-  margin-left: auto;
+.cfSummaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-top: 0.5px solid var(--border-default);
+}
+
+.cfSummaryRow:first-child {
+  border-top: none;
+}
+
+.cfSummaryRowNet {
+  background: var(--bg-surface-2);
+}
+
+.cfSummaryLabel {
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.cashflowKatRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--card-padding);
-}
-
-.cashflowKatIcon {
-  font-size: 15px;
-  width: 22px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.cashflowKatNama {
-  flex: 1;
-  font-size: 14px;
   color: var(--text-secondary);
+}
+
+.cfSummaryLabelNet {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.cfSummaryAmount {
+  font-size: 15px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.cfTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: var(--space-2);
+  border-top: 0.5px solid var(--border-default);
+}
+
+.cfTableSection {
+  background: var(--bg-surface-2);
+}
+
+.cfTableSectionBorderTop {
+  border-top: 0.5px solid var(--border-default);
+}
+
+.cfTableSectionLabel {
+  padding: 6px var(--card-padding);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cfTableRow {
+  border-top: 0.5px solid var(--border-default);
+}
+
+.cfTableIcon {
+  padding: 8px 4px 8px var(--card-padding);
+  width: 20px;
+  font-size: 15px;
+}
+
+.cfTableNama {
+  padding: 8px 4px;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 160px;
 }
 
-.cashflowKatAmount {
-  font-size: 14px;
+.cfTableAmount {
+  padding: 8px var(--card-padding) 8px 4px;
+  text-align: right;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -934,8 +982,9 @@
 
 /* Area konten — ini yang di-screenshot user */
 .shareModalContent {
-  margin: 0 var(--page-padding-x) var(--space-4);
+  margin: 0 var(--page-padding-x) var(--space-3);
   background: var(--bg-base);
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius-lg);
   padding: var(--space-5) var(--space-5);
   display: flex;
