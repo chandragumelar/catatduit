@@ -55,7 +55,7 @@
   overflow: hidden;
 }
 
-/* ── Row item ─────────────────────────────────────────────────────────────── */
+/* ── Row base ─────────────────────────────────────────────────────────────── */
 
 .row {
   display: flex;
@@ -66,9 +66,7 @@
   border-bottom: 1px solid var(--border-default);
 }
 
-.row:last-child {
-  border-bottom: none;
-}
+.row:last-child { border-bottom: none; }
 
 .rowIcon {
   display: flex;
@@ -104,7 +102,7 @@
 .rowRight {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
   flex-shrink: 0;
 }
 
@@ -114,11 +112,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.rowChevron {
-  color: var(--text-tertiary);
-}
-
-/* ── Button row — actionable full-row ─────────────────────────────────────── */
+/* ── Button row ───────────────────────────────────────────────────────────── */
 
 .rowBtn {
   width: 100%;
@@ -137,18 +131,10 @@
   transition: background var(--duration-fast);
 }
 
-.rowBtn:last-child {
-  border-bottom: none;
-}
+.rowBtn:last-child { border-bottom: none; }
+.rowBtn:active { background: var(--bg-surface-2); }
 
-.rowBtn:active {
-  background: var(--bg-surface-2);
-}
-
-.rowBtnDanger .rowLabel {
-  color: var(--status-danger);
-}
-
+.rowBtnDanger .rowLabel { color: var(--status-danger); }
 .rowBtnDanger .rowIcon {
   background: var(--status-danger-bg);
   color: var(--status-danger);
@@ -175,9 +161,7 @@
   padding: 0;
 }
 
-.namaInput::placeholder {
-  color: var(--text-tertiary);
-}
+.namaInput::placeholder { color: var(--text-tertiary); }
 
 .namaSaveBtn {
   font-size: 13px;
@@ -190,19 +174,186 @@
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   -webkit-tap-highlight-color: transparent;
-  transition: background var(--duration-fast);
   flex-shrink: 0;
 }
 
-.namaSaveBtn:active {
-  background: var(--accent-subtle);
+/* ── Wallet rows ──────────────────────────────────────────────────────────── */
+
+.walletRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--card-padding);
+  min-height: 52px;
+  border-bottom: 1px solid var(--border-default);
 }
 
-/* ── Wallet list ──────────────────────────────────────────────────────────── */
+.walletEmoji {
+  font-size: 20px;
+  width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+}
 
-.walletIcon {
-  font-size: 18px;
-  line-height: 1;
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.iconBtn:active {
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+}
+
+.iconBtnDanger:active {
+  background: var(--status-danger-bg);
+  color: var(--status-danger);
+}
+
+/* ── Inline confirm (hapus wallet) ───────────────────────────────────────── */
+
+.inlineConfirm {
+  padding: var(--space-3) var(--card-padding);
+  background: var(--status-danger-bg);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.inlineConfirmText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.inlineConfirmActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ── Add wallet button ────────────────────────────────────────────────────── */
+
+.addWalletBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--card-padding);
+  min-height: 48px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--accent);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--duration-fast);
+}
+
+.addWalletBtn:active { background: var(--accent-subtle); }
+
+/* ── Wallet form ──────────────────────────────────────────────────────────── */
+
+.walletForm {
+  padding: var(--space-4) var(--card-padding);
+  border-top: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.walletFormTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.walletFormField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.walletFormLabel {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.walletFormInput {
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  outline: none;
+  transition: border-color var(--duration-fast);
+}
+
+.walletFormInput:focus { border-color: var(--border-focus); }
+
+.walletFormSelect {
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.walletFormActions {
+  display: flex;
+  gap: var(--space-2);
+  padding-top: var(--space-1);
+}
+
+.walletFormCancel {
+  flex: 1;
+  height: 40px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.walletFormSave {
+  flex: 1;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-family);
+  color: white;
+  cursor: pointer;
+  transition: opacity var(--duration-fast);
+}
+
+.walletFormSave:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* ── Konfirmasi reset ─────────────────────────────────────────────────────── */
@@ -245,7 +396,6 @@
   font-family: var(--font-family);
   color: var(--text-primary);
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .confirmResetBtn {
@@ -259,22 +409,139 @@
   font-family: var(--font-family);
   color: white;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
   transition: opacity var(--duration-fast);
 }
 
-.confirmResetBtn:active {
-  opacity: 0.85;
+.confirmResetBtn:active { opacity: 0.85; }
+
+/* ── FAQ ──────────────────────────────────────────────────────────────────── */
+
+.faqItem {
+  border-bottom: 1px solid var(--border-default);
 }
 
-/* ── App info ─────────────────────────────────────────────────────────────── */
+.faqItem:last-child { border-bottom: none; }
 
-.appInfo {
-  padding: var(--space-6) var(--page-padding-x);
-  text-align: center;
-  font-size: 12px;
+.faqQuestion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--card-padding);
+  min-height: 48px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-family);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.faqQuestionText {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.faqChevron {
   color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.faqAnswer {
+  padding: 0 var(--card-padding) var(--space-3);
+  font-size: 13px;
+  color: var(--text-secondary);
   line-height: 1.6;
+}
+
+/* ── Support card ─────────────────────────────────────────────────────────── */
+
+.supportCard {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #f5c842;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.supportTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #7a5210;
+}
+
+.supportDesc {
+  font-size: 13px;
+  color: #92400e;
+  line-height: 1.5;
+}
+
+.supportActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.supportBtn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #f5c842;
+  background: rgba(255,255,255,0.7);
+  color: #7a5210;
+  cursor: pointer;
+  font-family: var(--font-family);
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.supportBtn:hover { background: rgba(255,255,255,0.9); }
+
+/* ── Developer info ───────────────────────────────────────────────────────── */
+
+.devInfo {
+  padding: var(--space-6) var(--page-padding-x) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.devName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.devLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.devLink {
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+
+.devLink:hover { color: var(--text-secondary); }
+
+.appVersion {
+  font-size: 11px;
+  color: var(--text-tertiary);
 }
 
 /* ── Toast ────────────────────────────────────────────────────────────────── */
