@@ -1,0 +1,409 @@
+/* =============================================================================
+   features/insight/InsightPage.module.css
+   ============================================================================= */
+
+/* ── Page ─────────────────────────────────────────────────────────────────── */
+
+.page {
+  background: var(--bg-base);
+  min-height: 100%;
+  padding-bottom: var(--space-12);
+}
+
+.header {
+  padding: var(--space-4) var(--page-padding-x) var(--space-2);
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+/* ── Toggle ───────────────────────────────────────────────────────────────── */
+
+.toggleWrapper {
+  padding: var(--space-3) var(--page-padding-x) 0;
+}
+
+.toggleTrack {
+  display: flex;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 3px;
+  gap: 3px;
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: 9px 0;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast), box-shadow var(--duration-fast);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.toggleBtn:active {
+  transform: scale(0.98);
+}
+
+.toggleBtnActive {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--border-default);
+}
+
+.toggleSublabel {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-align: center;
+  margin-top: var(--space-2);
+  display: block;
+}
+
+/* ── Section ──────────────────────────────────────────────────────────────── */
+
+.section {
+  padding: var(--space-3) var(--page-padding-x) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--card-padding);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cardPeriod {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* ── Controls (dropdown row) ──────────────────────────────────────────────── */
+
+.controls {
+  padding: var(--space-3) var(--card-padding);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.select {
+  flex: 1;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  appearance: auto;
+}
+
+/* ── Chart area ───────────────────────────────────────────────────────────── */
+
+.chartWrap {
+  padding: var(--space-4) var(--card-padding) 0;
+}
+
+.legendRow {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.chartCanvas {
+  position: relative;
+  height: 200px;
+}
+
+/* ── Narasi ───────────────────────────────────────────────────────────────── */
+
+.narasi {
+  padding: var(--space-4) var(--card-padding);
+  border-top: 1px solid var(--border-default);
+}
+
+.narasiP {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.narasiP + .narasiP {
+  margin-top: var(--space-3);
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+
+.empty {
+  padding: var(--space-8) var(--card-padding);
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+/* ── Card 3 — Perbandingan Periode ───────────────────────────────────────── */
+
+.compareMetaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--card-padding) var(--space-3);
+  flex-wrap: wrap;
+}
+
+.compareLegendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.compareLegendLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.compareDivider {
+  width: 1px;
+  height: 10px;
+  background: var(--border-default);
+}
+
+.compareOnlyNote {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-left: auto;
+  font-style: italic;
+}
+
+.compareTotals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  padding: 0 var(--card-padding) var(--space-3);
+}
+
+.compareTotalCell {
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.compareTotalMonth {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.compareTotalLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.compareTotalValue {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.compareRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--card-padding) var(--space-3);
+}
+
+.compareRow {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.compareRowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.compareRowLabel {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.compareDelta {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.compareDeltaUp {
+  color: #A32D2D;
+  background: #FCEBEB;
+}
+
+.compareDeltaDown {
+  color: var(--status-success);
+  background: var(--status-success-bg);
+}
+
+.compareBarPair {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.compareBarRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.compareBarMonth {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.compareBarTrack {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.compareBarFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+}
+
+.compareBarValue {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  width: 32px;
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+}
+
+.compareNoData {
+  padding: var(--space-4) var(--card-padding) var(--space-3);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+/* ── Card 4 — Hari Paling Boros ──────────────────────────────────────────── */
+
+.borosGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--card-padding) var(--space-2);
+}
+
+.borosCell {
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) 10px;
+}
+
+.borosCellMonth {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-2);
+  display: block;
+}
+
+.borosCellTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.borosCellDay {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.borosCellAmount {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: #A32D2D;
+  background: #FCEBEB;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+}
+
+.borosCellBar {
+  height: 3px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.borosCellBarFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--status-danger);
+}
+
+.borosAlert {
+  margin: 0 var(--card-padding) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: #FFF0F0;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.borosAlertText {
+  font-size: 12px;
+  color: #A32D2D;
+  line-height: 1.5;
+}
+
+.borosAlertStrong {
+  font-weight: 600;
+}

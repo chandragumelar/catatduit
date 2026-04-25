@@ -149,12 +149,14 @@ Flag opsional "Bayar dari tabungan" — dipilih manual user, sistem tidak otomat
 
 ### INSIGHT
 
-Vertikal, tidak ada tab di dalam Insight:
+Toggle di paling atas: **Bulanan** (6 bulan terakhir) · **Mingguan** (6 minggu terakhir). Semua card mengacu ke toggle ini.
 
-- This Month Story — selalu ada
-- Trends — chart kategori terboros
-- Smart Projection — unlock setelah 2 minggu data. Sebelum unlock: progress indicator bukan hanya teks.
-- Budget Pacing — hanya muncul kalau user sudah set budget
+Empat card, vertikal, tidak ada tab internal. Setiap card wajib ada narasi interpretatif di bawah chart — maksimal 2 paragraf, tidak boleh mengulang angka yang sudah tampil di visual, hanya interpret pola dan konsekuensinya.
+
+- **Tren Lintas Waktu** — line chart. Dua dropdown independen (Pengeluaran / Pemasukan / Nabung). Dropdown kedua bisa di-set "tidak ada" untuk single metric. Default: Pengeluaran + Pemasukan. Metric 1 = solid line, Metric 2 = dashed line. Label nominal above dot.
+- **Tren per Kategori** — bar chart. Single dropdown kategori keluar (exclude transfer_keluar dan lainnya_keluar). Bar tertinggi warna penuh, sisanya transparan. Label nominal above bar.
+- **Perbandingan Periode** — bulanan: bulan ini vs bulan lalu. Mingguan: minggu ini vs minggu lalu. Hanya kategori yang eksis di kedua periode yang ditampilkan — ada footnote yang menjelaskan ini. Delta dalam nominal bukan persen ("naik 900rb bulan ini"). Dual bar per kategori dengan label bulan eksplisit.
+- **Hari Paling Boros** — grid 3×2 per periode. Tiap cell: nama periode, hari terboros, nominal, bar mini relatif ke nilai tertinggi. Alert strip muncul kalau satu hari dominan ≥50% periode.
 
 ### RIWAYAT
 
