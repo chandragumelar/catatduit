@@ -811,3 +811,255 @@
   font-size: 13px;
   color: var(--text-tertiary);
 }
+
+
+/* ── Cashflow detail by kategori ─────────────────────────────────────────── */
+
+.cashflowSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--card-padding) var(--space-1);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cashflowSectionTotal {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cashflowKatRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--card-padding);
+}
+
+.cashflowKatIcon {
+  font-size: 15px;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.cashflowKatNama {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cashflowKatAmount {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Toast ────────────────────────────────────────────────────────────────── */
+
+.toastStack {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-height) + var(--space-4));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 200;
+  pointer-events: none;
+  width: max-content;
+  max-width: calc(100vw - var(--space-8));
+}
+
+.toast {
+  background: var(--text-primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  animation: toastIn var(--duration-normal) ease-out;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Share Modal ──────────────────────────────────────────────────────────── */
+
+.shareOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+
+.shareModal {
+  width: 100%;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+  animation: slideUp var(--duration-slow) ease-out;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.shareModalHandle {
+  width: 36px;
+  height: 4px;
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
+  margin: var(--space-3) auto var(--space-4);
+}
+
+/* Area konten — ini yang di-screenshot user */
+.shareModalContent {
+  margin: 0 var(--page-padding-x) var(--space-4);
+  background: var(--bg-base);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  overflow-y: auto;
+  flex-shrink: 1;
+}
+
+.shareModalTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.shareModalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+
+.shareModalLabel {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.shareModalLabelBold {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.shareModalAmount {
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.shareModalAmountBold {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.shareAmountIn {
+  color: var(--money-in);
+}
+
+.shareAmountOut {
+  color: var(--money-out);
+}
+
+.shareAmountSavings {
+  color: #3b82f6;
+}
+
+.shareModalDivider {
+  height: 1px;
+  background: var(--border-default);
+  margin: var(--space-1) 0;
+}
+
+.shareModalBadge {
+  margin-top: var(--space-2);
+  align-self: flex-end;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Instruksi & actions */
+.shareModalHint {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-4);
+  flex-shrink: 0;
+}
+
+.shareModalActions {
+  display: flex;
+  gap: var(--space-3);
+  padding: 0 var(--page-padding-x);
+  flex-shrink: 0;
+}
+
+.shareModalCopyBtn {
+  flex: 1;
+  height: 44px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  transition: background var(--duration-fast), border-color var(--duration-fast);
+}
+
+.shareModalCopyBtn:hover {
+  background: var(--bg-surface-2);
+}
+
+.shareModalCloseBtn {
+  flex: 1;
+  height: 44px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.shareModalCloseBtn:hover {
+  background: var(--accent-hover);
+}

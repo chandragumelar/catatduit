@@ -1,0 +1,1010 @@
+/* =============================================================================
+   features/budget/PlanningPage.module.css
+   ============================================================================= */
+
+.page {
+  background: var(--bg-base);
+  min-height: 100%;
+  padding-bottom: calc(var(--bottom-nav-height) + var(--space-12));
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+  padding: 0 var(--page-padding-x);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ── Tab bar ──────────────────────────────────────────────────────────────── */
+
+.tabBar {
+  display: flex;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
+  position: sticky;
+  top: var(--header-height);
+  z-index: 9;
+}
+
+.tabBtn {
+  flex: 1;
+  height: 44px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: color var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tabBtn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+
+.tabBtnActive {
+  color: var(--accent);
+}
+
+.tabBtnActive::after {
+  opacity: 1;
+}
+
+/* ── Tab content ──────────────────────────────────────────────────────────── */
+
+.tabContent {
+  padding: var(--space-4) var(--page-padding-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Currency switcher ────────────────────────────────────────────────────── */
+
+.currencyTabs {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.currencyTab {
+  padding: var(--space-1) var(--space-3);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-full);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.currencyTabActive {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+/* ── Section ──────────────────────────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 var(--space-1);
+  margin-bottom: var(--space-1);
+}
+
+/* ── Budget rows ──────────────────────────────────────────────────────────── */
+
+.budgetRow {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.budgetRowTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.budgetRowIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.budgetRowNama {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.editBtn,
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.editBtn {
+  background: transparent;
+  color: var(--text-tertiary);
+}
+
+.editBtn:hover {
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+}
+
+.addBtn {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+.addBtn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.budgetProgress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.budgetBar {
+  height: 6px;
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.budgetBarFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-normal);
+  min-width: 3px;
+}
+
+.budgetBarOver {
+  background: var(--status-danger);
+}
+
+.budgetAmounts {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.amountMuted {
+  color: var(--text-secondary);
+}
+
+.amountDanger {
+  color: var(--status-danger);
+  font-weight: 500;
+}
+
+/* ── Inline edit ──────────────────────────────────────────────────────────── */
+
+.editRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.editInput {
+  flex: 1;
+  height: 36px;
+  padding: 0 var(--space-3);
+  border: 1.5px solid var(--border-focus);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+.editSaveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.editCancelBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Summary strip ────────────────────────────────────────────────────────── */
+
+.summaryStrip {
+  display: flex;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  gap: var(--space-4);
+}
+
+.summaryDivider {
+  width: 1px;
+  height: 32px;
+  background: var(--border-default);
+  flex-shrink: 0;
+}
+
+.summaryLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+
+.summaryValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.summaryDanger {
+  color: var(--status-danger);
+}
+
+/* ── Tagihan rows ─────────────────────────────────────────────────────────── */
+
+.tagihanRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-3);
+  transition: border-color var(--duration-fast);
+}
+
+.tagihanRowSoon {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.tagihanRowOverdue {
+  border-color: var(--status-danger);
+  background: var(--status-danger-bg);
+}
+
+.tagihanRowPaid {
+  opacity: 0.6;
+}
+
+.checkCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.checkCircleEmpty {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-strong);
+  border-radius: 50%;
+  transition: border-color var(--duration-fast);
+}
+
+.checkCircle:hover .checkCircleEmpty {
+  border-color: var(--accent);
+}
+
+.checkIcon {
+  color: var(--status-success);
+}
+
+.tagihanInfo {
+  flex: 1;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.tagihanNama {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tagihanNamaPaid {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.tagihanMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: 2px;
+}
+
+.tagihanDue {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.metaDanger {
+  color: var(--status-danger);
+}
+
+.metaWarn {
+  color: #d97706;
+}
+
+.metaDot {
+  color: var(--text-tertiary);
+  font-size: 10px;
+}
+
+.tagihanWallet {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tagihanRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.tagihanNominal {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tagihanNominalPaid {
+  color: var(--text-tertiary);
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.deleteBtn:hover {
+  color: var(--status-danger);
+  background: var(--status-danger-bg);
+}
+
+/* ── Goal cards ───────────────────────────────────────────────────────────── */
+
+.goalCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.goalCardDone {
+  border-color: var(--status-success);
+  background: var(--status-success-bg);
+}
+
+.goalCardTop {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.goalIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.goalInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.goalNama {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.goalDeadline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.goalActions {
+  display: flex;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.iconBtn:hover {
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+}
+
+.goalProgressBar {
+  height: 8px;
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.goalProgressFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-normal);
+  min-width: 3px;
+}
+
+.goalProgressDone {
+  background: var(--status-success);
+}
+
+.goalAmounts {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.goalTerkumpul {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.goalPercent {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.addProgressRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.addProgressInput {
+  flex: 1;
+  height: 38px;
+  padding: 0 var(--space-3);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: border-color var(--duration-fast);
+}
+
+.addProgressInput:focus {
+  border-color: var(--border-focus);
+}
+
+.addProgressBtn {
+  height: 38px;
+  padding: 0 var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--duration-fast);
+}
+
+.addProgressBtn:hover {
+  background: var(--accent-hover);
+}
+
+.addProgressBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.goalDoneBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--status-success);
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+
+.emptyState {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+}
+
+.emptyTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.emptyDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ── FAB add ──────────────────────────────────────────────────────────────── */
+
+.fabAdd {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-height) + var(--space-4));
+  right: var(--space-4);
+  width: var(--fab-size);
+  height: var(--fab-size);
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(15, 123, 108, 0.35);
+  transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 50;
+}
+
+.fabAdd:hover {
+  transform: scale(1.05);
+}
+
+.fabAdd:active {
+  transform: scale(0.92);
+}
+
+/* ── Bottom sheet ─────────────────────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet {
+  width: 100%;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp var(--duration-slow) ease-out;
+}
+
+.confirmSheet {
+  width: 100%;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: var(--space-4) var(--page-padding-x) calc(var(--space-6) + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: slideUp var(--duration-slow) ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheetHandle {
+  width: 36px;
+  height: 4px;
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
+  margin: var(--space-3) auto 0;
+  flex-shrink: 0;
+}
+
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--page-padding-x) var(--space-2);
+  flex-shrink: 0;
+}
+
+.sheetTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sheetClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.sheetBody {
+  overflow-y: auto;
+  padding: var(--space-2) var(--page-padding-x) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1;
+}
+
+.sheetFooter {
+  padding: var(--space-4) var(--page-padding-x) calc(var(--space-6) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+
+/* ── Form fields ──────────────────────────────────────────────────────────── */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.fieldRow {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.fieldInput {
+  height: 44px;
+  padding: 0 var(--space-3);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: border-color var(--duration-fast);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fieldInput:focus {
+  border-color: var(--border-focus);
+}
+
+.selectWrap {
+  position: relative;
+}
+
+.fieldSelect {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-8) 0 var(--space-3);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--duration-fast);
+  box-sizing: border-box;
+}
+
+.fieldSelect:focus {
+  border-color: var(--border-focus);
+}
+
+.selectChevron {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+/* ── Toggle ───────────────────────────────────────────────────────────────── */
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  cursor: pointer;
+}
+
+.toggleLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.toggle {
+  width: 44px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--border-strong);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background var(--duration-normal);
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: transform var(--duration-normal);
+}
+
+.toggleOn {
+  background: var(--accent);
+}
+
+.toggleOn::after {
+  transform: translateX(18px);
+}
+
+/* ── Icon picker ──────────────────────────────────────────────────────────── */
+
+.iconPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.iconOption {
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-2);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color var(--duration-fast), background var(--duration-fast);
+}
+
+.iconOptionActive {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+/* ── Confirm sheet ────────────────────────────────────────────────────────── */
+
+.confirmTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.confirmDesc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.btnPrimary {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+
+.btnPrimary:hover { background: var(--accent-hover); }
+.btnPrimary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btnDanger {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--status-danger);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnSecondary {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ── Toast ────────────────────────────────────────────────────────────────── */
+
+.toastStack {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-height) + var(--space-4));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 200;
+  pointer-events: none;
+  width: max-content;
+  max-width: calc(100vw - var(--space-8));
+}
+
+.toast {
+  background: var(--text-primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  animation: toastIn var(--duration-normal) ease-out;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

@@ -284,6 +284,27 @@
   color: var(--text-primary);
 }
 
+.customWalletRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0;
+  flex-shrink: 0;
+  transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.customWalletRemove:hover {
+  color: var(--status-danger);
+  background: var(--status-danger-bg);
+}
+
 /* ── Saldo list ────────────────────────────────────────────────────────────── */
 
 .saldoList {

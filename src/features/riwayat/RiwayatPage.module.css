@@ -26,22 +26,27 @@
 .backBtn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
+  gap: var(--space-1);
   height: 40px;
+  padding: 0 var(--space-2);
   border: none;
   background: transparent;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   cursor: pointer;
   border-radius: var(--radius-md);
   flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
-  transition: background var(--duration-fast);
-  padding: 0;
+  transition: background var(--duration-fast), color var(--duration-fast);
 }
 
 .backBtn:hover {
   background: var(--bg-surface-2);
+  color: var(--text-primary);
+}
+
+.backBtnLabel {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .headerTitle {

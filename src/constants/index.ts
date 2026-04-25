@@ -19,7 +19,6 @@ export const STORAGE_KEYS = {
   CURRENCY:               'cd_currency',
   NUDGE:                  'cd_nudge_shown',
   CHECKLIST_DISMISSED:    'cd_checklist_dismissed',
-  BUDGET_PERIOD:          'cd_budget_period',
   CARD_COLLAPSED:         'cd_card_collapsed',
   SUPPORT_BANNER:         'cd_support_banner_dismissed_at',
   SECONDARY_CURRENCY:     'cd_secondary_currency',

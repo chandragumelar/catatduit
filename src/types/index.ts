@@ -69,7 +69,6 @@ export type BudgetMap = {
   }
 }
 
-export type BudgetPeriod = 'monthly' | 'weekly'
 export type CurrencyToggle = 'base' | 'secondary'
 
 // Computed values — hasil kalkulasi, bukan entity storage

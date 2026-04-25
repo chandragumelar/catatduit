@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, Plus, Check, ChevronDown } from "lucide-react";
+import { ChevronLeft, Plus, Check, ChevronDown, X } from "lucide-react";
 import { saveNama, setOnboardingDone, saveWallets } from "@/storage";
 import { useWalletStore } from "@/store/wallet.store";
 import { CURRENCY_OPTIONS, DEFAULT_WALLET_ID } from "@/constants";
@@ -116,12 +116,14 @@ function StepDompet({
   selected,
   onToggle,
   onAddCustom,
+  onRemoveCustom,
   onNext,
   onBack,
 }: {
   selected: OnboardingWallet[];
   onToggle: (preset: WalletPreset) => void;
   onAddCustom: () => void;
+  onRemoveCustom: (nama: string) => void;
   onNext: () => void;
   onBack: () => void;
 }) {
@@ -170,7 +172,13 @@ function StepDompet({
             <div key={i} className={styles.customWalletChip}>
               <span>{w.icon}</span>
               <span className={styles.customWalletNama}>{w.nama}</span>
-              <Check size={14} strokeWidth={2.5} className={styles.presetCheck} />
+              <button
+                className={styles.customWalletRemove}
+                onClick={() => onRemoveCustom(w.nama)}
+                aria-label={`Hapus ${w.nama}`}
+              >
+                <X size={14} strokeWidth={2} />
+              </button>
             </div>
           ))}
         </div>
@@ -452,6 +460,7 @@ export default function OnboardingPage({
             selected={wallets}
             onToggle={togglePreset}
             onAddCustom={() => setShowCustomSheet(true)}
+            onRemoveCustom={(nama) => setWallets(wallets.filter(w => !(w.presetId === null && w.nama === nama)))}
             onNext={() => goTo(3, "forward")}
             onBack={() => goTo(1, "back")}
           />

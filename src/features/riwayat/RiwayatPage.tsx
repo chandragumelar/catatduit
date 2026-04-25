@@ -165,7 +165,8 @@ export default function RiwayatPage() {
           onClick={() => navigate(-1)}
           aria-label="Kembali"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={18} strokeWidth={1.5} />
+          <span className={styles.backBtnLabel}>Kembali</span>
         </button>
         <span className={styles.headerTitle}>Semua Catatan</span>
       </div>

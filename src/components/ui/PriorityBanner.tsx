@@ -1,21 +1,25 @@
 // =============================================================================
 // components/ui/PriorityBanner.tsx
-// Dipakai untuk: update tersedia, budget jebol, tagihan jatuh tempo.
+// Variant "update": accent hijau, clickable.
+// Variant "warning": amber, tidak clickable.
 // Tidak dismissible. Hilang otomatis ketika kondisi resolved.
 // =============================================================================
 
 interface PriorityBannerProps {
   message: string
   onClick?: () => void
+  variant?: 'update' | 'warning'
 }
 
-export function PriorityBanner({ message, onClick }: PriorityBannerProps) {
+export function PriorityBanner({ message, onClick, variant = 'update' }: PriorityBannerProps) {
+  const isWarning = variant === 'warning'
+
   return (
     <div
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       style={{
-        background: 'var(--accent)',
+        background: isWarning ? '#92400e' : 'var(--accent)',
         color: '#fff',
         padding: '10px var(--page-padding-x)',
         fontSize: 14,

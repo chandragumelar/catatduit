@@ -3,6 +3,7 @@
 // =============================================================================
 
 import { useState, useMemo } from 'react'
+import { useToast } from '@/hooks/useToast'
 import { useNavigate } from 'react-router-dom'
 import {
   ChevronDown,
@@ -90,6 +91,8 @@ export default function HomePage() {
   const [collapsedCards, setCollapsedCards] = useState<Set<string>>(
     () => new Set(getCardCollapsed())
   )
+  const { toasts, showToast } = useToast()
+  const [showShareModal, setShowShareModal] = useState(false)
   const [shareCopied, setShareCopied] = useState(false)
 
   // ── Data derivations ───────────────────────────────────────────────────────
@@ -133,17 +136,6 @@ export default function HomePage() {
     [relevantWallets]
   )
 
-  // Saldo aktif wallet
-  const activeWalletSaldo = useMemo(() => {
-    if (!activeWallet) return 0
-    const masuk = transaksi
-      .filter(tx => tx.wallet_id === activeWallet.id && tx.jenis === 'masuk')
-      .reduce((s, tx) => s + tx.nominal, 0)
-    const keluar = transaksi
-      .filter(tx => tx.wallet_id === activeWallet.id && tx.jenis === 'keluar')
-      .reduce((s, tx) => s + tx.nominal, 0)
-    return activeWallet.saldo_awal + masuk - keluar
-  }, [activeWallet, transaksi])
 
   // Total saldo — hanya wallet currency yang relevan
   const totalSaldoFiltered = useMemo(() => {
@@ -194,6 +186,28 @@ export default function HomePage() {
 
   const uangBebas = totalSaldoFiltered - tagihanBulanIni - totalNabungFiltered
   const netBulanIni = totalMasukFiltered - totalKeluarFiltered
+
+  // Cashflow detail by kategori
+  const cashflowByKategori = useMemo(() => {
+    const masukMap: Record<string, { nama: string; icon: string; total: number }> = {}
+    const keluarMap: Record<string, { nama: string; icon: string; total: number }> = {}
+
+    txBulanIni.forEach(tx => {
+      if (tx.jenis === 'masuk') {
+        const kat = kategoriMap.masuk.find(k => k.id === tx.kategori)
+        if (!masukMap[tx.kategori]) masukMap[tx.kategori] = { nama: kat?.nama ?? tx.kategori, icon: kat?.icon ?? '📥', total: 0 }
+        masukMap[tx.kategori].total += tx.nominal
+      } else if (tx.jenis === 'keluar') {
+        const kat = kategoriMap.keluar.find(k => k.id === tx.kategori)
+        if (!keluarMap[tx.kategori]) keluarMap[tx.kategori] = { nama: kat?.nama ?? tx.kategori, icon: kat?.icon ?? '📤', total: 0 }
+        keluarMap[tx.kategori].total += tx.nominal
+      }
+    })
+
+    const masuk = Object.values(masukMap).sort((a, b) => b.total - a.total)
+    const keluar = Object.values(keluarMap).sort((a, b) => b.total - a.total)
+    return { masuk, keluar }
+  }, [txBulanIni, kategoriMap])
 
   // Bar chart — keluar per hari bulan ini
   const chartData = useMemo(() => {
@@ -271,6 +285,11 @@ export default function HomePage() {
 
   const bulanLabel = getMonthLabel()
   const hasNabung = totalNabungFiltered > 0
+
+  // Total tabungan = sum terkumpul semua goals
+  const totalTabungan = useMemo(() => {
+    return getGoals().reduce((s, g) => s + g.terkumpul, 0)
+  }, [])
   const hasTagihan = tagihanBulanIni > 0
   const hasMasuk = totalMasukFiltered > 0
   const hasKeluar = totalKeluarFiltered > 0
@@ -341,18 +360,18 @@ export default function HomePage() {
     return `Uang bebasmu bulan ini ${bebasStr}.`
   }
 
-  async function handleShare() {
-    const text = buildShareText()
-    if (navigator.share) {
-      try {
-        await navigator.share({ text })
-      } catch {
-        // user cancel — no-op
-      }
-    } else {
-      await navigator.clipboard.writeText(text)
+  function handleShare() {
+    setShowShareModal(true)
+    setShareCopied(false)
+  }
+
+  async function handleCopyText() {
+    try {
+      await navigator.clipboard.writeText(buildShareText())
       setShareCopied(true)
       setTimeout(() => setShareCopied(false), 2000)
+    } catch {
+      showToast('Gagal menyalin, coba lagi')
     }
   }
 
@@ -362,6 +381,15 @@ export default function HomePage() {
 
   return (
     <div className={styles.page}>
+
+      {/* Toast renderer */}
+      {toasts.length > 0 && (
+        <div className={styles.toastStack}>
+          {toasts.map(t => (
+            <div key={t.id} className={styles.toast}>{t.message}</div>
+          ))}
+        </div>
+      )}
 
       {/* Greeting */}
       <div className={styles.greeting}>
@@ -501,8 +529,8 @@ export default function HomePage() {
               {/* Nabung */}
               <div className={styles.kasRow}>
                 <span className={styles.kasSymMinus}>−</span>
-                <span className={styles.kasLabel}>Nabung bulan ini</span>
-                <span className={styles.kasAmountSavings}>{fmt(totalNabungFiltered)}</span>
+                <span className={styles.kasLabel}>Total tabungan</span>
+                <span className={styles.kasAmountSavings}>{fmt(totalTabungan)}</span>
               </div>
 
               {/* Double underline + uang bebas */}
@@ -531,41 +559,67 @@ export default function HomePage() {
           <div className={styles.cardHeader}>
             <span className={styles.cardTitle}>Cashflow — {getMonthLabel()}</span>
           </div>
-          <div className={styles.cashflowDesc}>
-            Total uang masuk dikurangi uang keluar bulan ini.
-          </div>
-          <div className={styles.cashflowGrid}>
-            <div className={styles.cashflowItem}>
-              <div className={styles.cashflowItemLabel}>
-                <TrendingUp size={12} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-                Uang masuk
+
+          {/* Uang Masuk section */}
+          {hasMasuk && (
+            <>
+              <div className={styles.cashflowSectionHeader}>
+                <TrendingUp size={12} />
+                <span>Uang masuk</span>
+                <span className={[styles.cashflowSectionTotal, styles.cashflowIn].join(' ')}>{fmt(totalMasukFiltered)}</span>
               </div>
-              <div className={[styles.cashflowItemAmount, styles.cashflowIn].join(' ')}>
-                {fmt(totalMasukFiltered)}
+              {cashflowByKategori.masuk.map(k => (
+                <div key={k.nama} className={styles.cashflowKatRow}>
+                  <span className={styles.cashflowKatIcon}>{k.icon}</span>
+                  <span className={styles.cashflowKatNama}>{k.nama}</span>
+                  <span className={[styles.cashflowKatAmount, styles.cashflowIn].join(' ')}>{fmt(k.total)}</span>
+                </div>
+              ))}
+            </>
+          )}
+
+          {hasMasuk && hasKeluar && <div className={styles.cardDivider} />}
+
+          {/* Uang Keluar section */}
+          {hasKeluar && (
+            <>
+              <div className={styles.cashflowSectionHeader}>
+                <TrendingDown size={12} />
+                <span>Uang keluar</span>
+                <span className={[styles.cashflowSectionTotal, styles.cashflowOut].join(' ')}>{fmt(totalKeluarFiltered)}</span>
               </div>
+              {cashflowByKategori.keluar.map(k => (
+                <div key={k.nama} className={styles.cashflowKatRow}>
+                  <span className={styles.cashflowKatIcon}>{k.icon}</span>
+                  <span className={styles.cashflowKatNama}>{k.nama}</span>
+                  <span className={[styles.cashflowKatAmount, styles.cashflowOut].join(' ')}>{fmt(k.total)}</span>
+                </div>
+              ))}
+            </>
+          )}
+
+          {!hasMasuk && !hasKeluar && (
+            <div className={styles.cardEmptyState}>
+              <p className={styles.cardEmptyText}>Belum ada transaksi bulan ini.</p>
             </div>
-            <div className={styles.cashflowItem}>
-              <div className={styles.cashflowItemLabel}>
-                <TrendingDown size={12} style={{ display: 'inline', marginRight: 4, verticalAlign: 'middle' }} />
-                Uang keluar
+          )}
+
+          {(hasMasuk || hasKeluar) && (
+            <>
+              <div className={styles.cardDivider} />
+              <div className={styles.cashflowNet}>
+                <span className={styles.cashflowNetLabel}>Uang bersih bulan ini</span>
+                <span className={[
+                  styles.cashflowNetAmount,
+                  netBulanIni > 0 ? styles.cashflowNetPositive :
+                  netBulanIni < 0 ? styles.cashflowNetNegative :
+                  styles.cashflowNetNeutral,
+                ].join(' ')}>
+                  {netBulanIni >= 0 ? '+' : ''}{fmt(netBulanIni)}
+                </span>
               </div>
-              <div className={[styles.cashflowItemAmount, styles.cashflowOut].join(' ')}>
-                {fmt(totalKeluarFiltered)}
-              </div>
-            </div>
-          </div>
-          <div className={styles.cardDivider} />
-          <div className={styles.cashflowNet}>
-            <span className={styles.cashflowNetLabel}>Uang bersih bulan ini</span>
-            <span className={[
-              styles.cashflowNetAmount,
-              netBulanIni > 0 ? styles.cashflowNetPositive :
-              netBulanIni < 0 ? styles.cashflowNetNegative :
-              styles.cashflowNetNeutral,
-            ].join(' ')}>
-              {netBulanIni >= 0 ? '+' : ''}{fmt(netBulanIni)}
-            </span>
-          </div>
+            </>
+          )}
         </div>
 
         {/* Card Pengeluaran per Hari */}
@@ -783,16 +837,92 @@ export default function HomePage() {
                 className={styles.shareBtn}
                 onClick={handleShare}
               >
-                {shareCopied
-                  ? <><Check size={16} /> Disalin</>
-                  : <><Share2 size={16} /> Bagikan</>
-                }
+                <Share2 size={16} /> Bagikan
               </button>
             </div>
           )}
         </div>
 
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className={styles.shareOverlay} onClick={() => setShowShareModal(false)}>
+          <div className={styles.shareModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.shareModalHandle} />
+
+            {/* Konten yang enak di-screenshot */}
+            <div className={styles.shareModalContent}>
+              <div className={styles.shareModalTitle}>Keuangan {bulanLabel}</div>
+
+              {hasMasuk && (
+                <div className={styles.shareModalRow}>
+                  <span className={styles.shareModalLabel}>Pemasukan</span>
+                  <span className={[styles.shareModalAmount, styles.shareAmountIn].join(' ')}>
+                    +{fmt(totalMasukFiltered)}
+                  </span>
+                </div>
+              )}
+              {hasKeluar && (
+                <div className={styles.shareModalRow}>
+                  <span className={styles.shareModalLabel}>Pengeluaran</span>
+                  <span className={[styles.shareModalAmount, styles.shareAmountOut].join(' ')}>
+                    −{fmt(totalKeluarFiltered)}
+                  </span>
+                </div>
+              )}
+              {hasNabung && (
+                <div className={styles.shareModalRow}>
+                  <span className={styles.shareModalLabel}>Ditabung</span>
+                  <span className={[styles.shareModalAmount, styles.shareAmountSavings].join(' ')}>
+                    {fmt(totalNabungFiltered)}
+                  </span>
+                </div>
+              )}
+              {tagihanBulanIni > 0 && (
+                <div className={styles.shareModalRow}>
+                  <span className={styles.shareModalLabel}>Tagihan</span>
+                  <span className={[styles.shareModalAmount, styles.shareAmountOut].join(' ')}>
+                    −{fmt(tagihanBulanIni)}
+                  </span>
+                </div>
+              )}
+
+              <div className={styles.shareModalDivider} />
+
+              <div className={styles.shareModalRow}>
+                <span className={styles.shareModalLabelBold}>Uang bebas</span>
+                <span className={[
+                  styles.shareModalAmountBold,
+                  uangBebas < 0 ? styles.shareAmountOut : styles.shareAmountIn
+                ].join(' ')}>
+                  {fmt(uangBebas)}
+                </span>
+              </div>
+
+              <div className={styles.shareModalBadge}>CatatDuit</div>
+            </div>
+
+            {/* Instruksi + actions */}
+            <p className={styles.shareModalHint}>Yuk screenshot dan bagikan!</p>
+            <div className={styles.shareModalActions}>
+              <button
+                className={styles.shareModalCopyBtn}
+                onClick={handleCopyText}
+              >
+                {shareCopied ? <><Check size={15} /> Tersalin</> : 'Salin teks'}
+              </button>
+              <button
+                className={styles.shareModalCloseBtn}
+                onClick={() => setShowShareModal(false)}
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
