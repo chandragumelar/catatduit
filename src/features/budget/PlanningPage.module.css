@@ -479,12 +479,13 @@
   gap: var(--space-3);
 }
 
-.goalCardDone {
-  border-color: var(--status-success);
-  background: var(--status-success-bg);
+.goalAmounts {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
-.goalCardTop {
+/* ── Empty state ──────────────────────────────────────────────────────────── */.goalCardTop {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
@@ -505,6 +506,13 @@
   font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
+}
+
+.goalTarget {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
 }
 
 .goalDeadline {
@@ -557,83 +565,6 @@
   min-width: 3px;
 }
 
-.goalProgressDone {
-  background: var(--status-success);
-}
-
-.goalAmounts {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.goalTerkumpul {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-.goalPercent {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
-}
-
-.addProgressRow {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.addProgressInput {
-  flex: 1;
-  height: 38px;
-  padding: 0 var(--space-3);
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  color: var(--text-primary);
-  background: var(--bg-surface);
-  font-variant-numeric: tabular-nums;
-  outline: none;
-  transition: border-color var(--duration-fast);
-}
-
-.addProgressInput:focus {
-  border-color: var(--border-focus);
-}
-
-.addProgressBtn {
-  height: 38px;
-  padding: 0 var(--space-4);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  color: white;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background var(--duration-fast);
-}
-
-.addProgressBtn:hover {
-  background: var(--accent-hover);
-}
-
-.addProgressBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.goalDoneBadge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--status-success);
-}
 
 /* ── Empty state ──────────────────────────────────────────────────────────── */
 
@@ -809,6 +740,13 @@
 
 .fieldInput:focus {
   border-color: var(--border-focus);
+}
+
+.fieldHint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+  line-height: 1.4;
 }
 
 .selectWrap {

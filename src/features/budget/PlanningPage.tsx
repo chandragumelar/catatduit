@@ -5,7 +5,7 @@
 
 import { useState, useMemo } from 'react'
 import {
-  Plus, X, Check, ChevronDown, AlertCircle, Calendar,
+  Plus, X, ChevronDown, AlertCircle,
   Trash2, Pencil,
 } from 'lucide-react'
 
@@ -18,7 +18,7 @@ import {
   getKategori,
 } from '@/storage'
 import { KATEGORI_DEFAULT, MAX_GOALS, CURRENCY_OPTIONS } from '@/constants'
-import { formatRupiah, getCurrentMonthKey, generateId, getTodayString } from '@/lib/format'
+import { formatRupiah, getCurrentMonthKey, generateId } from '@/lib/format'
 import { useToast } from '@/hooks/useToast'
 import type { Tagihan, Goal } from '@/types'
 
@@ -244,8 +244,8 @@ function TabBudget() {
 
       {budgetRows.length === 0 && (
         <div className={styles.emptyState}>
-          <div className={styles.emptyTitle}>Tidak ada kategori</div>
-          <div className={styles.emptyDesc}>Tambah kategori pengeluaran dulu di Pengaturan.</div>
+          <div className={styles.emptyTitle}>Belum ada kategori pengeluaran</div>
+          <div className={styles.emptyDesc}>Tambah kategori dulu di Pengaturan, lalu kembali ke sini untuk atur budget.</div>
         </div>
       )}
     </div>
@@ -458,7 +458,7 @@ function TabTagihan() {
                   <label className={styles.fieldLabel}>Jatuh tempo</label>
                   <div className={styles.selectWrap}>
                     <select className={styles.fieldSelect} value={formTanggal} onChange={e => setFormTanggal(Number(e.target.value))}>
-                      {Array.from({ length: 28 }, (_, i) => i + 1).map(d => <option key={d} value={d}>Tgl {d}</option>)}
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map(d => <option key={d} value={d}>Tgl {d}</option>)}
                     </select>
                     <ChevronDown size={14} className={styles.selectChevron} />
                   </div>
@@ -523,60 +523,46 @@ function TabTabungan() {
   const [showForm, setShowForm] = useState(false)
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
-  const [addNominal, setAddNominal] = useState<Record<string, string>>({})
 
   const ICONS = ['🎯', '✈️', '🏠', '🚗', '💻', '📱', '👗', '🎓', '💍', '🏖️', '🎮', '📷']
 
   const [formNama, setFormNama] = useState('')
   const [formTarget, setFormTarget] = useState('')
-  const [formTerkumpul, setFormTerkumpul] = useState('')
-  const [formDeadline, setFormDeadline] = useState('')
   const [formIcon, setFormIcon] = useState('🎯')
 
   function resetForm() {
-    setFormNama(''); setFormTarget(''); setFormTerkumpul('')
-    setFormDeadline(''); setFormIcon('🎯'); setEditingGoal(null); setShowForm(false)
+    setFormNama(''); setFormTarget('')
+    setFormIcon('🎯'); setEditingGoal(null); setShowForm(false)
   }
 
   function openAdd() {
     setEditingGoal(null); setFormNama(''); setFormTarget('')
-    setFormTerkumpul(''); setFormDeadline(''); setFormIcon('🎯'); setShowForm(true)
+    setFormIcon('🎯'); setShowForm(true)
   }
 
   function openEdit(g: Goal) {
     setEditingGoal(g); setFormNama(g.nama)
     setFormTarget(g.target.toLocaleString('id-ID'))
-    setFormTerkumpul(g.terkumpul.toLocaleString('id-ID'))
-    setFormDeadline(g.deadline ?? ''); setFormIcon(g.icon ?? '🎯'); setShowForm(true)
+    setFormIcon(g.icon ?? '🎯'); setShowForm(true)
   }
 
   function handleSave() {
     const target = parseNominal(formTarget)
-    const terkumpul = parseNominal(formTerkumpul)
     if (!formNama.trim() || target <= 0) return
     let next: Goal[]
     if (editingGoal) {
       next = goals.map(g => g.id === editingGoal.id
-        ? { ...g, nama: formNama.trim(), target, terkumpul, deadline: formDeadline || undefined, icon: formIcon }
+        ? { ...g, nama: formNama.trim(), target, icon: formIcon }
         : g
       )
       showToast('Target diperbarui')
     } else {
       if (goals.length >= MAX_GOALS) { showToast(`Maksimal ${MAX_GOALS} target`); return }
-      next = [...goals, { id: generateId(), nama: formNama.trim(), target, terkumpul, deadline: formDeadline || undefined, icon: formIcon }]
+      next = [...goals, { id: generateId(), nama: formNama.trim(), target, icon: formIcon }]
       showToast('Target ditambahkan')
     }
     try { saveGoals(next); setGoalsState(next); resetForm() }
     catch { showToast('Gagal menyimpan, coba lagi') }
-  }
-
-  function handleAddProgress(id: string) {
-    const val = parseNominal(addNominal[id] ?? '')
-    if (val <= 0) return
-    const next = goals.map(g => g.id === id ? { ...g, terkumpul: g.terkumpul + val } : g)
-    saveGoals(next); setGoalsState(next)
-    setAddNominal(prev => ({ ...prev, [id]: '' }))
-    showToast('Progress diperbarui')
   }
 
   function handleDelete(id: string) {
@@ -602,57 +588,21 @@ function TabTabungan() {
         </div>
       ) : (
         <div className={styles.section}>
-          {goals.map(goal => {
-            const pct = goal.target > 0 ? Math.min(goal.terkumpul / goal.target, 1) : 0
-            const done = pct >= 1
-            return (
-              <div key={goal.id} className={[styles.goalCard, done ? styles.goalCardDone : ''].join(' ')}>
+          {goals.map(goal => (
+              <div key={goal.id} className={styles.goalCard}>\
                 <div className={styles.goalCardTop}>
                   <span className={styles.goalIcon}>{goal.icon ?? '🎯'}</span>
                   <div className={styles.goalInfo}>
                     <div className={styles.goalNama}>{goal.nama}</div>
-                    {goal.deadline && (
-                      <div className={styles.goalDeadline}>
-                        <Calendar size={12} strokeWidth={1.5} />
-                        Target: {new Date(goal.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                      </div>
-                    )}
+                    <div className={styles.goalTarget}>{fmt(goal.target)}</div>
                   </div>
                   <div className={styles.goalActions}>
                     <button className={styles.iconBtn} onClick={() => openEdit(goal)}><Pencil size={14} strokeWidth={1.5} /></button>
                     <button className={styles.iconBtn} onClick={() => setConfirmDeleteId(goal.id)}><Trash2 size={14} strokeWidth={1.5} /></button>
                   </div>
                 </div>
-                <div className={styles.goalProgressBar}>
-                  <div className={[styles.goalProgressFill, done ? styles.goalProgressDone : ''].join(' ')} style={{ width: `${pct * 100}%` }} />
-                </div>
-                <div className={styles.goalAmounts}>
-                  <span className={styles.goalTerkumpul}>{fmt(goal.terkumpul)}</span>
-                  <span className={styles.goalPercent}>{Math.round(pct * 100)}% dari {fmt(goal.target)}</span>
-                </div>
-                {!done && (
-                  <div className={styles.addProgressRow}>
-                    <input
-                      className={styles.addProgressInput}
-                      type="text" inputMode="numeric" placeholder="Tambah nominal"
-                      value={addNominal[goal.id] ?? ''}
-                      onChange={e => setAddNominal(prev => ({ ...prev, [goal.id]: fmtInput(e.target.value) }))}
-                    />
-                    <button className={styles.addProgressBtn}
-                      onClick={() => handleAddProgress(goal.id)}
-                      disabled={!parseNominal(addNominal[goal.id] ?? '')}>
-                      Tambah
-                    </button>
-                  </div>
-                )}
-                {done && (
-                  <div className={styles.goalDoneBadge}>
-                    <Check size={13} strokeWidth={2.5} /> Target tercapai
-                  </div>
-                )}
               </div>
-            )
-          })}
+            ))}
         </div>
       )}
 
@@ -687,16 +637,6 @@ function TabTabungan() {
                 <label className={styles.fieldLabel}>Target nominal</label>
                 <input className={styles.fieldInput} type="text" inputMode="numeric" placeholder="0"
                   value={formTarget} onChange={e => setFormTarget(fmtInput(e.target.value))} />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.fieldLabel}>Sudah terkumpul (opsional)</label>
-                <input className={styles.fieldInput} type="text" inputMode="numeric" placeholder="0"
-                  value={formTerkumpul} onChange={e => setFormTerkumpul(fmtInput(e.target.value))} />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.fieldLabel}>Deadline (opsional)</label>
-                <input className={styles.fieldInput} type="date" value={formDeadline}
-                  min={getTodayString()} onChange={e => setFormDeadline(e.target.value)} />
               </div>
             </div>
             <div className={styles.sheetFooter}>

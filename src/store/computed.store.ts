@@ -72,7 +72,10 @@ export function useComputed(): ComputedKeuangan {
         const keluar = transaksi
           .filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'keluar')
           .reduce((s, tx) => s + tx.nominal, 0)
-        return sum + wallet.saldo_awal + masuk - keluar
+        const nabung = transaksi
+          .filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'nabung')
+          .reduce((s, tx) => s + tx.nominal, 0)
+        return sum + wallet.saldo_awal + masuk - keluar - nabung
       }, 0)
 
     const totalTagihan = 0 // override di useComputedWithTagihan kalau dibutuhkan

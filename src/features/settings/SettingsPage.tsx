@@ -12,14 +12,14 @@ import { useToast } from '@/hooks/useToast'
 import {
   getNama, saveNama,
   getTransaksi, saveTransaksi,
-  getTagihan, getGoals,
+  getKategori, saveKategori,
 } from '@/storage'
 import {
   STORAGE_KEYS, CURRENT_SCHEMA_VERSION, CURRENCY_OPTIONS,
-  DEFAULT_WALLET_ID,
+  DEFAULT_WALLET_ID, HARDCODED_KATEGORI_IDS,
 } from '@/constants'
 import { formatRupiah, generateId } from '@/lib/format'
-import type { Wallet } from '@/types'
+import type { Wallet, KategoriItem, KategoriMap } from '@/types'
 
 import styles from './SettingsPage.module.css'
 
@@ -116,6 +116,155 @@ const FAQ_ITEMS = [
     a: 'Hubungi kami lewat X (Twitter) @win32_icang atau buka issue di GitHub. Kami baca semua pesan yang masuk.',
   },
 ]
+
+
+// ── Emoji icon options for kategori ──────────────────────────────────────────
+
+const KATEGORI_ICONS = [
+  '🍴','🚗','🛒','📱','💡','💧','🏠','🏥','🎮','📚',
+  '✈️','👗','💄','🐾','🎓','⚽','🎵','📷','🛠️','🎁',
+  '💼','💻','🏪','📈','💰','🏦','🛡️','📦',
+]
+
+// ── Kategori Section ─────────────────────────────────────────────────────────
+
+type KategoriTab = 'keluar' | 'masuk'
+const HARDCODED_SET = new Set<string>(HARDCODED_KATEGORI_IDS)
+
+interface KategoriSectionProps {
+  showToast: (msg: string) => void
+  allTx: ReturnType<typeof getTransaksi>
+}
+
+function KategoriSection({ showToast, allTx }: KategoriSectionProps) {
+  const [aktifTab, setAktifTab] = useState<KategoriTab>('keluar')
+  const [kategoriMap, setKategoriMap] = useState<KategoriMap>(() => getKategori())
+  const [showForm, setShowForm] = useState(false)
+  const [formNama, setFormNama] = useState('')
+  const [formIcon, setFormIcon] = useState('📦')
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+
+  const list = kategoriMap[aktifTab].filter(k => !k.id.startsWith('transfer_'))
+
+  function handleTambah() {
+    const nama = formNama.trim()
+    if (!nama) return
+    const id = `custom_${Date.now()}`
+    const newItem: KategoriItem = { id, nama, icon: formIcon }
+    const next: KategoriMap = {
+      ...kategoriMap,
+      [aktifTab]: [...kategoriMap[aktifTab], newItem],
+    }
+    saveKategori(next)
+    setKategoriMap(next)
+    setFormNama('')
+    setFormIcon('📦')
+    setShowForm(false)
+    showToast('Kategori ditambahkan')
+  }
+
+  function handleHapus(id: string) {
+    const usedInTx = allTx.some(tx => tx.kategori === id)
+    if (usedInTx) {
+      const count = allTx.filter(tx => tx.kategori === id).length
+      showToast(`Kategori ini dipakai di ${count} catatan. Hapus catatannya dulu.`)
+      setConfirmDeleteId(null)
+      return
+    }
+    const next: KategoriMap = {
+      ...kategoriMap,
+      [aktifTab]: kategoriMap[aktifTab].filter(k => k.id !== id),
+    }
+    saveKategori(next)
+    setKategoriMap(next)
+    setConfirmDeleteId(null)
+    showToast('Kategori dihapus')
+  }
+
+  return (
+    <div className={styles.section}>
+      <span className={styles.sectionLabel}>Kategori</span>
+      <div className={styles.card}>
+        <div className={styles.kategoriTabBar}>
+          {(['keluar', 'masuk'] as KategoriTab[]).map(tab => (
+            <button
+              key={tab}
+              className={[styles.kategoriTab, aktifTab === tab ? styles.kategoriTabActive : ''].join(' ')}
+              onClick={() => { setAktifTab(tab); setShowForm(false); setConfirmDeleteId(null) }}
+            >
+              {tab === 'keluar' ? 'Pengeluaran' : 'Pemasukan'}
+            </button>
+          ))}
+        </div>
+
+        {list.map(k => {
+          const isHardcoded = HARDCODED_SET.has(k.id)
+          return (
+            <div key={k.id}>
+              <div className={styles.kategoriRow}>
+                <span className={styles.kategoriIcon}>{k.icon}</span>
+                <span className={styles.kategoriNama}>{k.nama}</span>
+                {!isHardcoded && (
+                  <button
+                    className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
+                    onClick={() => setConfirmDeleteId(confirmDeleteId === k.id ? null : k.id)}
+                    aria-label="Hapus"
+                  >
+                    <X size={15} strokeWidth={1.5} />
+                  </button>
+                )}
+              </div>
+              {confirmDeleteId === k.id && (
+                <div className={styles.inlineConfirm}>
+                  <span className={styles.inlineConfirmText}>
+                    Hapus kategori "{k.nama}"?
+                  </span>
+                  <div className={styles.inlineConfirmActions}>
+                    <button className={styles.confirmCancelBtn} onClick={() => setConfirmDeleteId(null)}>Batal</button>
+                    <button className={styles.confirmResetBtn} onClick={() => handleHapus(k.id)}>Hapus</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
+
+        {showForm ? (
+          <div className={styles.kategoriForm}>
+            <div className={styles.kategoriIconPicker}>
+              {KATEGORI_ICONS.map(ic => (
+                <button
+                  key={ic}
+                  className={[styles.kategoriIconOption, formIcon === ic ? styles.kategoriIconActive : ''].join(' ')}
+                  onClick={() => setFormIcon(ic)}
+                >
+                  {ic}
+                </button>
+              ))}
+            </div>
+            <input
+              className={styles.walletFormInput}
+              placeholder="Nama kategori"
+              value={formNama}
+              onChange={e => setFormNama(e.target.value)}
+              maxLength={30}
+              autoFocus
+            />
+            <div className={styles.walletFormActions}>
+              <button className={styles.walletFormCancel} onClick={() => { setShowForm(false); setFormNama(''); setFormIcon('📦') }}>Batal</button>
+              <button className={styles.walletFormSave} onClick={handleTambah} disabled={!formNama.trim()}>Tambah</button>
+            </div>
+          </div>
+        ) : (
+          <button className={styles.addWalletBtn} onClick={() => setShowForm(true)}>
+            <Plus size={15} strokeWidth={1.5} />
+            Tambah Kategori
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
 
 // ── Wallet form (add / edit) ──────────────────────────────────────────────────
 
@@ -224,7 +373,8 @@ export default function SettingsPage() {
   function walletSaldo(w: Wallet): number {
     const masuk = allTx.filter(tx => tx.wallet_id === w.id && tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
     const keluar = allTx.filter(tx => tx.wallet_id === w.id && tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0)
-    return w.saldo_awal + masuk - keluar
+    const nabung = allTx.filter(tx => tx.wallet_id === w.id && tx.jenis === 'nabung').reduce((s, tx) => s + tx.nominal, 0)
+    return w.saldo_awal + masuk - keluar - nabung
   }
 
   // ── Nama ──────────────────────────────────────────────────────────────────
@@ -385,6 +535,9 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+
+      {/* ── Kategori ── */}
+      <KategoriSection showToast={showToast} allTx={allTx} />
 
       {/* ── Ekspor & Reset ── */}
       <div className={styles.section}>

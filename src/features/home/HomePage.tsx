@@ -15,14 +15,6 @@ import {
   Share2,
   Check,
 } from 'lucide-react'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts'
 
 import { useTransaksiStore } from '@/store/transaksi.store'
 import { useWalletStore } from '@/store/wallet.store'
@@ -63,6 +55,17 @@ function getGreetingDate(): string {
   })
 }
 
+function getGreetingPeriod(): string {
+  const hour = new Date().getHours()
+  if (hour < 11) return '🌤️ Selamat pagi'
+  if (hour < 15) return '☀️ Selamat siang'
+  if (hour < 19) return '🌇 Selamat sore'
+  return '🌙 Selamat malam'
+}
+
+const MOOD_OPTIONS = ['😊', '😐', '😔', '🤑', '😤'] as const
+type Mood = typeof MOOD_OPTIONS[number]
+
 function isSupportVisible(): boolean {
   const dismissedAt = getSupportBannerDismissedAt()
   if (!dismissedAt) return true
@@ -87,13 +90,16 @@ export default function HomePage() {
   const { toasts, showToast } = useToast()
   const [showShareModal, setShowShareModal] = useState(false)
   const [shareCopied, setShareCopied] = useState(false)
+  const [mood, setMood] = useState<Mood | null>(null)
+  const [heatMode, setHeatMode] = useState<'keluar' | 'masuk' | 'semua'>('keluar')
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
 
   // ── Data derivations ───────────────────────────────────────────────────────
 
   const currentMonth = getCurrentMonthKey()
   const tagihan = useMemo(() => getTagihan(), [])
   const budgets = useMemo(() => getBudgets(), [])
-  const goals = useMemo(() => getGoals(), [])
+  const goals = useMemo(() => getGoals(), [transaksi])
   const kategoriMap = useMemo(() => getKategori() ?? KATEGORI_DEFAULT, [])
 
   const allKategori = useMemo(() => [
@@ -139,7 +145,10 @@ export default function HomePage() {
       const keluar = transaksi
         .filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'keluar')
         .reduce((s, tx) => s + tx.nominal, 0)
-      return sum + wallet.saldo_awal + masuk - keluar
+      const nabung = transaksi
+        .filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'nabung')
+        .reduce((s, tx) => s + tx.nominal, 0)
+      return sum + wallet.saldo_awal + masuk - keluar - nabung
     }, 0)
   }, [relevantWallets, transaksi])
 
@@ -203,23 +212,27 @@ export default function HomePage() {
   }, [txBulanIni, kategoriMap])
 
   // Bar chart — semua tanggal di bulan ini, hari tanpa tx = 0
-  const chartData = useMemo(() => {
-    const map: Record<string, number> = {}
-    txBulanIni
-      .filter(tx => tx.jenis === 'keluar')
-      .forEach(tx => {
-        map[tx.tanggal] = (map[tx.tanggal] ?? 0) + tx.nominal
-      })
+  // Heatmap data — per hari: masuk, keluar, txs
+  const heatmapData = useMemo(() => {
     const now = new Date()
     const year = now.getFullYear()
     const month = now.getMonth()
     const daysInMonth = new Date(year, month + 1, 0).getDate()
+    const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
     return Array.from({ length: daysInMonth }, (_, i) => {
       const day = i + 1
       const tanggal = `${currentMonth}-${String(day).padStart(2, '0')}`
-      return { tanggal, label: String(day), total: map[tanggal] ?? 0 }
+      const dayTx = txBulanIni.filter(tx => tx.tanggal === tanggal && !tx.type)
+      const masuk = dayTx.filter(tx => tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
+      const keluar = dayTx.filter(tx => tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0)
+      const nabung = dayTx.filter(tx => tx.jenis === 'nabung').reduce((s, tx) => s + tx.nominal, 0)
+      const date = new Date(year, month, day)
+      return { day, tanggal, masuk, keluar, nabung, txs: dayTx, dayLabel: dayNames[date.getDay()] }
     })
   }, [txBulanIni, currentMonth])
+
+  // chartData untuk backward compat — bisa dihapus nanti
+  const chartData = heatmapData.map(d => ({ tanggal: d.tanggal, label: String(d.day), total: d.keluar }))
 
   // Budget bulan ini
   const budgetRows = useMemo(() => {
@@ -285,9 +298,11 @@ export default function HomePage() {
   const bulanLabel = getMonthLabel()
   const hasNabung = totalNabungFiltered > 0
 
-  // Total tabungan = sum terkumpul semua goals
+  // Total tabungan = sum semua transaksi nabung all-time (currency aktif)
   const totalTabungan = useMemo(() => {
-    return getGoals().reduce((s, g) => s + g.terkumpul, 0)
+    return transaksi
+      .filter(tx => tx.jenis === 'nabung' && relevantWalletIds.has(tx.wallet_id))
+      .reduce((s, tx) => s + tx.nominal, 0)
   }, [])
   const hasTagihan = tagihanBulanIni > 0
   const hasMasuk = totalMasukFiltered > 0
@@ -348,95 +363,84 @@ export default function HomePage() {
       return 'Belum ada catatan bulan ini. Mulai catat transaksi pertamamu — nanti di sini kamu bisa lihat cerita keuanganmu selama sebulan penuh.'
     }
 
-    const paragraphs: string[] = []
-
-    // ── Paragraf 1: Interpretasi cashflow ───────────────────────────────────
     const topKeluar = cashflowByKategori.keluar[0]
     const topMasuk = cashflowByKategori.masuk[0]
     const secondKeluar = cashflowByKategori.keluar[1]
 
+    // ── Paragraf 1: Cashflow + Budget dalam satu napas ───────────────────────
+    let p1 = ''
+
     if (hasMasuk && hasKeluar) {
       const ratio = totalKeluarFiltered / totalMasukFiltered
       const pctLabel = `${Math.round(ratio * 100)}%`
-      let p1 = ''
       if (ratio < 0.5) {
-        p1 = `Pengeluaran bulan ini hanya ${pctLabel} dari pemasukan — bulan yang cukup hemat.`
+        p1 = `Bulan ini pengeluaran jauh di bawah pemasukan — hanya sekitar ${pctLabel}-nya`
       } else if (ratio < 0.8) {
-        p1 = `Pengeluaran bulan ini sekitar ${pctLabel} dari pemasukan — masih terkontrol.`
+        p1 = `Pengeluaran bulan ini sekitar ${pctLabel} dari pemasukan, masih terkontrol`
       } else if (ratio < 1) {
-        p1 = `Pengeluaran sudah mencapai ${pctLabel} dari pemasukan — hampir impas, hati-hati sisa bulan ini.`
+        p1 = `Pengeluaran sudah menyentuh ${pctLabel} dari pemasukan — tipis`
       } else {
-        p1 = `Pengeluaran bulan ini melampaui pemasukan yang tercatat.`
+        p1 = `Pengeluaran bulan ini melampaui pemasukan yang tercatat`
       }
       if (topKeluar && secondKeluar) {
-        p1 += ` ${topKeluar.nama} dan ${secondKeluar.nama} jadi dua pos terbesar bulan ini.`
+        p1 += `, dengan ${topKeluar.nama} dan ${secondKeluar.nama} sebagai dua pos terbesar.`
       } else if (topKeluar) {
-        p1 += ` ${topKeluar.nama} jadi pos pengeluaran terbesar bulan ini.`
+        p1 += `, dengan ${topKeluar.nama} sebagai pos terbesar.`
+      } else {
+        p1 += '.'
       }
-      paragraphs.push(p1)
     } else if (hasMasuk && !hasKeluar) {
-      let p1 = `Bulan ini ada pemasukan tapi belum ada pengeluaran yang tercatat.`
-      if (topMasuk) p1 += ` Sumbernya dari ${topMasuk.nama}.`
-      paragraphs.push(p1)
+      p1 = `Bulan ini ada pemasukan${topMasuk ? ` dari ${topMasuk.nama}` : ''} tapi belum ada pengeluaran yang tercatat.`
     } else if (!hasMasuk && hasKeluar) {
-      let p1 = `Bulan ini ada pengeluaran tapi belum ada pemasukan yang tercatat.`
-      if (topKeluar) p1 += ` Pos terbesar di ${topKeluar.nama}.`
-      paragraphs.push(p1)
+      p1 = `Bulan ini ada pengeluaran${topKeluar ? ` di ${topKeluar.nama}` : ''} tapi belum ada pemasukan yang tercatat.`
     }
 
-    // ── Paragraf 2: Budget ───────────────────────────────────────────────────
     if (budgetRows.length > 0) {
       const jebols = budgetRows.filter(r => r.pct >= 1)
       const warns = budgetRows.filter(r => r.pct >= 0.75 && r.pct < 1)
-      const amans = budgetRows.filter(r => r.pct < 0.75)
-      if (jebols.length === 0 && warns.length === 0) {
-        paragraphs.push(`Semua budget aman — ${amans.length} kategori masih di bawah 75% dari limitnya.`)
-      } else if (jebols.length > 0 && warns.length === 0) {
+      if (jebols.length > 0) {
         const namaJebol = jebols.map(r => r.nama).join(' dan ')
-        paragraphs.push(`Budget ${namaJebol} sudah jebol. Perlu dicermati kalau masih ada rencana pengeluaran di sana sampai akhir bulan.`)
-      } else if (jebols.length === 0 && warns.length > 0) {
+        p1 += ` Budget ${namaJebol} sudah jebol${warns.length > 0 ? ', dan beberapa kategori lain juga mendekati batas' : ''} — perlu dicermati kalau bulan belum habis.`
+      } else if (warns.length > 0) {
         const namaWarn = warns.map(r => r.nama).join(' dan ')
-        paragraphs.push(`${namaWarn} sudah di atas 75% budget — masih aman, tapi perlu hati-hati kalau bulan belum habis.`)
+        p1 += ` ${namaWarn} sudah di atas 75% budget, jadi perlu sedikit hati-hati sampai akhir bulan.`
       } else {
-        const namaJebol = jebols.map(r => r.nama).join(' dan ')
-        paragraphs.push(`Budget ${namaJebol} sudah jebol. Beberapa kategori lain juga mendekati batas — cek card Budget di atas untuk detailnya.`)
+        p1 += ` Semua budget masih aman.`
       }
     }
 
-    // ── Paragraf 3: Tabungan & goals ────────────────────────────────────────
+    // ── Paragraf 2: Tabungan + Uang bebas sebagai penutup ───────────────────
+    let p2 = ''
+
     if (hasNabung || goals.length > 0) {
-      const goalsNearTarget = goals.filter(g => g.target > 0 && g.terkumpul / g.target >= 0.9 && g.terkumpul < g.target)
-      const goalsDone = goals.filter(g => g.target > 0 && g.terkumpul >= g.target)
-      let p3 = ''
-      if (hasNabung) {
-        p3 = `Bulan ini kamu berhasil menyisihkan sebagian untuk ditabung.`
+      const totalTarget = goals.reduce((s, g) => s + g.target, 0)
+      const pctOverall = totalTarget > 0 ? totalTabungan / totalTarget : 0
+
+      if (hasNabung && pctOverall >= 1) {
+        p2 = `Luar biasa — total tabungan kamu sudah melewati keseluruhan target yang diset.`
+      } else if (hasNabung && pctOverall >= 0.9) {
+        p2 = `Kamu menyisihkan untuk ditabung, dan total tabungan sudah hampir mencapai keseluruhan target.`
+      } else if (hasNabung) {
+        p2 = `Meski begitu, kamu masih sempat menyisihkan sebagian untuk ditabung.`
+      } else if (goals.length > 0) {
+        p2 = `Progress tabungan tetap berjalan meski bulan ini penuh pengeluaran.`
       }
-      if (goalsDone.length > 0) {
-        p3 += ` ${goalsDone.map(g => g.nama).join(' dan ')} sudah mencapai target — selamat!`
-      } else if (goalsNearTarget.length > 0) {
-        p3 += ` ${goalsNearTarget.map(g => g.nama).join(' dan ')} sudah hampir tercapai, tinggal sedikit lagi.`
-      } else if (!hasNabung && goals.length > 0) {
-        p3 = `Progress tabungan berjalan — cek card Target Menabung di atas untuk lihat posisi masing-masing goal.`
-      }
-      if (p3) paragraphs.push(p3)
     }
 
-    // ── Paragraf 4: Uang bebas — penutup ────────────────────────────────────
-    let p4 = ''
     if (isDefisit) {
-      p4 = hasTagihan
-        ? `Setelah dipotong tagihan, uang bebas masih minus. Perlu ada penyesuaian supaya bulan ini bisa selesai dengan nyaman.`
-        : `Uang bebas saat ini masih minus. Perlu ada penyesuaian di sisa bulan ini.`
+      const penutup = hasTagihan
+        ? `Setelah tagihan diperhitungkan, uang bebas masih minus — ada baiknya cek lagi pos mana yang bisa dikurangi sampai akhir bulan.`
+        : `Uang bebas saat ini masih minus, jadi perlu sedikit penyesuaian di sisa bulan ini.`
+      p2 = p2 ? `${p2} ${penutup}` : penutup
     } else {
-      p4 = hasTagihan
-        ? `Setelah tagihan dipotong, masih ada ruang gerak. Jaga pengeluaran sampai akhir bulan supaya nggak terkikis.`
-        : `Masih ada ruang gerak di uang bebas. Pantau terus supaya tetap sesuai rencana sampai akhir bulan.`
+      const penutup = hasTagihan
+        ? `Setelah tagihan diperhitungkan, masih ada ruang gerak — tinggal jaga supaya tidak terkikis sampai akhir bulan.`
+        : `Ruang gerak masih ada, tinggal dijaga supaya tetap sesuai rencana sampai akhir bulan.`
+      p2 = p2 ? `${p2} ${penutup}` : penutup
     }
-    paragraphs.push(p4)
 
-    return paragraphs.join('\n\n')
+    return [p1, p2].filter(Boolean).join('\n\n')
   }
-
   function buildShareTeaser(): JSX.Element {
     const isEmpty = !hasMasuk && !hasKeluar && !hasNabung
 
@@ -533,8 +537,12 @@ export default function HomePage() {
 
       {/* Greeting */}
       <div className={styles.greeting}>
-        <div className={styles.greetingRow}>
-          <span className={styles.greetingName}>Halo, {nama || 'kamu'}</span>
+        <div className={styles.greetingTop}>
+          <div className={styles.greetingLeft}>
+            <span className={styles.greetingPeriod}>{getGreetingPeriod()}</span>
+            <span className={styles.greetingName}>Halo, {nama || 'kamu'}</span>
+            <span className={styles.greetingDate}>{getGreetingDate()}</span>
+          </div>
           <button
             className={styles.settingsBtn}
             onClick={() => navigate('/settings')}
@@ -543,7 +551,21 @@ export default function HomePage() {
             <Settings size={20} strokeWidth={1.5} />
           </button>
         </div>
-        <span className={styles.greetingDate}>{getGreetingDate()}</span>
+        <div className={styles.moodRow}>
+          <span className={styles.moodLabel}>Mood hari ini?</span>
+          <div className={styles.moodChips}>
+            {MOOD_OPTIONS.map(m => (
+              <button
+                key={m}
+                className={[styles.moodChip, mood === m ? styles.moodChipActive : ''].join(' ')}
+                onClick={() => setMood(prev => prev === m ? null : m)}
+                aria-pressed={mood === m}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className={styles.section}>
@@ -551,58 +573,46 @@ export default function HomePage() {
         {/* ChecklistCard — conditional */}
         <ChecklistCard />
 
-        {/* Support Card — conditional */}
+        {/* Support Card — split panel amber */}
         {supportVisible && (
           <div className={styles.supportCard}>
-            <button
-              className={styles.supportDismiss}
-              onClick={dismissSupport}
-              aria-label="Tutup"
-            >
-              <X size={16} />
-            </button>
-            <div className={styles.supportTitle}>
-              ☕ CatatDuit gratis selamanya
+            <div className={styles.supportLeft}>
+              <span className={styles.supportIcon}>☕</span>
             </div>
-            <div className={styles.supportDesc}>
-              Kalau aplikasi ini membantu, kamu bisa traktir kopi buat pengembangnya.
-            </div>
-            <div className={styles.supportActions}>
-              <a
-                href="https://trakteer.id/win32_icang/gift"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.supportBtn}
+            <div className={styles.supportRight}>
+              <button
+                className={styles.supportDismiss}
+                onClick={dismissSupport}
+                aria-label="Tutup"
               >
-                Trakteer
-              </a>
-              <a
-                href="https://saweria.co/win32icang"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.supportBtn}
-              >
-                Saweria
-              </a>
+                <X size={14} />
+              </button>
+              <div className={styles.supportTitle}>CatatDuit gratis selamanya</div>
+              <div className={styles.supportDesc}>Suka? Traktir kopi buat pengembangnya. Ga dipaksa!</div>
+              <div className={styles.supportActions}>
+                <a
+                  href="https://trakteer.id/win32_icang/gift"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.supportBtn}
+                >
+                  Trakteer
+                </a>
+                <a
+                  href="https://saweria.co/win32icang"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={[styles.supportBtn, styles.supportBtnSec].join(' ')}
+                >
+                  Saweria
+                </a>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Hero Number: Uang Bebas */}
-        <div className={styles.heroCard}>
-          <div className={styles.heroLabel}>Uang Bebas</div>
-          <div className={styles.heroSublabel}>sisa setelah tagihan &amp; tabungan</div>
-          <div className={[
-            styles.heroAmount,
-            uangBebas < 0 ? styles.heroAmountNegative : ''
-          ].join(' ')}>
-            {fmt(uangBebas)}
-          </div>
-        </div>
-
-        {/* Card Keuangan */}
+        {/* Card Keuangan — bar proporsi + wallet breakdown */}
         <div className={styles.card}>
-          {/* Header: judul + Antar Dompet + collapse */}
           <div className={styles.kasHeader}>
             <span className={styles.cardTitle}>Keuangan</span>
             <div className={styles.kasHeaderRight}>
@@ -626,59 +636,79 @@ export default function HomePage() {
           {!isCollapsed('keuangan') && (
             <div className={styles.kasBody}>
 
-              {/* Daftar wallet — semua relevantWallets */}
-              {relevantWallets.map(wallet => {
-                const masuk = transaksi.filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
-                const keluar = transaksi.filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0)
-                const saldo = wallet.saldo_awal + masuk - keluar
+              {/* Bar proporsi */}
+              {(() => {
+                const total = totalSaldoFiltered
+                const pctTagihan = total > 0 ? Math.min(tagihanBulanIni / total, 1) : 0
+                const pctTabungan = total > 0 ? Math.min(totalTabungan / total, 1) : 0
+                const pctBebas = Math.max(0, 1 - pctTagihan - pctTabungan)
                 return (
-                  <div key={wallet.id} className={styles.kasRow}>
-                    <span className={styles.kasSymPlus}>+</span>
-                    <span className={styles.kasLabel}>{wallet.icon} {wallet.nama}</span>
-                    <span className={styles.kasAmountIn}>{fmt(saldo)}</span>
+                  <div className={styles.kasProporsi}>
+                    <div className={styles.kasProporsiLabels}>
+                      <span>{fmt(totalSaldoFiltered)} total saldo</span>
+                      <span>100%</span>
+                    </div>
+                    <div className={styles.kasProporsiTrack}>
+                      <div className={styles.kasProporsiSegBebas} style={{ width: `${pctBebas * 100}%` }} />
+                      <div className={styles.kasProporsiSegTagihan} style={{ width: `${pctTagihan * 100}%` }} />
+                      <div className={styles.kasProporsiSegTabungan} style={{ width: `${pctTabungan * 100}%` }} />
+                    </div>
+                    <div className={styles.kasProporsiLegend}>
+                      <div className={styles.kasProporsiLegendItem}>
+                        <div className={`${styles.kasProporsiDot} ${styles.kasProporsiDotBebas}`} />
+                        <span>Uang bebas {Math.round(pctBebas * 100)}%</span>
+                      </div>
+                      <div className={styles.kasProporsiLegendItem}>
+                        <div className={`${styles.kasProporsiDot} ${styles.kasProporsiDotTagihan}`} />
+                        <span>Tagihan {Math.round(pctTagihan * 100)}%</span>
+                      </div>
+                      <div className={styles.kasProporsiLegendItem}>
+                        <div className={`${styles.kasProporsiDot} ${styles.kasProporsiDotTabungan}`} />
+                        <span>Tabungan {Math.round(pctTabungan * 100)}%</span>
+                      </div>
+                    </div>
                   </div>
                 )
-              })}
+              })()}
 
-              {/* Garis + total — hanya kalau >1 wallet */}
-              {relevantWallets.length > 1 && (
-                <>
-                  <div className={styles.kasSepSingle} />
-                  <div className={styles.kasRow}>
-                    <span />
-                    <span className={styles.kasTotalLabel}>Total saldo</span>
-                    <span className={styles.kasTotalAmount}>{fmt(totalSaldoFiltered)}</span>
-                  </div>
-                </>
-              )}
+              {/* Wallet breakdown */}
+              <div className={styles.kasWalletSection}>
+                <span className={styles.kasWalletSectionLabel}>dari dompet</span>
+                {relevantWallets.map(wallet => {
+                  const masuk = transaksi.filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
+                  const keluar = transaksi.filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0)
+                  const nabung = transaksi.filter(tx => tx.wallet_id === wallet.id && tx.jenis === 'nabung').reduce((s, tx) => s + tx.nominal, 0)
+                  const saldo = wallet.saldo_awal + masuk - keluar - nabung
+                  const pct = totalSaldoFiltered > 0 ? Math.max(0, saldo / totalSaldoFiltered) : 0
+                  return (
+                    <div key={wallet.id} className={styles.kasWalletRow}>
+                      <span className={styles.kasWalletName}>{wallet.icon} {wallet.nama}</span>
+                      <div className={styles.kasWalletBarWrap}>
+                        <div className={styles.kasWalletBarTrack}>
+                          <div className={styles.kasWalletBarFill} style={{ width: `${pct * 100}%` }} />
+                        </div>
+                      </div>
+                      <span className={styles.kasWalletAmt}>{fmt(saldo)}</span>
+                    </div>
+                  )
+                })}
+              </div>
 
               <div className={styles.kasDivider} />
 
-              {/* Tagihan */}
-              <div className={styles.kasRow}>
-                <span className={styles.kasSymMinus}>−</span>
-                <span className={styles.kasLabel}>Tagihan bulan ini</span>
-                <span className={[
-                  styles.kasAmountNeutral,
-                  tagihanBulanIni > 0 ? styles.kasAmountDanger : ''
-                ].join(' ')}>
-                  {fmt(tagihanBulanIni)}
-                </span>
+              {/* Deductions */}
+              <div className={styles.kasDeductRow}>
+                <span className={styles.kasDeductLabel}>Tagihan bulan ini</span>
+                <span className={styles.kasDeductAmtDanger}>− {fmt(tagihanBulanIni)}</span>
+              </div>
+              <div className={styles.kasDeductRow}>
+                <span className={styles.kasDeductLabel}>Total tabungan</span>
+                <span className={styles.kasDeductAmtSavings}>− {fmt(totalTabungan)}</span>
               </div>
 
-              {/* Nabung */}
-              <div className={styles.kasRow}>
-                <span className={styles.kasSymMinus}>−</span>
-                <span className={styles.kasLabel}>Total tabungan</span>
-                <span className={styles.kasAmountSavings}>{fmt(totalTabungan)}</span>
-              </div>
-
-              {/* Double underline + uang bebas */}
-              <div className={styles.kasSepDouble} />
-
-              <div className={styles.kasBebasWrap}>
+              {/* Uang bebas */}
+              <div className={styles.kasBebasBlock}>
                 <div className={styles.kasBebasRow}>
-                  <span className={styles.kasBebasDot} />
                   <span className={styles.kasBebasLabel}>Uang bebas</span>
                   <span className={[
                     styles.kasBebasAmount,
@@ -687,12 +717,13 @@ export default function HomePage() {
                     {fmt(uangBebas)}
                   </span>
                 </div>
-                <p className={styles.kasBebasSub}>yang bisa kamu pakai untuk kebutuhan sehari-hari</p>
+                <p className={styles.kasBebasSub}>total uang yang bisa kamu pakai untuk kebutuhan sehari-hari</p>
               </div>
 
             </div>
           )}
         </div>
+
 
         {/* Card Cashflow */}
         <div className={styles.card}>
@@ -700,113 +731,219 @@ export default function HomePage() {
             <span className={styles.cardTitle}>Cashflow — {getMonthLabel()}</span>
           </div>
 
-          {/* Summary 3 metric cards */}
-          <div className={styles.cfMetrics}>
-            <div className={styles.cfMetricCard}>
-              <span className={styles.cfMetricLabel}>Uang masuk</span>
-              <span className={[styles.cfMetricAmount, styles.cashflowIn].join(' ')}>{fmt(totalMasukFiltered)}</span>
-            </div>
-            <div className={styles.cfMetricCard}>
-              <span className={styles.cfMetricLabel}>Uang keluar</span>
-              <span className={[styles.cfMetricAmount, styles.cashflowOut].join(' ')}>{fmt(totalKeluarFiltered)}</span>
-            </div>
-            <div className={styles.cfMetricCard}>
-              <span className={[styles.cfMetricLabel, styles.cfMetricLabelNet].join(' ')}>Uang bersih</span>
-              <span className={[styles.cfMetricAmount, netBulanIni >= 0 ? styles.cashflowIn : styles.cashflowOut].join(' ')}>
-                {netBulanIni >= 0 ? '+' : ''}{fmt(netBulanIni)}
-              </span>
-            </div>
-          </div>
+          {(hasMasuk || hasKeluar) ? (
+            <div className={styles.cfBody}>
+              {/* Bar masuk vs keluar */}
+              <div className={styles.cfBars}>
+                <div className={styles.cfBarRow}>
+                  <span className={styles.cfBarLabel}>Masuk</span>
+                  <div className={styles.cfBarTrack}>
+                    <div
+                      className={styles.cfBarFillMasuk}
+                      style={{ width: totalMasukFiltered >= totalKeluarFiltered ? '100%' : `${(totalMasukFiltered / totalKeluarFiltered) * 100}%` }}
+                    />
+                  </div>
+                  <span className={styles.cfBarAmt} style={{ color: 'var(--money-in)' }}>{fmt(totalMasukFiltered)}</span>
+                </div>
+                <div className={styles.cfBarRow}>
+                  <span className={styles.cfBarLabel}>Keluar</span>
+                  <div className={styles.cfBarTrack}>
+                    <div
+                      className={styles.cfBarFillKeluar}
+                      style={{ width: totalKeluarFiltered >= totalMasukFiltered ? '100%' : `${(totalKeluarFiltered / totalMasukFiltered) * 100}%` }}
+                    />
+                  </div>
+                  <span className={styles.cfBarAmt} style={{ color: 'var(--money-out)' }}>{fmt(totalKeluarFiltered)}</span>
+                </div>
+              </div>
 
-          {/* Table detail */}
-          {(hasMasuk || hasKeluar) && (
-            <table className={styles.cfTable}>
-              <tbody>
-                {hasMasuk && (
-                  <tr className={styles.cfTableSection}>
-                    <td colSpan={3} className={styles.cfTableSectionLabel}>Masuk</td>
-                  </tr>
-                )}
-                {cashflowByKategori.masuk.map(k => (
-                  <tr key={k.nama} className={styles.cfTableRow}>
-                    <td className={styles.cfTableIcon}>{k.icon}</td>
-                    <td className={styles.cfTableNama}>{k.nama}</td>
-                    <td className={[styles.cfTableAmount, styles.cashflowIn].join(' ')}>{fmt(k.total)}</td>
-                  </tr>
-                ))}
-                {hasKeluar && (
-                  <tr className={[styles.cfTableSection, hasMasuk ? styles.cfTableSectionBorderTop : ''].join(' ')}>
-                    <td colSpan={3} className={styles.cfTableSectionLabel}>Keluar</td>
-                  </tr>
-                )}
-                {cashflowByKategori.keluar.map(k => (
-                  <tr key={k.nama} className={styles.cfTableRow}>
-                    <td className={styles.cfTableIcon}>{k.icon}</td>
-                    <td className={styles.cfTableNama}>{k.nama}</td>
-                    <td className={[styles.cfTableAmount, styles.cashflowOut].join(' ')}>{fmt(k.total)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+              {/* Net */}
+              <div className={styles.cfNetRow}>
+                <span className={styles.cfNetLabel}>Bersih bulan ini</span>
+                <span className={[styles.cfNetAmt, netBulanIni >= 0 ? styles.cfNetPos : styles.cfNetNeg].join(' ')}>
+                  {netBulanIni >= 0 ? '+' : ''}{fmt(netBulanIni)}
+                </span>
+              </div>
 
-          {!hasMasuk && !hasKeluar && (
+              <div className={styles.cfDivider} />
+
+              {/* Detail pemasukan */}
+              {hasMasuk && (
+                <>
+                  <span className={styles.cfSectionLabel}>Pemasukan</span>
+                  {cashflowByKategori.masuk.map(k => (
+                    <div key={k.nama} className={styles.cfDetailRow}>
+                      <span className={styles.cfDetailIcon}>{k.icon}</span>
+                      <span className={styles.cfDetailNama}>{k.nama}</span>
+                      <span className={styles.cfDetailAmt} style={{ color: 'var(--money-in)' }}>{fmt(k.total)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {/* Detail pengeluaran */}
+              {hasKeluar && (
+                <>
+                  <span className={[styles.cfSectionLabel, hasMasuk ? styles.cfSectionLabelTop : ''].join(' ')}>Pengeluaran terbesar</span>
+                  {cashflowByKategori.keluar.map(k => (
+                    <div key={k.nama} className={styles.cfDetailRow}>
+                      <span className={styles.cfDetailIcon}>{k.icon}</span>
+                      <span className={styles.cfDetailNama}>{k.nama}</span>
+                      <span className={styles.cfDetailAmt} style={{ color: 'var(--money-out)' }}>{fmt(k.total)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          ) : (
             <div className={styles.cardEmptyState}>
               <p className={styles.cardEmptyText}>Belum ada transaksi bulan ini.</p>
             </div>
           )}
         </div>
 
-        {/* Card Pengeluaran per Hari */}
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <span className={styles.cardTitle}>Pengeluaran per Hari</span>
-          </div>
-          <div className={styles.chartWrap}>
-            {chartData.length === 0 ? (
-              <div className={styles.chartEmpty}>
-                Belum ada pengeluaran bulan ini.
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height={140}>
-                <BarChart data={chartData} barSize={8} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-                  <XAxis
-                    dataKey="label"
-                    tick={{ fontSize: 10, fill: 'var(--text-tertiary)' }}
-                    axisLine={false}
-                    tickLine={false}
-                    interval="preserveStartEnd"
-                  />
-                  <Tooltip
-                    cursor={{ fill: 'var(--bg-surface-2)' }}
-                    content={({ active, payload }) => {
-                      if (!active || !payload?.length) return null
-                      return (
-                        <div style={{
-                          background: 'var(--bg-surface)',
-                          border: '1px solid var(--border-default)',
-                          borderRadius: 'var(--radius-md)',
-                          padding: '6px 10px',
-                          fontSize: 12,
-                          color: 'var(--text-primary)',
-                        }}>
-                          {fmt(payload[0].value as number)}
-                        </div>
-                      )
-                    }}
-                  />
-                  <Bar dataKey="total" radius={[3, 3, 0, 0]}>
-                    {chartData.map((_, i) => (
-                      <Cell key={i} fill="var(--accent)" />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </div>
+        {/* Card Aktivitas Harian — Heatmap */}
+        {(() => {
+          const now = new Date()
+          const year = now.getFullYear()
+          const month = now.getMonth()
+          const firstDayOfWeek = new Date(year, month, 1).getDay() // 0=Sun
+          // Konversi ke Monday-first: Sun=6, Mon=0, Tue=1, ...
+          const startOffset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1
+          const maxKeluar = Math.max(...heatmapData.map(d => d.keluar), 1)
+          const maxMasuk = Math.max(...heatmapData.map(d => d.masuk), 1)
 
-        {/* Card Budget — selalu tampil */}
+          function getCellClass(d: typeof heatmapData[0]) {
+            if (heatMode === 'keluar') {
+              if (d.keluar === 0) return styles.heatCellZero
+              const p = d.keluar / maxKeluar
+              if (p < 0.25) return styles.heatKo1
+              if (p < 0.5) return styles.heatKo2
+              if (p < 0.75) return styles.heatKo3
+              return styles.heatKo4
+            }
+            if (heatMode === 'masuk') {
+              if (d.masuk === 0) return styles.heatCellZero
+              const p = d.masuk / maxMasuk
+              if (p < 0.25) return styles.heatMa1
+              if (p < 0.5) return styles.heatMa2
+              if (p < 0.75) return styles.heatMa3
+              return styles.heatMa4
+            }
+            const net = d.masuk - d.keluar
+            if (d.masuk === 0 && d.keluar === 0) return styles.heatCellZero
+            if (net > 500000) return styles.heatNetPos2
+            if (net > 0) return styles.heatNetPos1
+            if (net > -500000) return styles.heatNetNeg1
+            return styles.heatNetNeg2
+          }
+
+          const selData = selectedDay !== null ? heatmapData[selectedDay - 1] : null
+
+          return (
+            <div className={styles.card}>
+              <div className={styles.heatHeader}>
+                <span className={styles.cardTitle}>Aktivitas Harian</span>
+                <select
+                  className={styles.heatDropdown}
+                  value={heatMode}
+                  onChange={e => { setHeatMode(e.target.value as typeof heatMode); setSelectedDay(null) }}
+                >
+                  <option value="keluar">Pengeluaran</option>
+                  <option value="masuk">Pemasukan</option>
+                  <option value="semua">Semua (net)</option>
+                </select>
+              </div>
+
+              <div className={styles.heatBody}>
+                {/* Day labels */}
+                <div className={styles.heatGrid}>
+                  {['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map(d => (
+                    <div key={d} className={styles.heatDayLabel}>{d}</div>
+                  ))}
+                  {/* Empty cells for offset */}
+                  {Array.from({ length: startOffset }, (_, i) => (
+                    <div key={`empty-${i}`} className={styles.heatCellEmpty} />
+                  ))}
+                  {/* Day cells */}
+                  {heatmapData.map(d => (
+                    <div
+                      key={d.day}
+                      className={[
+                        styles.heatCell,
+                        getCellClass(d),
+                        selectedDay === d.day ? styles.heatCellSelected : '',
+                      ].join(' ')}
+                      onClick={() => setSelectedDay(prev => prev === d.day ? null : d.day)}
+                    >
+                      {d.day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Legend */}
+                <div className={styles.heatLegend}>
+                  {heatMode === 'semua' ? (
+                    <>
+                      <span className={styles.heatLegendLabel} style={{ color: 'var(--money-out)' }}>Defisit</span>
+                      {(['#D85A30', '#F5C4B3', 'var(--bg-surface-2)', '#9FE1CB', '#1D9E75'] as const).map((bg, i) => (
+                        <div key={i} className={styles.heatLegendCell} style={{ background: bg }} />
+                      ))}
+                      <span className={styles.heatLegendLabel} style={{ color: 'var(--money-in)' }}>Surplus</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className={styles.heatLegendLabel}>Sedikit</span>
+                      {(heatMode === 'keluar'
+                        ? ['var(--bg-surface-2)', '#F5C4B3', '#F0997B', '#D85A30', '#993C1D']
+                        : ['var(--bg-surface-2)', '#9FE1CB', '#5DCAA5', '#1D9E75', '#0F6E56']
+                      ).map((bg, i) => (
+                        <div key={i} className={styles.heatLegendCell} style={{ background: bg }} />
+                      ))}
+                      <span className={styles.heatLegendLabel}>Banyak</span>
+                    </>
+                  )}
+                </div>
+
+                {/* Detail strip */}
+                <div className={styles.heatStrip}>
+                  {selData ? (
+                    <>
+                      <div className={styles.heatStripTop}>
+                        <span className={styles.heatStripDate}>
+                          {new Date(year, month, selData.day).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' })}
+                        </span>
+                        <div className={styles.heatStripPills}>
+                          {selData.masuk > 0 && <span className={styles.heatPillMasuk}>+{fmt(selData.masuk)}</span>}
+                          {selData.keluar > 0 && <span className={styles.heatPillKeluar}>−{fmt(selData.keluar)}</span>}
+                          {selData.masuk === 0 && selData.keluar === 0 && selData.nabung === 0 && (
+                            <span className={styles.heatPillNone}>Tidak ada aktivitas</span>
+                          )}
+                        </div>
+                      </div>
+                      {selData.txs.filter(tx => !tx.type).map(tx => {
+                        const kat = allKategori.find(k => k.id === tx.kategori)
+                        return (
+                          <div key={tx.id} className={styles.heatStripTx}>
+                            <span className={styles.heatStripTxIcon}>{kat?.icon ?? '📦'}</span>
+                            <span className={styles.heatStripTxNama}>{kat?.nama ?? tx.kategori}</span>
+                            <span className={styles.heatStripTxAmt} style={{ color: tx.jenis === 'masuk' ? 'var(--money-in)' : 'var(--money-out)' }}>
+                              {tx.jenis === 'masuk' ? '+' : '−'}{fmt(tx.nominal)}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </>
+                  ) : (
+                    <span className={styles.heatStripEmpty}>Ketuk tanggal untuk lihat detail</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* Card Budget — Thermometer vertikal */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <span className={styles.cardTitle}>Budget Bulan Ini</span>
@@ -824,42 +961,36 @@ export default function HomePage() {
               </button>
             </div>
           ) : (
-            <div className={styles.budgetRows}>
+            <div className={styles.thermoWrap}>
               {budgetRows.map(row => {
                 const isOver = row.pct >= 1
                 const isWarn = !isOver && row.pct >= 0.75
-                const barColor = isOver ? 'var(--status-danger)' : isWarn ? '#EF9F27' : 'var(--accent)'
-                const pctLabel = isOver ? `${Math.round(row.pct * 100)}%` : `${Math.round(row.pct * 100)}%`
-                const pctColor = isOver ? 'var(--status-danger)' : isWarn ? '#854F0B' : 'var(--accent)'
-                const overAmount = isOver ? row.spent - row.limit : 0
+                const fillColor = isOver ? '#E24B4A' : isWarn ? '#EF9F27' : '#639922'
+                const pctColor = isOver ? '#E24B4A' : isWarn ? '#854F0B' : '#3B6D11'
                 return (
-                <div key={row.id} className={styles.budgetRow}>
-                  <div className={styles.budgetRowTop}>
-                    <span className={styles.budgetRowLabel}>
-                      {row.icon} {row.nama}
+                  <div key={row.id} className={styles.thermoCol}>
+                    <span className={styles.thermoPct} style={{ color: pctColor }}>
+                      {Math.round(Math.min(row.pct, 9.99) * 100)}%
                     </span>
-                    <span className={styles.budgetRowPct} style={{ color: pctColor }}>{pctLabel}</span>
+                    <div className={styles.thermoTrack}>
+                      <div
+                        className={styles.thermoFill}
+                        style={{ height: `${Math.min(row.pct, 1) * 100}%`, background: fillColor }}
+                      />
+                    </div>
+                    <span className={styles.thermoIcon}>{row.icon}</span>
+                    <span className={styles.thermoNama}>{row.nama}</span>
+                    <span className={styles.thermoMeta}>
+                      {fmt(row.spent)}/{fmt(row.limit)}
+                    </span>
                   </div>
-                  <div className={styles.budgetBar}>
-                    <div
-                      className={styles.budgetBarFill}
-                      style={{ width: `${Math.min(row.pct, 1) * 100}%`, background: barColor }}
-                    />
-                  </div>
-                  <div className={styles.budgetRowMeta} style={{ color: isOver ? 'var(--status-danger)' : 'var(--text-tertiary)' }}>
-                    {isOver
-                      ? `${fmt(row.spent)} dari ${fmt(row.limit)} · jebol ${fmt(overAmount)}`
-                      : `${fmt(row.spent)} dari ${fmt(row.limit)}`
-                    }
-                  </div>
-                </div>
                 )
               })}
             </div>
           )}
         </div>
 
-        {/* Card Progress Nabung — selalu tampil */}
+        {/* Card Target Menabung — Stamp collection */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <span className={styles.cardTitle}>Target Menabung</span>
@@ -876,43 +1007,37 @@ export default function HomePage() {
                 Tambah Target
               </button>
             </div>
-          ) : (
-            <div className={styles.goalRows}>
-              {goals.map(goal => {
-                const pct = goal.target > 0
-                  ? Math.min(goal.terkumpul / goal.target, 1)
-                  : 0
-                return (
-                  <div key={goal.id} className={styles.goalRow}>
-                    <div className={styles.goalRowTop}>
-                      <div className={styles.goalRowLeft}>
-                        {goal.icon && (
-                          <span className={styles.goalIcon}>{goal.icon}</span>
-                        )}
-                        <span className={styles.goalName}>{goal.nama}</span>
-                      </div>
-                      <span className={styles.goalPercent}>
-                        {Math.round(pct * 100)}%
-                      </span>
-                    </div>
-                    <div className={styles.goalProgressBar}>
-                      <div
-                        className={styles.goalProgressFill}
-                        style={{ width: `${pct * 100}%` }}
-                      />
-                    </div>
-                    <div className={styles.goalAmounts}>
-                      <span>{fmt(goal.terkumpul)}</span>
-                      <span>{fmt(goal.target)}</span>
-                    </div>
+          ) : (() => {
+              const totalTarget = goals.reduce((s, g) => s + g.target, 0)
+              const pct = totalTarget > 0 ? Math.min(totalTabungan / totalTarget, 1) : 0
+              return (
+                <div className={styles.stampBody}>
+                  <div className={styles.stampGrid}>
+                    {goals.map(g => {
+                      const reached = totalTabungan >= g.target
+                      return (
+                        <div key={g.id} className={[styles.stamp, reached ? styles.stampDone : ''].join(' ')}>
+                          <span className={styles.stampIcon}>{g.icon ?? '🎯'}</span>
+                          <span className={styles.stampNama}>{g.nama}</span>
+                          <span className={styles.stampTarget}>{fmt(g.target)}{reached ? ' ✓' : ''}</span>
+                        </div>
+                      )
+                    })}
                   </div>
-                )
-              })}
-            </div>
-          )}
+                  <div className={styles.stampTotal}>
+                    <div>
+                      <span className={styles.stampTotalLabel}>Terkumpul </span>
+                      <span className={styles.stampTotalPct}>· {Math.round(pct * 100)}% dari total</span>
+                    </div>
+                    <span className={styles.stampTotalVal}>{fmt(totalTabungan)}</span>
+                  </div>
+                </div>
+              )
+            })()
+          }
         </div>
 
-        {/* Card Catatan Terakhir — paling bawah */}
+        {/* Card Catatan Terakhir — chat bubble */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <span className={styles.cardTitle}>Catatan Terakhir</span>
@@ -922,35 +1047,28 @@ export default function HomePage() {
               Belum ada catatan. Tambah transaksi pertamamu.
             </div>
           ) : (
-            <div className={styles.transaksiList}>
+            <div className={styles.bubbleList}>
               {recentTx.map(tx => {
                 const kat = getKategoriInfo(tx.kategori)
-                const isKeluar = tx.jenis === 'keluar'
-                const isMasuk = tx.jenis === 'masuk'
+                const isRight = tx.jenis === 'masuk' || tx.jenis === 'nabung'
+                const wallet = relevantWallets.find(w => w.id === tx.wallet_id)
+                const today = new Date().toISOString().slice(0, 10)
+                const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+                const dateLabel = tx.tanggal === today ? 'Hari ini' : tx.tanggal === yesterday ? 'Kemarin' : tx.tanggal.slice(8) + ' ' + new Date(tx.tanggal).toLocaleDateString('id-ID', { month: 'short' })
                 return (
-                  <div key={tx.id} className={styles.transaksiItem}>
-                    <div className={styles.transaksiIcon}>
+                  <div key={tx.id} className={[styles.bubbleRow, isRight ? styles.bubbleRowRight : ''].join(' ')}>
+                    <div className={[styles.bubbleAvatar, isRight ? styles.bubbleAvatarRight : styles.bubbleAvatarLeft].join(' ')}>
                       {kat?.icon ?? '📦'}
                     </div>
-                    <div className={styles.transaksiInfo}>
-                      <div className={styles.transaksiKategori}>
-                        {kat?.nama ?? tx.kategori}
+                    <div className={[styles.bubble, isRight ? styles.bubbleRight : styles.bubbleLeft].join(' ')}>
+                      <div className={styles.bubbleTop}>
+                        <span className={styles.bubbleKat}>{kat?.nama ?? tx.kategori}</span>
+                        <span className={styles.bubbleAmt} style={{ color: isRight ? 'var(--money-in)' : 'var(--money-out)' }}>
+                          {isRight ? '+' : '−'}{fmt(tx.nominal)}
+                        </span>
                       </div>
-                      {tx.catatan && (
-                        <div className={styles.transaksiCatatan}>{tx.catatan}</div>
-                      )}
-                    </div>
-                    <div className={styles.transaksiRight}>
-                      <div className={[
-                        styles.transaksiNominal,
-                        isKeluar ? styles.transaksiNominalKeluar :
-                        isMasuk  ? styles.transaksiNominalMasuk  :
-                                   styles.transaksiNominalNabung,
-                      ].join(' ')}>
-                        {isKeluar ? '−' : isMasuk ? '+' : ''}{fmt(tx.nominal)}
-                      </div>
-                      <div className={styles.transaksiTanggal}>
-                        {tx.tanggal.slice(8)}/{tx.tanggal.slice(5, 7)}
+                      <div className={styles.bubbleMeta}>
+                        {tx.catatan ? `${tx.catatan} · ` : ''}{wallet?.nama ?? ''} · {dateLabel}
                       </div>
                     </div>
                   </div>
@@ -967,25 +1085,52 @@ export default function HomePage() {
           </button>
         </div>
 
-        {/* Card Bagikan Ringkasan — fix paling bawah */}
+        {/* Card Ringkasan Bulan Ini — Receipt style */}
         <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <span className={styles.cardTitle}>Ringkasan Bulan Ini</span>
-          </div>
-          <div className={styles.shareTeaser}>
-            <div className={styles.shareTeaserInner}>
-              {buildShareTeaser()}
+          <div className={styles.receiptBody}>
+            <div className={styles.receiptTitle}>📋 Ringkasan {bulanLabel}</div>
+            {hasMasuk && (
+              <div className={styles.receiptRow}>
+                <span className={styles.receiptLabel}>Pemasukan</span>
+                <span className={styles.receiptVal} style={{ color: 'var(--money-in)' }}>+ {fmt(totalMasukFiltered)}</span>
+              </div>
+            )}
+            {hasKeluar && (
+              <div className={styles.receiptRow}>
+                <span className={styles.receiptLabel}>Pengeluaran</span>
+                <span className={styles.receiptVal} style={{ color: 'var(--money-out)' }}>− {fmt(totalKeluarFiltered)}</span>
+              </div>
+            )}
+            {hasNabung && (
+              <div className={styles.receiptRow}>
+                <span className={styles.receiptLabel}>Ditabung</span>
+                <span className={styles.receiptVal} style={{ color: 'var(--status-success)' }}>− {fmt(totalNabungFiltered)}</span>
+              </div>
+            )}
+            {hasTagihan && (
+              <div className={styles.receiptRow}>
+                <span className={styles.receiptLabel}>Tagihan</span>
+                <span className={styles.receiptVal} style={{ color: 'var(--money-out)' }}>− {fmt(tagihanBulanIni)}</span>
+              </div>
+            )}
+            <div className={styles.receiptDashes} />
+            <div className={styles.receiptTotalRow}>
+              <span className={styles.receiptTotalLabel}>Uang bebas</span>
+              <span className={styles.receiptTotalVal} style={{ color: uangBebas < 0 ? 'var(--money-out)' : 'var(--money-in)' }}>
+                {fmt(uangBebas)}
+              </span>
             </div>
+            {!isShareEmpty && (() => {
+              const narasi = buildRingkasanNarasi()
+              return narasi ? (
+                <div className={styles.receiptNarasi}>{narasi.split('\n\n')[0]}</div>
+              ) : null
+            })()}
           </div>
           {!isShareEmpty && (
-            <div className={styles.shareActions}>
-              <button
-                className={styles.shareBtn}
-                onClick={handleShare}
-              >
-                <Share2 size={16} /> Bagikan
-              </button>
-            </div>
+            <button className={styles.receiptShareBtn} onClick={handleShare}>
+              <Share2 size={14} /> Bagikan ringkasan
+            </button>
           )}
         </div>
 

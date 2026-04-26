@@ -5,12 +5,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { ChevronDown } from 'lucide-react'
-import type { TransaksiJenis } from '@/types'
+import type { TransaksiJenis, Goal } from '@/types'
 import { useInputStore } from '@/store/input.store'
 import { useTransaksiStore } from '@/store/transaksi.store'
 import { useWalletStore } from '@/store/wallet.store'
 import { getRelevantWalletIds } from '@/store/computed.store'
-import { getKategori } from '@/storage'
+import { getKategori, getGoals, saveGoals } from '@/storage'
 import { generateId, getTodayString } from '@/lib/format'
 import { MAX_NOMINAL, CURRENCY_OPTIONS } from '@/constants'
 import s from './InputBottomSheet.module.css'
@@ -30,8 +30,8 @@ function formatNominalDisplay(raw: string): string {
 // ── Tab config ────────────────────────────────────────────────────────────────
 
 const TABS: { jenis: TransaksiJenis; label: string }[] = [
-  { jenis: 'keluar', label: 'Keluar' },
-  { jenis: 'masuk',  label: 'Masuk'  },
+  { jenis: 'keluar', label: 'Uang Keluar' },
+  { jenis: 'masuk',  label: 'Uang Masuk'  },
   { jenis: 'nabung', label: 'Nabung' },
 ]
 
@@ -59,6 +59,8 @@ export function InputBottomSheet() {
   const [tanggal, setTanggal] = useState(getTodayString())
   const [catatan, setCatatan] = useState('')
   const [bayarDariTabungan, setBayarDariTabungan] = useState(false)
+  const [selectedGoalId, setSelectedGoalId] = useState<string>('')
+  const [goals, setGoals] = useState<Goal[]>([])
 
   const kategoriMap = getKategori()
 
@@ -76,6 +78,10 @@ export function InputBottomSheet() {
       setTanggal(getTodayString())
       setCatatan('')
       setBayarDariTabungan(false)
+      setSelectedGoalId('')
+      const loadedGoals = getGoals().filter(g => g.terkumpul > 0)
+      setGoals(loadedGoals)
+      setSelectedGoalId(loadedGoals[0]?.id ?? '')
     }
   }, [isOpen, initialJenis, activeWalletId])
 
@@ -84,6 +90,7 @@ export function InputBottomSheet() {
     setJenis(j)
     setKategoriId(DEFAULT_KATEGORI[j])
     setBayarDariTabungan(false)
+    setSelectedGoalId('')
   }, [])
 
   // ── Nominal input ───────────────────────────────────────────────────────────
@@ -107,6 +114,11 @@ export function InputBottomSheet() {
   const handleSubmit = () => {
     if (!canSubmit) return
 
+    const isDariTabungan = jenis === 'keluar' && bayarDariTabungan
+    const goalTarget = isDariTabungan && selectedGoalId
+      ? goals.find(g => g.id === selectedGoalId)
+      : null
+
     addTransaksi({
       id: generateId(),
       jenis,
@@ -116,9 +128,20 @@ export function InputBottomSheet() {
       catatan: catatan.trim(),
       wallet_id: walletId,
       timestamp: Date.now(),
-      // flag tabungan disimpan di catatan internal — tidak ada field khusus di schema
-      // bayarDariTabungan hanya UI flag, tidak ada efek ke data saat ini
+      ...(isDariTabungan && {
+        dari_tabungan: true,
+        ...(selectedGoalId && { goal_id: selectedGoalId }),
+      }),
     })
+
+    if (goalTarget) {
+      const updatedGoals = goals.map(g =>
+        g.id === selectedGoalId
+          ? { ...g, terkumpul: Math.max(0, g.terkumpul - nominal) }
+          : g
+      )
+      saveGoals(updatedGoals)
+    }
 
     close()
   }
@@ -165,6 +188,29 @@ export function InputBottomSheet() {
         {/* Form body */}
         <div className={s.body}>
 
+          {/* Wallet — di atas karena menentukan currency symbol */}
+          <div className={s.fieldGroup}>
+            <span className={s.label}>Dompet</span>
+            {relevantWallets.length === 0 ? (
+              <p className={s.emptyWallet}>Belum ada dompet untuk mata uang ini.</p>
+            ) : (
+              <div className={s.selectWrapper}>
+                <select
+                  className={s.select}
+                  value={walletId}
+                  onChange={e => setWalletId(e.target.value)}
+                >
+                  {relevantWallets.map(w => (
+                    <option key={w.id} value={w.id}>
+                      {w.icon} {w.nama}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={16} className={s.selectChevron} />
+              </div>
+            )}
+          </div>
+
           {/* Nominal */}
           <div className={s.fieldGroup}>
             <span className={s.label}>Nominal</span>
@@ -200,29 +246,6 @@ export function InputBottomSheet() {
             </div>
           </div>
 
-          {/* Wallet */}
-          <div className={s.fieldGroup}>
-            <span className={s.label}>Dompet</span>
-            {relevantWallets.length === 0 ? (
-              <p className={s.emptyWallet}>Belum ada dompet untuk mata uang ini.</p>
-            ) : (
-              <div className={s.selectWrapper}>
-                <select
-                  className={s.select}
-                  value={walletId}
-                  onChange={e => setWalletId(e.target.value)}
-                >
-                  {relevantWallets.map(w => (
-                    <option key={w.id} value={w.id}>
-                      {w.icon} {w.nama}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown size={16} className={s.selectChevron} />
-              </div>
-            )}
-          </div>
-
           {/* Tanggal */}
           <div className={s.fieldGroup}>
             <span className={s.label}>Tanggal</span>
@@ -246,24 +269,45 @@ export function InputBottomSheet() {
             />
           </div>
 
-          {/* Flag: Bayar dari tabungan — hanya untuk keluar */}
-          {jenis === 'keluar' && (
-            <div className={s.flagRow}>
-              <div>
-                <div className={s.flagLabel}>Bayar dari tabungan</div>
-                <div className={s.flagSub}>Tandai kalau ini diambil dari dana tabungan</div>
+          {/* Flag: Bayar dari tabungan — hanya untuk keluar, hanya kalau ada goals */}
+          {jenis === 'keluar' && goals.length > 0 && (
+            <>
+              <div className={s.flagRow}>
+                <div>
+                  <div className={s.flagLabel}>Bayar dari tabungan</div>
+                  <div className={s.flagSub}>Tandai kalau ini diambil dari dana tabungan</div>
+                </div>
+                <button
+                  type="button"
+                  aria-pressed={bayarDariTabungan}
+                  className={[s.toggle, bayarDariTabungan ? s.toggleActive : ''].join(' ')}
+                  onClick={() => setBayarDariTabungan(v => !v)}
+                >
+                  <span
+                    className={[s.toggleThumb, bayarDariTabungan ? s.toggleThumbActive : ''].join(' ')}
+                  />
+                </button>
               </div>
-              <button
-                type="button"
-                aria-pressed={bayarDariTabungan}
-                className={[s.toggle, bayarDariTabungan ? s.toggleActive : ''].join(' ')}
-                onClick={() => setBayarDariTabungan(v => !v)}
-              >
-                <span
-                  className={[s.toggleThumb, bayarDariTabungan ? s.toggleThumbActive : ''].join(' ')}
-                />
-              </button>
-            </div>
+              {bayarDariTabungan && (
+                <div className={s.fieldGroup}>
+                  <span className={s.label}>Kurangi dari target</span>
+                  <div className={s.selectWrapper}>
+                    <select
+                      className={s.select}
+                      value={selectedGoalId}
+                      onChange={e => setSelectedGoalId(e.target.value)}
+                    >
+                      {goals.map(g => (
+                        <option key={g.id} value={g.id}>
+                          {g.icon ?? '🎯'} {g.nama}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown size={16} className={s.selectChevron} />
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
         </div>
