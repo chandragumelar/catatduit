@@ -1,0 +1,1 @@
+import{r as e}from"./index-Db1LLd_l.js";function i(){const[a,s]=e.useState([]),r=e.useCallback(n=>{const o=Date.now();s(t=>[...t,{id:o,message:n}]),setTimeout(()=>{s(t=>t.filter(u=>u.id!==o))},2500)},[]);return{toasts:a,showToast:r}}export{i as u};

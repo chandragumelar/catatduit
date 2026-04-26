@@ -592,11 +592,13 @@ export default function SettingsPage() {
       {/* ── Support ── */}
       <div className={styles.section}>
         <div className={styles.supportCard}>
-          <span className={styles.supportDeco}>☕</span>
-          <div className={styles.supportTop}>
+          {/* Banner kuning */}
+          <div className={styles.supportBanner}>
             <div className={styles.supportTag}>Open &amp; gratis</div>
             <div className={styles.supportTitle}>CatatDuit<br />dibuat dengan<br />sepenuh hati.</div>
+            <span className={styles.supportDeco}>☕</span>
           </div>
+          {/* Body putih */}
           <div className={styles.supportBody}>
             <p className={styles.supportDesc}>Tidak ada iklan, tidak ada subscription, tidak ada jebakan. Kalau CatatDuit membantu, traktir kopi buat pengembangnya.</p>
             <div className={styles.supportBtns}>
@@ -604,6 +606,7 @@ export default function SettingsPage() {
               <a href="https://saweria.co/win32icang" target="_blank" rel="noopener noreferrer" className={`${styles.supportBtn} ${styles.supportBtnSecondary}`}>Saweria</a>
             </div>
           </div>
+          {/* Dev row */}
           <div className={styles.devRow}>
             <div className={styles.devAvatar}>CG</div>
             <span className={styles.devName}>Chandra Gumelar</span>

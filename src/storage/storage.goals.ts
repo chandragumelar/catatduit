@@ -7,7 +7,8 @@ import { STORAGE_KEYS, MAX_GOALS } from '@/constants'
 import { getData, setData } from './storage.base'
 
 export function getGoals(): Goal[] {
-  return getData<Goal[]>(STORAGE_KEYS.GOALS, [])
+  const goals = getData<Goal[]>(STORAGE_KEYS.GOALS, [])
+  return goals.map(g => ({ ...g, terkumpul: g.terkumpul ?? 0 }))
 }
 
 export function saveGoals(data: Goal[]): boolean {

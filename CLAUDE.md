@@ -473,6 +473,24 @@ Health score · Cerita bulan ini · Dark mode · i18n / English mode · Readonly
 
 ---
 
+## PWA Checklist
+
+- `index.html` wajib `<link rel="manifest" href="/manifest.webmanifest">` — bukan `.json`. Vite PWA selalu generate `.webmanifest`.
+- Icons wajib ada di `public/icon-192.png` dan `public/icon-512.png` sebelum build. Tanpa ini SW tidak bisa precache dan PWA tidak aktif.
+- Test PWA harus di production URL (HTTPS, tanpa Vercel auth) — bukan localhost atau preview URL. Preview URL Vercel punya authentication by default yang bikin manifest 401.
+- Setelah deploy, hard reload + clear site data sebelum cek DevTools → Application → Manifest.
+- Kalau "No manifest detected" di DevTools padahal file ada — cek Console, kemungkinan 401 bukan 404.
+
+---
+
+## File Delivery Rules
+
+- **Selalu kirim file via file output** — jangan paste code langsung di chat.
+- Code yang di-paste di chat berisiko corrupt jadi markdown link (contoh: `[array.map](http://array.map)(...)` atau `[w.id](http://w.id)`) yang tidak ketahuan saat build tapi crash di runtime sebagai `TypeError: boolean is not iterable`.
+- Kalau terpaksa paste di chat (snippet pendek), penerima wajib double-check baris yang mengandung `.map`, `.filter`, `.reduce`, `.find` — semua method array rawan corrupt.
+
+---
+
 ## Checklist Sebelum Add/Edit/Remove Fitur
 
 - [ ] Apakah fitur ini membaca/menulis localStorage key yang sudah ada?

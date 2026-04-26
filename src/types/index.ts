@@ -45,6 +45,8 @@ export interface Goal {
   id: string
   nama: string
   target: number
+  terkumpul: number          // update manual, tidak relasi ke tx nabung
+  deadline?: string          // "YYYY-MM-DD"
   icon?: string
 }
 

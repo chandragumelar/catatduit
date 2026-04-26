@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom'
 import {
   ChevronDown,
   ChevronUp,
-  X,
   ArrowRight,
   ArrowLeftRight,
   Settings,
@@ -231,9 +230,6 @@ export default function HomePage() {
     })
   }, [txBulanIni, currentMonth])
 
-  // chartData untuk backward compat — bisa dihapus nanti
-  const chartData = heatmapData.map(d => ({ tanggal: d.tanggal, label: String(d.day), total: d.keluar }))
-
   // Budget bulan ini
   const budgetRows = useMemo(() => {
     const currBudget = budgets[activeCurrency ?? baseCurrency] ?? {}
@@ -441,69 +437,6 @@ export default function HomePage() {
 
     return [p1, p2].filter(Boolean).join('\n\n')
   }
-  function buildShareTeaser(): JSX.Element {
-    const isEmpty = !hasMasuk && !hasKeluar && !hasNabung
-
-    if (isEmpty) {
-      return (
-        <p className={styles.ringkasanNarasi}>
-          {buildRingkasanNarasi()}
-        </p>
-      )
-    }
-
-    const narasi = buildRingkasanNarasi()
-    const narasiParagraphs = narasi.split('\n\n').filter(Boolean)
-
-    return (
-      <>
-        {/* Data block ringkas */}
-        <div className={styles.ringkasanDataBlock}>
-          {hasMasuk && (
-            <div className={styles.ringkasanDataRow}>
-              <span className={styles.ringkasanDataLabel}>Masuk</span>
-              <span className={[styles.ringkasanDataVal, styles.ringkasanIn].join(' ')}>{fmt(totalMasukFiltered)}</span>
-            </div>
-          )}
-          {hasKeluar && (
-            <div className={styles.ringkasanDataRow}>
-              <span className={styles.ringkasanDataLabel}>Keluar</span>
-              <span className={[styles.ringkasanDataVal, styles.ringkasanOut].join(' ')}>{fmt(totalKeluarFiltered)}</span>
-            </div>
-          )}
-          {hasNabung && (
-            <div className={styles.ringkasanDataRow}>
-              <span className={styles.ringkasanDataLabel}>Ditabung</span>
-              <span className={[styles.ringkasanDataVal, styles.ringkasanSavings].join(' ')}>{fmt(totalNabungFiltered)}</span>
-            </div>
-          )}
-          {hasTagihan && (
-            <div className={styles.ringkasanDataRow}>
-              <span className={styles.ringkasanDataLabel}>Tagihan</span>
-              <span className={[styles.ringkasanDataVal, styles.ringkasanOut].join(' ')}>{fmt(tagihanBulanIni)}</span>
-            </div>
-          )}
-          <div className={styles.ringkasanDataDivider} />
-          <div className={styles.ringkasanDataRow}>
-            <span className={styles.ringkasanDataLabelBold}>Uang bebas</span>
-            <span className={[
-              styles.ringkasanDataVal,
-              styles.ringkasanDataValBold,
-              isDefisit ? styles.ringkasanOut : styles.ringkasanIn,
-            ].join(' ')}>{fmt(uangBebas)}</span>
-          </div>
-        </div>
-
-        {/* Narasi panjang */}
-        <div className={styles.ringkasanNarasiBlock}>
-          {narasiParagraphs.map((p, i) => (
-            <p key={i} className={styles.ringkasanNarasi}>{p}</p>
-          ))}
-        </div>
-      </>
-    )
-  }
-
   function handleShare() {
     setShowShareModal(true)
     setShareCopied(false)
@@ -573,28 +506,34 @@ export default function HomePage() {
         {/* ChecklistCard — conditional */}
         <ChecklistCard />
 
-        {/* Support Card — split panel amber */}
+        {/* Support Card — dark bold */}
         {supportVisible && (
           <div className={styles.supportCard}>
-            <div className={styles.supportLeft}>
-              <span className={styles.supportIcon}>☕</span>
+            <span className={styles.supportDeco}>☕</span>
+            <button
+              className={styles.supportDismiss}
+              onClick={dismissSupport}
+              aria-label="Tutup"
+            >
+              ✕
+            </button>
+            <div className={styles.supportTop}>
+              <span className={styles.supportEyebrow}>Gratis selamanya</span>
+              <div className={styles.supportHeadline}>
+                Suka CatatDuit?<br />
+                <span className={styles.supportHeadlineAccent}>Traktir kopi.</span>
+              </div>
             </div>
-            <div className={styles.supportRight}>
-              <button
-                className={styles.supportDismiss}
-                onClick={dismissSupport}
-                aria-label="Tutup"
-              >
-                <X size={14} />
-              </button>
-              <div className={styles.supportTitle}>CatatDuit gratis selamanya</div>
-              <div className={styles.supportDesc}>Suka? Traktir kopi buat pengembangnya. Ga dipaksa!</div>
+            <div className={styles.supportBody}>
+              <p className={styles.supportDesc}>
+                Kalau aplikasi ini membantu, kamu bisa support pengembangnya dengan traktir kopi.
+              </p>
               <div className={styles.supportActions}>
                 <a
                   href="https://trakteer.id/win32_icang/gift"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={styles.supportBtn}
+                  className={`${styles.supportBtn} ${styles.supportBtnPrimary}`}
                 >
                   Trakteer
                 </a>
@@ -602,7 +541,7 @@ export default function HomePage() {
                   href="https://saweria.co/win32icang"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={[styles.supportBtn, styles.supportBtnSec].join(' ')}
+                  className={`${styles.supportBtn} ${styles.supportBtnSec}`}
                 >
                   Saweria
                 </a>

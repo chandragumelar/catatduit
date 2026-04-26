@@ -995,36 +995,36 @@
 /* ── Support card ─────────────────────────────────────────────────────────── */
 
 .supportCard {
-  background: #111;
-  border: 1px solid #222;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   overflow: hidden;
+}
+
+.supportBanner {
+  background: #f5c842;
+  padding: var(--space-4) var(--space-5) var(--space-5);
   position: relative;
 }
 
 .supportDeco {
   position: absolute;
-  top: 16px;
-  right: 18px;
-  font-size: 52px;
+  top: 14px;
+  right: 16px;
+  font-size: 44px;
   line-height: 1;
-  opacity: 0.15;
   pointer-events: none;
   user-select: none;
-}
-
-.supportTop {
-  padding: var(--space-6) var(--space-5) var(--space-4);
 }
 
 .supportTag {
   display: inline-block;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  background: #f5c842;
-  color: #111;
+  background: #111;
+  color: #f5c842;
   padding: 3px 8px;
   border-radius: 4px;
   margin-bottom: var(--space-3);
@@ -1033,21 +1033,22 @@
 .supportTitle {
   font-size: 24px;
   font-weight: 800;
-  color: #fff;
+  color: #111;
   line-height: 1.2;
   letter-spacing: -0.5px;
 }
 
 .supportBody {
-  padding: 0 var(--space-5) var(--space-5);
+  padding: var(--space-4) var(--space-5) var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  background: var(--bg-surface);
 }
 
 .supportDesc {
   font-size: 13px;
-  color: #aaa;
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 
@@ -1058,9 +1059,9 @@
 
 .supportBtn {
   flex: 1;
-  padding: 11px 0;
-  border-radius: 10px;
-  font-size: 13px;
+  padding: 12px 0;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
   font-weight: 700;
   font-family: var(--font-family);
   cursor: pointer;
@@ -1071,17 +1072,21 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity var(--duration-fast);
 }
 
+.supportBtn:active { opacity: 0.85; }
+
 .supportBtnPrimary {
-  background: #f5c842;
-  color: #111;
+  background: #111;
+  color: #f5c842;
 }
 
 .supportBtnSecondary {
-  background: #222;
-  color: #fff;
-  border: 1px solid #444;
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
 }
 
 .devRow {
@@ -1089,15 +1094,15 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-5);
-  border-top: 1px solid #222;
+  border-top: 1px solid var(--border-default);
 }
 
 .devAvatar {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #f5c842;
-  color: #111;
+  background: #111;
+  color: #f5c842;
   font-size: 11px;
   font-weight: 800;
   display: flex;
@@ -1107,9 +1112,9 @@
 }
 
 .devName {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: #888;
+  color: var(--text-primary);
   flex: 1;
 }
 
@@ -1119,12 +1124,12 @@
 }
 
 .devLink {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border: 1px solid #333;
-  background: #1a1a1a;
-  color: #888;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
   font-size: 11px;
   font-weight: 700;
   display: flex;
@@ -1135,8 +1140,8 @@
 }
 
 .appVersion {
-  font-size: 10px;
-  color: #555;
+  font-size: 11px;
+  color: var(--text-tertiary);
 }
 
 /* ── Toast ────────────────────────────────────────────────────────────────── */
