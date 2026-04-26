@@ -3,9 +3,7 @@
 // =============================================================================
 
 import { useState } from 'react'
-import {
-  User, Download, Trash2, Plus, Pencil, X, Check, ChevronDown, ChevronUp,
-} from 'lucide-react'
+import { Plus, Lock } from 'lucide-react'
 import { useWalletStore } from '@/store/wallet.store'
 import { useTransaksiStore } from '@/store/transaksi.store'
 import { useToast } from '@/hooks/useToast'
@@ -31,11 +29,7 @@ function exportCSV() {
   const rows = transaksi
     .filter(tx => !tx.type)
     .map(tx => [
-      tx.tanggal,
-      tx.jenis,
-      tx.nominal,
-      tx.kategori,
-      tx.wallet_id,
+      tx.tanggal, tx.jenis, tx.nominal, tx.kategori, tx.wallet_id,
       `"${(tx.catatan ?? '').replace(/"/g, '""')}"`,
     ])
   const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n')
@@ -58,67 +52,39 @@ function exportAndReset() {
 
 // ── FAQ data ──────────────────────────────────────────────────────────────────
 
-const FAQ_ITEMS = [
-  {
-    q: 'Apakah data saya aman?',
-    a: 'Ya. Data tersimpan langsung di perangkat kamu — bukan di server kami. Kami tidak bisa mengakses, melihat, atau mengambil data kamu dalam kondisi apapun.',
-  },
-  {
-    q: 'Apakah CatatDuit bisa dipakai offline?',
-    a: 'Ya. CatatDuit adalah PWA yang bisa diinstall dan dipakai sepenuhnya tanpa koneksi internet.',
-  },
-  {
-    q: 'Cara install ke homescreen',
-    a: 'Di iPhone: ketuk tombol Share (kotak dengan panah ke atas) → pilih "Add to Home Screen". Di Android: ketuk menu titik tiga di browser → pilih "Add to Home Screen" atau "Install App". Setelah diinstall, CatatDuit bisa dibuka langsung dari homescreen seperti aplikasi biasa dan bisa dipakai offline.',
-  },
-  {
-    q: 'Apa itu Uang Bebas?',
-    a: 'Uang Bebas = total saldo dikurangi tagihan yang belum dibayar bulan ini dan total tabungan yang sudah disisihkan. Ini angka yang realistis bisa kamu pakai untuk kebutuhan sehari-hari.',
-  },
-  {
-    q: 'Bagaimana cara pindah dompet / transfer antar dompet?',
-    a: 'Ketuk tombol "Antar Dompet" di card Keuangan, atau gunakan shortcut di header halaman utama.',
-  },
-  {
-    q: 'Bagaimana cara mencatat tagihan sebagai sudah dibayar?',
-    a: 'Buka tab Tagihan di halaman Planning, lalu ketuk tagihan yang ingin ditandai lunas.',
-  },
-  {
-    q: 'Kenapa saldo saya tidak sesuai?',
-    a: 'Saldo dihitung otomatis dari saldo awal dompet ditambah semua pemasukan dikurangi pengeluaran. Pastikan semua transaksi sudah tercatat dengan benar dan dompet yang dipilih sudah sesuai.',
-  },
-  {
-    q: 'Apakah data hilang kalau saya clear browser atau ganti HP?',
-    a: 'Ya. Karena data tersimpan di perangkat, clear browser cache atau ganti HP tanpa backup akan menghilangkan data. Rutin ekspor data dari Pengaturan sebagai cadangan.',
-  },
-  {
-    q: 'Apakah CatatDuit bisa dipakai di beberapa perangkat sekaligus?',
-    a: 'Belum. Data tidak tersinkronisasi antar perangkat — setiap perangkat punya data sendiri.',
-  },
-  {
-    q: 'Bagaimana cara backup data saya?',
-    a: 'Buka Pengaturan → Ekspor Data. File CSV akan otomatis terunduh ke perangkat kamu. Simpan file ini di tempat yang aman.',
-  },
-  {
-    q: 'Bagaimana cara reset aplikasi?',
-    a: 'Buka Pengaturan → Reset Aplikasi. Data akan diekspor otomatis sebelum reset sebagai cadangan. Setelah reset, aplikasi kembali ke kondisi awal.',
-  },
-  {
-    q: 'Apakah CatatDuit gratis?',
-    a: 'Ya, gratis selamanya. Tidak ada fitur berbayar, tidak ada iklan, tidak ada subscription.',
-  },
-  {
-    q: 'Kenapa aplikasi tiba-tiba minta update?',
-    a: 'Kami sesekali merilis pembaruan untuk perbaikan bug atau fitur baru. Update tidak otomatis — kamu yang menentukan kapan mau memperbarui.',
-  },
-  {
-    q: 'Ada bug atau mau kasih masukan?',
-    a: 'Hubungi kami lewat X (Twitter) @win32_icang atau buka issue di GitHub. Kami baca semua pesan yang masuk.',
-  },
+type FaqTag = 'privasi' | 'fitur' | 'teknis' | 'umum'
+
+const FAQ_ITEMS: { q: string; a: string; tag: FaqTag }[] = [
+  { tag: 'privasi', q: 'Apakah data saya aman?', a: 'Ya. Data tersimpan langsung di perangkat kamu — bukan di server kami. Kami tidak bisa mengakses, melihat, atau mengambil data kamu dalam kondisi apapun.' },
+  { tag: 'privasi', q: 'Data hilang kalau clear browser atau ganti HP?', a: 'Ya. Karena data tersimpan di perangkat, clear cache atau ganti HP tanpa backup akan menghilangkan data. Rutin ekspor data dari Pengaturan sebagai cadangan.' },
+  { tag: 'privasi', q: 'Bisa dipakai di beberapa perangkat sekaligus?', a: 'Belum. Data tidak tersinkronisasi antar perangkat — setiap perangkat punya data sendiri.' },
+  { tag: 'fitur', q: 'Apa itu Uang Bebas?', a: 'Uang Bebas = total saldo dikurangi tagihan yang belum dibayar bulan ini dan total tabungan yang sudah disisihkan. Ini angka yang realistis bisa kamu pakai untuk kebutuhan sehari-hari.' },
+  { tag: 'fitur', q: 'Cara pindah dompet / transfer antar dompet?', a: 'Ketuk tombol "Antar Dompet" di card Keuangan, atau gunakan shortcut di header halaman utama.' },
+  { tag: 'fitur', q: 'Cara mencatat tagihan sebagai sudah dibayar?', a: 'Buka tab Tagihan di halaman Planning, lalu ketuk tagihan yang ingin ditandai lunas.' },
+  { tag: 'fitur', q: 'Cara backup data saya?', a: 'Buka Pengaturan → Ekspor Data. File CSV akan otomatis terunduh ke perangkat kamu. Simpan file ini di tempat yang aman.' },
+  { tag: 'teknis', q: 'Apakah CatatDuit bisa dipakai offline?', a: 'Ya. CatatDuit adalah PWA yang bisa diinstall dan dipakai sepenuhnya tanpa koneksi internet.' },
+  { tag: 'teknis', q: 'Cara install ke homescreen?', a: 'Di iPhone: ketuk tombol Share → pilih "Add to Home Screen". Di Android: ketuk menu titik tiga → pilih "Install App". Setelah diinstall, CatatDuit bisa dibuka langsung dari homescreen seperti aplikasi biasa.' },
+  { tag: 'teknis', q: 'Kenapa saldo tidak sesuai?', a: 'Saldo dihitung otomatis dari saldo awal dompet ditambah semua pemasukan dikurangi pengeluaran. Pastikan semua transaksi sudah tercatat dengan benar dan dompet yang dipilih sudah sesuai.' },
+  { tag: 'umum', q: 'Apakah CatatDuit gratis?', a: 'Ya, gratis selamanya. Tidak ada fitur berbayar, tidak ada iklan, tidak ada subscription.' },
+  { tag: 'umum', q: 'Kenapa aplikasi tiba-tiba minta update?', a: 'Kami sesekali merilis pembaruan untuk perbaikan bug atau fitur baru. Update tidak otomatis — kamu yang menentukan kapan mau memperbarui.' },
+  { tag: 'umum', q: 'Ada bug atau mau kasih masukan?', a: 'Hubungi kami lewat X (Twitter) @win32_icang atau buka issue di GitHub. Kami baca semua pesan yang masuk.' },
 ]
 
+const FAQ_TAGS: { id: FaqTag; label: string }[] = [
+  { id: 'privasi', label: 'Privasi & data' },
+  { id: 'fitur',   label: 'Fitur' },
+  { id: 'teknis',  label: 'Teknis' },
+  { id: 'umum',    label: 'Umum' },
+]
 
-// ── Emoji icon options for kategori ──────────────────────────────────────────
+// ── Avatar options ────────────────────────────────────────────────────────────
+
+const AVATAR_OPTIONS = [
+  '🙂','😎','🤓','🧑','👩','🧔','👨','🙋','🤗','😄',
+  '🥳','😊','🧘','🏃','🧗','🤑','🎯','🌟','🦊','🐼',
+]
+
+// ── Kategori icon options ─────────────────────────────────────────────────────
 
 const KATEGORI_ICONS = [
   '🍴','🚗','🛒','📱','💡','💧','🏠','🏥','🎮','📚',
@@ -126,7 +92,53 @@ const KATEGORI_ICONS = [
   '💼','💻','🏪','📈','💰','🏦','🛡️','📦',
 ]
 
-// ── Kategori Section ─────────────────────────────────────────────────────────
+// ── FAQ Section ───────────────────────────────────────────────────────────────
+
+function FaqSection() {
+  const [activeTag, setActiveTag] = useState<FaqTag>('privasi')
+  const [openIdx, setOpenIdx] = useState<number | null>(null)
+  const filtered = FAQ_ITEMS.filter(item => item.tag === activeTag)
+
+  const tagStyle: Record<FaqTag, string> = {
+    privasi: styles.tagPrivasi,
+    fitur:   styles.tagFitur,
+    teknis:  styles.tagTeknis,
+    umum:    styles.tagUmum,
+  }
+
+  return (
+    <div className={styles.section}>
+      <span className={styles.sectionLabel}>FAQ</span>
+      <div className={styles.faqChips}>
+        {FAQ_TAGS.map(t => (
+          <button
+            key={t.id}
+            className={[styles.faqChip, activeTag === t.id ? styles.faqChipActive : ''].join(' ')}
+            onClick={() => { setActiveTag(t.id); setOpenIdx(null) }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div className={styles.card}>
+        {filtered.map((item, i) => (
+          <div key={i} className={[styles.faqItem, openIdx === i ? styles.faqItemExpanded : ''].join(' ')}>
+            <button className={styles.faqRow} onClick={() => setOpenIdx(openIdx === i ? null : i)}>
+              <span className={[styles.faqTag, tagStyle[item.tag]].join(' ')}>
+                {item.tag === 'privasi' ? 'Privasi' : item.tag === 'fitur' ? 'Fitur' : item.tag === 'teknis' ? 'Teknis' : 'Umum'}
+              </span>
+              <span className={styles.faqQ}>{item.q}</span>
+              <span className={styles.faqChevron}>{openIdx === i ? '▴' : '▾'}</span>
+            </button>
+            {openIdx === i && <div className={styles.faqAnswer}>{item.a}</div>}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Kategori Section ──────────────────────────────────────────────────────────
 
 type KategoriTab = 'keluar' | 'masuk'
 const HARDCODED_SET = new Set<string>(HARDCODED_KATEGORI_IDS)
@@ -151,10 +163,7 @@ function KategoriSection({ showToast, allTx }: KategoriSectionProps) {
     if (!nama) return
     const id = `custom_${Date.now()}`
     const newItem: KategoriItem = { id, nama, icon: formIcon }
-    const next: KategoriMap = {
-      ...kategoriMap,
-      [aktifTab]: [...kategoriMap[aktifTab], newItem],
-    }
+    const next: KategoriMap = { ...kategoriMap, [aktifTab]: [...kategoriMap[aktifTab], newItem] }
     saveKategori(next)
     setKategoriMap(next)
     setFormNama('')
@@ -166,15 +175,11 @@ function KategoriSection({ showToast, allTx }: KategoriSectionProps) {
   function handleHapus(id: string) {
     const usedInTx = allTx.some(tx => tx.kategori === id)
     if (usedInTx) {
-      const count = allTx.filter(tx => tx.kategori === id).length
-      showToast(`Kategori ini dipakai di ${count} catatan. Hapus catatannya dulu.`)
+      showToast(`Kategori ini dipakai di ${allTx.filter(tx => tx.kategori === id).length} catatan. Hapus catatannya dulu.`)
       setConfirmDeleteId(null)
       return
     }
-    const next: KategoriMap = {
-      ...kategoriMap,
-      [aktifTab]: kategoriMap[aktifTab].filter(k => k.id !== id),
-    }
+    const next: KategoriMap = { ...kategoriMap, [aktifTab]: kategoriMap[aktifTab].filter(k => k.id !== id) }
     saveKategori(next)
     setKategoriMap(next)
     setConfirmDeleteId(null)
@@ -184,89 +189,85 @@ function KategoriSection({ showToast, allTx }: KategoriSectionProps) {
   return (
     <div className={styles.section}>
       <span className={styles.sectionLabel}>Kategori</span>
+      <div className={styles.katTabSwitch}>
+        {(['keluar', 'masuk'] as KategoriTab[]).map(tab => (
+          <button
+            key={tab}
+            className={[styles.katTabBtn, aktifTab === tab ? styles.katTabBtnActive : ''].join(' ')}
+            onClick={() => { setAktifTab(tab); setShowForm(false); setConfirmDeleteId(null) }}
+          >
+            {tab === 'keluar' ? 'Pengeluaran' : 'Pemasukan'}
+          </button>
+        ))}
+      </div>
       <div className={styles.card}>
-        <div className={styles.kategoriTabBar}>
-          {(['keluar', 'masuk'] as KategoriTab[]).map(tab => (
-            <button
-              key={tab}
-              className={[styles.kategoriTab, aktifTab === tab ? styles.kategoriTabActive : ''].join(' ')}
-              onClick={() => { setAktifTab(tab); setShowForm(false); setConfirmDeleteId(null) }}
-            >
-              {tab === 'keluar' ? 'Pengeluaran' : 'Pemasukan'}
-            </button>
-          ))}
-        </div>
-
         {list.map(k => {
           const isHardcoded = HARDCODED_SET.has(k.id)
           return (
             <div key={k.id}>
-              <div className={styles.kategoriRow}>
-                <span className={styles.kategoriIcon}>{k.icon}</span>
-                <span className={styles.kategoriNama}>{k.nama}</span>
-                {!isHardcoded && (
-                  <button
-                    className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
-                    onClick={() => setConfirmDeleteId(confirmDeleteId === k.id ? null : k.id)}
-                    aria-label="Hapus"
-                  >
-                    <X size={15} strokeWidth={1.5} />
-                  </button>
-                )}
-              </div>
-              {confirmDeleteId === k.id && (
-                <div className={styles.inlineConfirm}>
-                  <span className={styles.inlineConfirmText}>
-                    Hapus kategori "{k.nama}"?
-                  </span>
-                  <div className={styles.inlineConfirmActions}>
-                    <button className={styles.confirmCancelBtn} onClick={() => setConfirmDeleteId(null)}>Batal</button>
-                    <button className={styles.confirmResetBtn} onClick={() => handleHapus(k.id)}>Hapus</button>
+              {confirmDeleteId === k.id ? (
+                <div className={styles.katConfirmStrip}>
+                  <span className={styles.katConfirmText}>Hapus "{k.nama}"?</span>
+                  <div className={styles.katConfirmActions}>
+                    <button className={styles.katConfirmYes} onClick={() => handleHapus(k.id)}>Hapus</button>
+                    <button className={styles.katConfirmNo} onClick={() => setConfirmDeleteId(null)}>Batal</button>
                   </div>
+                </div>
+              ) : (
+                <div className={styles.katRow}>
+                  <div className={styles.katBadge}>{k.icon}</div>
+                  <span className={styles.katNama}>{k.nama}</span>
+                  {isHardcoded
+                    ? <Lock size={14} strokeWidth={1.5} className={styles.katLock} />
+                    : <button className={styles.katDelBtn} onClick={() => setConfirmDeleteId(k.id)} aria-label="Hapus">✕</button>
+                  }
                 </div>
               )}
             </div>
           )
         })}
-
-        {showForm ? (
-          <div className={styles.kategoriForm}>
-            <div className={styles.kategoriIconPicker}>
-              {KATEGORI_ICONS.map(ic => (
-                <button
-                  key={ic}
-                  className={[styles.kategoriIconOption, formIcon === ic ? styles.kategoriIconActive : ''].join(' ')}
-                  onClick={() => setFormIcon(ic)}
-                >
-                  {ic}
-                </button>
-              ))}
-            </div>
+        {!showForm && (
+          <button className={styles.katAddRow} onClick={() => setShowForm(true)}>
+            <div className={styles.katAddIcon}><Plus size={14} strokeWidth={2} /></div>
+            <span className={styles.katAddLabel}>Tambah kategori</span>
+          </button>
+        )}
+      </div>
+      {showForm && (
+        <div className={styles.katForm}>
+          <div className={styles.katFormTop}>
+            <div className={styles.katFormPreview}>{formIcon}</div>
             <input
-              className={styles.walletFormInput}
+              className={styles.katFormInput}
               placeholder="Nama kategori"
               value={formNama}
               onChange={e => setFormNama(e.target.value)}
               maxLength={30}
               autoFocus
             />
-            <div className={styles.walletFormActions}>
-              <button className={styles.walletFormCancel} onClick={() => { setShowForm(false); setFormNama(''); setFormIcon('📦') }}>Batal</button>
-              <button className={styles.walletFormSave} onClick={handleTambah} disabled={!formNama.trim()}>Tambah</button>
-            </div>
           </div>
-        ) : (
-          <button className={styles.addWalletBtn} onClick={() => setShowForm(true)}>
-            <Plus size={15} strokeWidth={1.5} />
-            Tambah Kategori
-          </button>
-        )}
-      </div>
+          <div className={styles.katIconGrid}>
+            {KATEGORI_ICONS.map(ic => (
+              <button
+                key={ic}
+                className={[styles.katIconOpt, formIcon === ic ? styles.katIconSel : ''].join(' ')}
+                onClick={() => setFormIcon(ic)}
+              >
+                {ic}
+              </button>
+            ))}
+          </div>
+          <div className={styles.katFormFooter}>
+            <button className={styles.katFormCancel} onClick={() => { setShowForm(false); setFormNama(''); setFormIcon('📦') }}>Batal</button>
+            <button className={styles.katFormSave} onClick={handleTambah} disabled={!formNama.trim()}>Tambah</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-// ── Wallet form (add / edit) ──────────────────────────────────────────────────
+// ── Wallet form ───────────────────────────────────────────────────────────────
 
 interface WalletFormProps {
   initial?: Wallet
@@ -277,71 +278,40 @@ interface WalletFormProps {
 function WalletForm({ initial, onSave, onCancel }: WalletFormProps) {
   const [nama, setNama] = useState(initial?.nama ?? '')
   const [currency, setCurrency] = useState(initial?.currency ?? 'IDR')
-  const [saldoAwal, setSaldoAwal] = useState(
-    initial ? String(initial.saldo_awal) : ''
-  )
+  const [saldoAwal, setSaldoAwal] = useState(initial ? String(initial.saldo_awal) : '')
   const isEdit = !!initial
 
   function handleSave() {
     const trimmed = nama.trim()
     if (!trimmed) return
-    const nominalVal = parseInt(saldoAwal.replace(/\D/g, ''), 10) || 0
     onSave({
       id: initial?.id ?? generateId(),
       nama: trimmed,
       icon: initial?.icon ?? '👛',
-      saldo_awal: nominalVal,
+      saldo_awal: parseInt(saldoAwal.replace(/\D/g, ''), 10) || 0,
       currency,
     })
   }
 
   return (
-    <div className={styles.walletForm}>
-      <div className={styles.walletFormTitle}>{isEdit ? 'Edit Dompet' : 'Tambah Dompet'}</div>
+    <div className={styles.walletEditForm}>
       <div className={styles.walletFormField}>
         <label className={styles.walletFormLabel}>Nama dompet</label>
-        <input
-          className={styles.walletFormInput}
-          value={nama}
-          onChange={e => setNama(e.target.value)}
-          placeholder="Contoh: Dompet Utama"
-          maxLength={30}
-          autoFocus
-        />
+        <input className={styles.walletFormInput} value={nama} onChange={e => setNama(e.target.value)} placeholder="Contoh: Dompet Utama" maxLength={30} autoFocus />
       </div>
       <div className={styles.walletFormField}>
         <label className={styles.walletFormLabel}>Mata uang</label>
-        <select
-          className={styles.walletFormSelect}
-          value={currency}
-          onChange={e => setCurrency(e.target.value)}
-        >
-          {CURRENCY_OPTIONS.map(opt => (
-            <option key={opt.code} value={opt.code}>{opt.label}</option>
-          ))}
+        <select className={styles.walletFormSelect} value={currency} onChange={e => setCurrency(e.target.value)}>
+          {CURRENCY_OPTIONS.map(opt => <option key={opt.code} value={opt.code}>{opt.label}</option>)}
         </select>
       </div>
       <div className={styles.walletFormField}>
-        <label className={styles.walletFormLabel}>
-          {isEdit ? 'Saldo awal' : 'Saldo awal'}
-        </label>
-        <input
-          className={styles.walletFormInput}
-          value={saldoAwal}
-          onChange={e => setSaldoAwal(e.target.value)}
-          placeholder="0"
-          inputMode="numeric"
-        />
+        <label className={styles.walletFormLabel}>Saldo awal</label>
+        <input className={styles.walletFormInput} value={saldoAwal} onChange={e => setSaldoAwal(e.target.value)} placeholder="0" inputMode="numeric" />
       </div>
       <div className={styles.walletFormActions}>
         <button className={styles.walletFormCancel} onClick={onCancel}>Batal</button>
-        <button
-          className={styles.walletFormSave}
-          onClick={handleSave}
-          disabled={!nama.trim()}
-        >
-          {isEdit ? 'Simpan' : 'Tambah'}
-        </button>
+        <button className={styles.walletFormSave} onClick={handleSave} disabled={!nama.trim()}>{isEdit ? 'Simpan' : 'Tambah'}</button>
       </div>
     </div>
   )
@@ -354,40 +324,45 @@ export default function SettingsPage() {
   const saveWallets = useWalletStore(s => s.save)
   const hydrateTx = useTransaksiStore(s => s.hydrate)
   const { toasts, showToast } = useToast()
-
-  const [nama, setNama] = useState(() => getNama())
-  const [namaDirty, setNamaDirty] = useState(false)
-  const [resetStep, setResetStep] = useState<0 | 1 | 2>(0)
-
-  // Wallet CRUD state
-  const [walletFormMode, setWalletFormMode] = useState<'none' | 'add' | 'edit'>('none')
-  const [editingWallet, setEditingWallet] = useState<Wallet | null>(null)
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
-
-  // FAQ state
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
-
-  // ── Saldo per wallet ───────────────────────────────────────────────────────
   const allTx = getTransaksi()
 
+  // Profil
+  const [nama, setNama] = useState(() => getNama())
+  const [namaEditing, setNamaEditing] = useState(false)
+  const [namaDraft, setNamaDraft] = useState('')
+  const [avatar, setAvatar] = useState('🙂')
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false)
+
+  // Wallet
+  const [walletFormMode, setWalletFormMode] = useState<'none' | 'add' | 'edit'>('none')
+  const [editingWallet, setEditingWallet] = useState<Wallet | null>(null)
+  const [walletConfirmDeleteId, setWalletConfirmDeleteId] = useState<string | null>(null)
+
+  // Data
+  const [resetStep, setResetStep] = useState<0 | 1 | 2>(0)
+  const [eksporSuccess, setEksporSuccess] = useState(false)
+
   function walletSaldo(w: Wallet): number {
-    const masuk = allTx.filter(tx => tx.wallet_id === w.id && tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
+    const masuk  = allTx.filter(tx => tx.wallet_id === w.id && tx.jenis === 'masuk').reduce((s, tx) => s + tx.nominal, 0)
     const keluar = allTx.filter(tx => tx.wallet_id === w.id && tx.jenis === 'keluar').reduce((s, tx) => s + tx.nominal, 0)
     const nabung = allTx.filter(tx => tx.wallet_id === w.id && tx.jenis === 'nabung').reduce((s, tx) => s + tx.nominal, 0)
     return w.saldo_awal + masuk - keluar - nabung
   }
 
-  // ── Nama ──────────────────────────────────────────────────────────────────
-
-  function handleNamaSave() {
-    const trimmed = nama.trim()
-    if (!trimmed) return
-    saveNama(trimmed)
-    setNamaDirty(false)
-    showToast('Tersimpan')
+  function startNamaEdit() {
+    setNamaDraft(nama)
+    setNamaEditing(true)
+    setAvatarPickerOpen(false)
   }
 
-  // ── Wallet handlers ───────────────────────────────────────────────────────
+  function saveNamaHandler() {
+    const trimmed = namaDraft.trim()
+    if (!trimmed) return
+    saveNama(trimmed)
+    setNama(trimmed)
+    setNamaEditing(false)
+    showToast('Tersimpan')
+  }
 
   function handleWalletSave(w: Wallet) {
     if (walletFormMode === 'add') {
@@ -404,29 +379,21 @@ export default function SettingsPage() {
   function handleWalletDelete(id: string) {
     if (id === DEFAULT_WALLET_ID && wallets.length === 1) {
       showToast('Harus ada minimal satu dompet')
-      setConfirmDeleteId(null)
+      setWalletConfirmDeleteId(null)
       return
     }
-    // Migrate transaksi ke dompet utama atau dompet pertama yang tersisa
     const fallbackId = wallets.find(w => w.id !== id)?.id ?? DEFAULT_WALLET_ID
-    const migratedTx = allTx.map(tx =>
-      tx.wallet_id === id ? { ...tx, wallet_id: fallbackId } : tx
-    )
-    saveTransaksi(migratedTx)
+    saveTransaksi(allTx.map(tx => tx.wallet_id === id ? { ...tx, wallet_id: fallbackId } : tx))
     hydrateTx()
     saveWallets(wallets.filter(w => w.id !== id))
-    setConfirmDeleteId(null)
+    setWalletConfirmDeleteId(null)
     showToast('Dompet dihapus')
   }
-
-  // ── Reset ─────────────────────────────────────────────────────────────────
 
   function handleResetConfirm() {
     if (resetStep === 1) setResetStep(2)
     else if (resetStep === 2) exportAndReset()
   }
-
-  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className={styles.page}>
@@ -444,93 +411,118 @@ export default function SettingsPage() {
       {/* ── Profil ── */}
       <div className={styles.section}>
         <span className={styles.sectionLabel}>Profil</span>
-        <div className={styles.card}>
-          <div className={styles.namaForm}>
-            <div className={styles.rowIcon}><User size={16} strokeWidth={1.5} /></div>
-            <input
-              className={styles.namaInput}
-              value={nama}
-              onChange={e => { setNama(e.target.value); setNamaDirty(true) }}
-              onKeyDown={e => e.key === 'Enter' && handleNamaSave()}
-              placeholder="Nama kamu"
-              maxLength={40}
-            />
-            {namaDirty && nama.trim() && (
-              <button className={styles.namaSaveBtn} onClick={handleNamaSave}>Simpan</button>
-            )}
+        <div className={styles.profilCard}>
+          <div className={styles.profilTop}>
+            <button
+              className={styles.avatar}
+              onClick={() => { setAvatarPickerOpen(p => !p); setNamaEditing(false) }}
+              aria-label="Pilih avatar"
+            >
+              <span className={styles.avatarEmoji}>{avatar}</span>
+              <span className={styles.avatarEditBadge}>✎</span>
+            </button>
+            <div className={styles.profilMeta}>
+              <span className={styles.profilGreeting}>Halo,</span>
+              {namaEditing ? (
+                <div className={styles.namaEditRow}>
+                  <input
+                    className={styles.namaEditInput}
+                    value={namaDraft}
+                    onChange={e => setNamaDraft(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && saveNamaHandler()}
+                    maxLength={40}
+                    placeholder="Nama kamu"
+                    autoFocus
+                  />
+                  <button className={styles.namaSaveBtn} onClick={saveNamaHandler}>Simpan</button>
+                  <button className={styles.namaCancelBtn} onClick={() => setNamaEditing(false)}>Batal</button>
+                </div>
+              ) : (
+                <div className={styles.namaViewRow}>
+                  <span
+                    className={nama ? styles.namaDisplay : styles.namaPlaceholder}
+                    onClick={startNamaEdit}
+                  >
+                    {nama || 'Siapa namamu?'}
+                  </span>
+                  <button className={styles.namaEditBtn} onClick={startNamaEdit} aria-label="Edit nama">✎</button>
+                </div>
+              )}
+            </div>
           </div>
+          {avatarPickerOpen && (
+            <div className={styles.avatarPicker}>
+              <span className={styles.avatarPickerLabel}>Pilih avatar</span>
+              <div className={styles.avatarGrid}>
+                {AVATAR_OPTIONS.map(em => (
+                  <button
+                    key={em}
+                    className={[styles.avatarOpt, avatar === em ? styles.avatarOptSel : ''].join(' ')}
+                    onClick={() => { setAvatar(em); setAvatarPickerOpen(false) }}
+                  >
+                    {em}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* ── Dompet ── */}
       <div className={styles.section}>
         <span className={styles.sectionLabel}>Dompet</span>
-        <div className={styles.card}>
+        <div className={styles.dompetList}>
           {wallets.map(w => (
-            <div key={w.id}>
-              <div className={styles.walletRow}>
-                <span className={styles.walletEmoji}>{w.icon}</span>
-                <div className={styles.rowBody}>
-                  <div className={styles.rowLabel}>{w.nama}</div>
-                  <div className={styles.rowSub}>{w.currency} · {formatRupiah(walletSaldo(w))}</div>
+            <div key={w.id} className={styles.dompetCard}>
+              <div className={styles.dompetMain}>
+                <div className={styles.dompetIcon}>{w.icon}</div>
+                <div className={styles.dompetBody}>
+                  <div className={styles.dompetNama}>{w.nama}</div>
+                  <div className={styles.dompetSub}>{w.currency}</div>
                 </div>
-                <div className={styles.rowRight}>
+                <div className={styles.dompetSaldo}>{formatRupiah(walletSaldo(w))}</div>
+                <div className={styles.dompetActions}>
                   <button
-                    className={styles.iconBtn}
-                    onClick={() => { setEditingWallet(w); setWalletFormMode('edit') }}
+                    className={styles.dompetEditBtn}
+                    onClick={() => { setEditingWallet(w); setWalletFormMode('edit'); setWalletConfirmDeleteId(null) }}
                     aria-label="Edit"
-                  >
-                    <Pencil size={15} strokeWidth={1.5} />
-                  </button>
+                  >✎</button>
                   {wallets.length > 1 && (
                     <button
-                      className={`${styles.iconBtn} ${styles.iconBtnDanger}`}
-                      onClick={() => setConfirmDeleteId(w.id)}
+                      className={styles.dompetDelBtn}
+                      onClick={() => { setWalletConfirmDeleteId(w.id); setWalletFormMode('none'); setEditingWallet(null) }}
                       aria-label="Hapus"
-                    >
-                      <X size={15} strokeWidth={1.5} />
-                    </button>
+                    >✕</button>
                   )}
                 </div>
               </div>
-
-              {/* Konfirmasi hapus dompet */}
-              {confirmDeleteId === w.id && (
-                <div className={styles.inlineConfirm}>
-                  <span className={styles.inlineConfirmText}>
-                    Transaksi di dompet ini akan dipindah ke dompet lain. Lanjutkan?
-                  </span>
-                  <div className={styles.inlineConfirmActions}>
-                    <button className={styles.confirmCancelBtn} onClick={() => setConfirmDeleteId(null)}>Batal</button>
-                    <button className={styles.confirmResetBtn} onClick={() => handleWalletDelete(w.id)}>Hapus</button>
+              {walletConfirmDeleteId === w.id && (
+                <div className={styles.dompetConfirmStrip}>
+                  <span className={styles.dompetConfirmText}>Transaksi akan dipindah ke dompet lain. Lanjutkan?</span>
+                  <div className={styles.dompetConfirmActions}>
+                    <button className={styles.dompetConfirmYes} onClick={() => handleWalletDelete(w.id)}>Hapus</button>
+                    <button className={styles.dompetConfirmNo} onClick={() => setWalletConfirmDeleteId(null)}>Batal</button>
                   </div>
                 </div>
               )}
-
-              {/* Edit form inline */}
               {walletFormMode === 'edit' && editingWallet?.id === w.id && (
-                <WalletForm
-                  initial={w}
-                  onSave={handleWalletSave}
-                  onCancel={() => { setWalletFormMode('none'); setEditingWallet(null) }}
-                />
+                <WalletForm initial={w} onSave={handleWalletSave} onCancel={() => { setWalletFormMode('none'); setEditingWallet(null) }} />
               )}
             </div>
           ))}
-
-          {/* Add form inline */}
           {walletFormMode === 'add' ? (
-            <WalletForm
-              onSave={handleWalletSave}
-              onCancel={() => setWalletFormMode('none')}
-            />
+            <div className={styles.dompetCard}>
+              <div className={styles.dompetAddHeader}>Dompet baru</div>
+              <WalletForm onSave={handleWalletSave} onCancel={() => setWalletFormMode('none')} />
+            </div>
           ) : (
             <button
-              className={styles.addWalletBtn}
-              onClick={() => setWalletFormMode('add')}
+              className={styles.dompetAddCard}
+              onClick={() => { setWalletFormMode('add'); setEditingWallet(null); setWalletConfirmDeleteId(null) }}
             >
-              <Plus size={15} strokeWidth={1.5} />
-              Tambah Dompet
+              <div className={styles.dompetAddIcon}><Plus size={16} strokeWidth={2} /></div>
+              <span className={styles.dompetAddLabel}>Tambah dompet</span>
             </button>
           )}
         </div>
@@ -539,48 +531,53 @@ export default function SettingsPage() {
       {/* ── Kategori ── */}
       <KategoriSection showToast={showToast} allTx={allTx} />
 
-      {/* ── Ekspor & Reset ── */}
+      {/* ── Data ── */}
       <div className={styles.section}>
         <span className={styles.sectionLabel}>Data</span>
-        <div className={styles.card}>
-          <button className={styles.rowBtn} onClick={() => { exportCSV(); showToast('Data diekspor') }}>
-            <div className={styles.rowIcon}><Download size={16} strokeWidth={1.5} /></div>
-            <div className={styles.rowBody}>
-              <div className={styles.rowLabel}>Ekspor Data</div>
-              <div className={styles.rowSub}>Unduh semua transaksi sebagai file CSV</div>
+        <div className={styles.dataGrid}>
+          <button
+            className={styles.dataTile}
+            onClick={() => { exportCSV(); setEksporSuccess(true); showToast('Data diekspor'); setTimeout(() => setEksporSuccess(false), 4000) }}
+          >
+            <span className={styles.dataTileIcon}>⬇</span>
+            <div>
+              <div className={styles.dataTileLabel}>Ekspor Data</div>
+              <div className={styles.dataTileSub}>Unduh semua transaksi sebagai CSV</div>
             </div>
           </button>
           <button
-            className={`${styles.rowBtn} ${styles.rowBtnDanger}`}
-            onClick={() => setResetStep(1)}
+            className={`${styles.dataTile} ${styles.dataTileDanger}`}
+            onClick={() => { setResetStep(1); setEksporSuccess(false) }}
           >
-            <div className={styles.rowIcon}><Trash2 size={16} strokeWidth={1.5} /></div>
-            <div className={styles.rowBody}>
-              <div className={styles.rowLabel}>Reset Aplikasi</div>
-              <div className={styles.rowSub}>Hapus semua data, mulai dari awal</div>
+            <span className={styles.dataTileIcon}>🗑</span>
+            <div>
+              <div className={styles.dataTileLabel}>Reset Aplikasi</div>
+              <div className={styles.dataTileSub}>Hapus semua data, mulai dari awal</div>
             </div>
           </button>
         </div>
-
+        {eksporSuccess && (
+          <div className={styles.eksporSuccess}>
+            <span className={styles.eksporSuccessIcon}>✓</span>
+            <span className={styles.eksporSuccessText}>Data berhasil diekspor. Cek folder unduhan kamu.</span>
+          </div>
+        )}
         {resetStep === 1 && (
           <div className={styles.confirmBox}>
+            <div className={styles.confirmStep}>Langkah 1 dari 2</div>
             <div className={styles.confirmTitle}>Hapus semua data?</div>
-            <div className={styles.confirmBody}>
-              Semua transaksi, dompet, tagihan, dan target menabung akan dihapus permanen. Data akan diekspor otomatis sebagai CSV sebelum reset.
-            </div>
+            <div className={styles.confirmBody}>Semua transaksi, dompet, tagihan, dan target menabung akan dihapus permanen. Data akan diekspor otomatis sebagai CSV sebelum reset.</div>
             <div className={styles.confirmActions}>
               <button className={styles.confirmCancelBtn} onClick={() => setResetStep(0)}>Batal</button>
               <button className={styles.confirmResetBtn} onClick={handleResetConfirm}>Lanjutkan</button>
             </div>
           </div>
         )}
-
         {resetStep === 2 && (
           <div className={styles.confirmBox}>
+            <div className={styles.confirmStep}>Langkah 2 dari 2</div>
             <div className={styles.confirmTitle}>Yakin? Ini tidak bisa dibatalkan.</div>
-            <div className={styles.confirmBody}>
-              Data akan diekspor dulu, lalu semua data dihapus dan aplikasi mulai ulang dari awal.
-            </div>
+            <div className={styles.confirmBody}>Data akan diekspor dulu, lalu semua data dihapus dan aplikasi mulai ulang dari awal.</div>
             <div className={styles.confirmActions}>
               <button className={styles.confirmCancelBtn} onClick={() => setResetStep(0)}>Batal</button>
               <button className={styles.confirmResetBtn} onClick={handleResetConfirm}>Hapus Sekarang</button>
@@ -590,77 +587,33 @@ export default function SettingsPage() {
       </div>
 
       {/* ── FAQ ── */}
-      <div className={styles.section}>
-        <span className={styles.sectionLabel}>Pertanyaan Umum</span>
-        <div className={styles.card}>
-          {FAQ_ITEMS.map((item, i) => (
-            <div key={i} className={styles.faqItem}>
-              <button
-                className={styles.faqQuestion}
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-              >
-                <span className={styles.faqQuestionText}>{item.q}</span>
-                {openFaq === i
-                  ? <ChevronUp size={15} strokeWidth={1.5} className={styles.faqChevron} />
-                  : <ChevronDown size={15} strokeWidth={1.5} className={styles.faqChevron} />
-                }
-              </button>
-              {openFaq === i && (
-                <div className={styles.faqAnswer}>{item.a}</div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      <FaqSection />
 
-      {/* ── Support / Sponsor ── */}
+      {/* ── Support ── */}
       <div className={styles.section}>
         <div className={styles.supportCard}>
-          <div className={styles.supportTitle}>☕ CatatDuit gratis selamanya</div>
-          <div className={styles.supportDesc}>
-            Kalau aplikasi ini membantu, kamu bisa traktir kopi buat pengembangnya.
+          <span className={styles.supportDeco}>☕</span>
+          <div className={styles.supportTop}>
+            <div className={styles.supportTag}>Open &amp; gratis</div>
+            <div className={styles.supportTitle}>CatatDuit<br />dibuat dengan<br />sepenuh hati.</div>
           </div>
-          <div className={styles.supportActions}>
-            <a href="https://trakteer.id/win32_icang/gift" target="_blank" rel="noopener noreferrer" className={styles.supportBtn}>
-              Trakteer
-            </a>
-            <a href="https://saweria.co/win32icang" target="_blank" rel="noopener noreferrer" className={styles.supportBtn}>
-              Saweria
-            </a>
+          <div className={styles.supportBody}>
+            <p className={styles.supportDesc}>Tidak ada iklan, tidak ada subscription, tidak ada jebakan. Kalau CatatDuit membantu, traktir kopi buat pengembangnya.</p>
+            <div className={styles.supportBtns}>
+              <a href="https://trakteer.id/win32_icang/gift" target="_blank" rel="noopener noreferrer" className={`${styles.supportBtn} ${styles.supportBtnPrimary}`}>Trakteer</a>
+              <a href="https://saweria.co/win32icang" target="_blank" rel="noopener noreferrer" className={`${styles.supportBtn} ${styles.supportBtnSecondary}`}>Saweria</a>
+            </div>
+          </div>
+          <div className={styles.devRow}>
+            <div className={styles.devAvatar}>CG</div>
+            <span className={styles.devName}>Chandra Gumelar</span>
+            <div className={styles.devLinks}>
+              <a href="https://github.com/chandragumelar/catatduit" target="_blank" rel="noopener noreferrer" className={styles.devLink} aria-label="GitHub">GH</a>
+              <a href="https://x.com/win32_icang" target="_blank" rel="noopener noreferrer" className={styles.devLink} aria-label="X">𝕏</a>
+            </div>
+            <span className={styles.appVersion}>v4 · Schema v{CURRENT_SCHEMA_VERSION}</span>
           </div>
         </div>
-      </div>
-
-      {/* ── Developer info ── */}
-      <div className={styles.devInfo}>
-        <span className={styles.devName}>Chandra Gumelar</span>
-        <div className={styles.devLinks}>
-          <a
-            href="https://github.com/chandragumelar/catatduit"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.devLink}
-            aria-label="GitHub"
-          >
-            {/* GitHub icon */}
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-            </svg>
-          </a>
-          <a
-            href="https://x.com/win32_icang"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.devLink}
-            aria-label="X (Twitter)"
-          >
-            {/* X icon */}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-            </svg>
-          </a>
-        </div>
-        <span className={styles.appVersion}>v4 · Schema v{CURRENT_SCHEMA_VERSION}</span>
       </div>
 
     </div>

@@ -46,7 +46,7 @@
   padding: 0 var(--space-1);
 }
 
-/* ── Card ─────────────────────────────────────────────────────────────────── */
+/* ── Card base ────────────────────────────────────────────────────────────── */
 
 .card {
   background: var(--bg-surface);
@@ -55,229 +55,383 @@
   overflow: hidden;
 }
 
-/* ── Row base ─────────────────────────────────────────────────────────────── */
+/* ── Profil ───────────────────────────────────────────────────────────────── */
 
-.row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--card-padding);
-  min-height: 52px;
-  border-bottom: 1px solid var(--border-default);
+.profilCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
-.row:last-child { border-bottom: none; }
+.profilTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
 
-.rowIcon {
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #EEEDFE;
+  border: 1px solid #AFA9EC;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--bg-surface-2);
   flex-shrink: 0;
-  color: var(--text-secondary);
+  cursor: pointer;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.rowBody {
+.avatarEmoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.avatarEditBadge {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  background: #534AB7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #EEEDFE;
+  font-style: normal;
+  line-height: 1;
+}
+
+.profilMeta {
   flex: 1;
   min-width: 0;
 }
 
-.rowLabel {
-  font-size: 14px;
-  color: var(--text-primary);
+.profilGreeting {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-bottom: 2px;
 }
 
-.rowSub {
-  font-size: 12px;
-  color: var(--text-tertiary);
-  margin-top: 1px;
+.namaViewRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.namaDisplay {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
 }
 
-.rowRight {
+.namaPlaceholder {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  flex: 1;
+  cursor: pointer;
+}
+
+.namaEditBtn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  font-size: 14px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.namaEditRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.namaEditInput {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-family);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 6px;
+  border: 1px solid #7F77DD;
+  background: #EEEDFE;
+  color: #3C3489;
+  outline: none;
+  min-width: 0;
+}
+
+.namaSaveBtn {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: #534AB7;
+  color: #EEEDFE;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.namaCancelBtn {
+  font-size: 12px;
+  font-family: var(--font-family);
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.avatarPicker {
+  border-top: 1px solid var(--border-default);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.avatarPickerLabel {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.avatarGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.avatarOpt {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-2);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.avatarOptSel {
+  border: 2px solid #7F77DD;
+  background: #EEEDFE;
+}
+
+/* ── Dompet ───────────────────────────────────────────────────────────────── */
+
+.dompetList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dompetCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.dompetMain {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--card-padding);
+}
+
+.dompetIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--bg-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.dompetBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.dompetNama {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.dompetSub {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+.dompetSaldo {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  margin-right: var(--space-2);
+  white-space: nowrap;
+}
+
+.dompetActions {
+  display: flex;
   gap: var(--space-1);
   flex-shrink: 0;
 }
 
-.rowValue {
-  font-size: 14px;
+.dompetEditBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface-2);
   color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Button row ───────────────────────────────────────────────────────────── */
-
-.rowBtn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--card-padding);
-  min-height: 52px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-family: var(--font-family);
-  border-bottom: 1px solid var(--border-default);
-  text-align: left;
-  -webkit-tap-highlight-color: transparent;
-  transition: background var(--duration-fast);
-}
-
-.rowBtn:last-child { border-bottom: none; }
-.rowBtn:active { background: var(--bg-surface-2); }
-
-.rowBtnDanger .rowLabel { color: var(--status-danger); }
-.rowBtnDanger .rowIcon {
-  background: var(--status-danger-bg);
-  color: var(--status-danger);
-}
-
-/* ── Inline edit (nama) ───────────────────────────────────────────────────── */
-
-.namaForm {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 0 var(--card-padding);
-  min-height: 52px;
-}
-
-.namaInput {
-  flex: 1;
-  font-size: 14px;
-  font-family: var(--font-family);
-  color: var(--text-primary);
-  background: transparent;
-  border: none;
-  outline: none;
-  padding: 0;
-}
-
-.namaInput::placeholder { color: var(--text-tertiary); }
-
-.namaSaveBtn {
-  font-size: 13px;
-  font-weight: 500;
-  font-family: var(--font-family);
-  color: var(--accent);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  -webkit-tap-highlight-color: transparent;
-  flex-shrink: 0;
-}
-
-/* ── Wallet rows ──────────────────────────────────────────────────────────── */
-
-.walletRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--card-padding);
-  min-height: 52px;
-  border-bottom: 1px solid var(--border-default);
-}
-
-.walletEmoji {
-  font-size: 20px;
-  width: 32px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.iconBtn {
+  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: var(--text-tertiary);
   cursor: pointer;
-  border-radius: var(--radius-sm);
   -webkit-tap-highlight-color: transparent;
-  transition: background var(--duration-fast), color var(--duration-fast);
 }
 
-.iconBtn:active {
-  background: var(--bg-surface-2);
-  color: var(--text-primary);
-}
-
-.iconBtnDanger:active {
-  background: var(--status-danger-bg);
-  color: var(--status-danger);
-}
-
-/* ── Inline confirm (hapus wallet) ───────────────────────────────────────── */
-
-.inlineConfirm {
-  padding: var(--space-3) var(--card-padding);
-  background: var(--status-danger-bg);
-  border-bottom: 1px solid var(--border-default);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.inlineConfirmText {
+.dompetDelBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid #F09595;
+  background: #FCEBEB;
+  color: #A32D2D;
   font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.inlineConfirmActions {
+  font-weight: 600;
   display: flex;
-  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* ── Add wallet button ────────────────────────────────────────────────────── */
-
-.addWalletBtn {
-  width: 100%;
+.dompetConfirmStrip {
+  background: var(--status-danger-bg);
+  border-top: 1px solid var(--border-default);
+  padding: var(--space-3) var(--card-padding);
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--card-padding);
-  min-height: 48px;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: var(--font-family);
-  color: var(--accent);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background var(--duration-fast);
+  flex-wrap: wrap;
 }
 
-.addWalletBtn:active { background: var(--accent-subtle); }
+.dompetConfirmText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  flex: 1;
+  line-height: 1.4;
+  min-width: 0;
+}
 
-/* ── Wallet form ──────────────────────────────────────────────────────────── */
+.dompetConfirmActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
 
-.walletForm {
-  padding: var(--space-4) var(--card-padding);
-  border-top: 1px solid var(--border-default);
+.dompetConfirmYes {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--status-danger);
+  border: 1px solid var(--status-danger);
+  background: transparent;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.dompetConfirmNo {
+  font-size: 12px;
+  font-family: var(--font-family);
+  color: var(--text-tertiary);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dompetAddCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--card-padding);
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dompetAddIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px dashed var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+}
+
+.dompetAddLabel {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.dompetAddHeader {
+  padding: var(--space-3) var(--card-padding) 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ── Wallet form (inside dompet card) ────────────────────────────────────── */
+
+.walletEditForm {
+  padding: var(--space-3) var(--card-padding) var(--card-padding);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-}
-
-.walletFormTitle {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
+  border-top: 1px solid var(--border-default);
 }
 
 .walletFormField {
@@ -287,12 +441,12 @@
 }
 
 .walletFormLabel {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-tertiary);
 }
 
 .walletFormInput {
-  font-size: 14px;
+  font-size: 13px;
   font-family: var(--font-family);
   color: var(--text-primary);
   background: var(--bg-surface-2);
@@ -306,7 +460,7 @@
 .walletFormInput:focus { border-color: var(--border-focus); }
 
 .walletFormSelect {
-  font-size: 14px;
+  font-size: 13px;
   font-family: var(--font-family);
   color: var(--text-primary);
   background: var(--bg-surface-2);
@@ -321,42 +475,368 @@
 .walletFormActions {
   display: flex;
   gap: var(--space-2);
-  padding-top: var(--space-1);
+  justify-content: flex-end;
 }
 
 .walletFormCancel {
-  flex: 1;
-  height: 40px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  background: transparent;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
   font-family: var(--font-family);
-  color: var(--text-primary);
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
 .walletFormSave {
-  flex: 1;
-  height: 40px;
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   font-family: var(--font-family);
+  padding: 5px 16px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--accent);
   color: white;
   cursor: pointer;
   transition: opacity var(--duration-fast);
 }
 
-.walletFormSave:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.walletFormSave:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Kategori ─────────────────────────────────────────────────────────────── */
+
+.katTabSwitch {
+  display: flex;
+  background: var(--bg-surface-2);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--border-default);
 }
 
-/* ── Konfirmasi reset ─────────────────────────────────────────────────────── */
+.katTabBtn {
+  flex: 1;
+  height: 32px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.katTabBtnActive {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+}
+
+.katRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--card-padding);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.katRow:last-of-type { border-bottom: none; }
+
+.katBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--bg-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.katNama {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.katLock {
+  color: var(--text-tertiary);
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+.katDelBtn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid #F09595;
+  background: #FCEBEB;
+  color: #A32D2D;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.katConfirmStrip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--card-padding);
+  background: var(--status-danger-bg);
+  border-bottom: 1px solid var(--border-default);
+  flex-wrap: wrap;
+}
+
+.katConfirmText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  flex: 1;
+  min-width: 0;
+}
+
+.katConfirmActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.katConfirmYes {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  color: var(--status-danger);
+  border: 1px solid var(--status-danger);
+  background: transparent;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.katConfirmNo {
+  font-size: 12px;
+  font-family: var(--font-family);
+  color: var(--text-tertiary);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.katAddRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--card-padding);
+  background: transparent;
+  border: none;
+  border-top: 1px dashed var(--border-strong);
+  width: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.katAddIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: 1px dashed var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+}
+
+.katAddLabel {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.katForm {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--card-padding) var(--card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.katFormTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.katFormPreview {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.katFormInput {
+  flex: 1;
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  outline: none;
+  transition: border-color var(--duration-fast);
+}
+
+.katFormInput:focus { border-color: var(--border-focus); }
+
+.katIconGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.katIconOpt {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface-2);
+  font-size: 17px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.katIconSel {
+  border: 2px solid #7F77DD;
+  background: #EEEDFE;
+}
+
+.katFormFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.katFormCancel {
+  font-size: 12px;
+  font-family: var(--font-family);
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.katFormSave {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  padding: 5px 16px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: #534AB7;
+  color: #EEEDFE;
+  cursor: pointer;
+  transition: opacity var(--duration-fast);
+}
+
+.katFormSave:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Data ─────────────────────────────────────────────────────────────────── */
+
+.dataGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.dataTile {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--duration-fast);
+  font-family: var(--font-family);
+}
+
+.dataTile:active { background: var(--bg-surface-2); }
+
+.dataTileDanger {
+  background: var(--status-danger-bg);
+  border-color: #F7C1C1;
+}
+
+.dataTileDanger:active { background: #ffe8e8; }
+
+.dataTileIcon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.dataTileLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.dataTileDanger .dataTileLabel { color: var(--status-danger); }
+
+.dataTileSub {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+.dataTileDanger .dataTileSub { color: #c0392b; opacity: 0.7; }
+
+.eksporSuccess {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--status-success-bg);
+  border: 1px solid var(--status-success);
+  border-radius: var(--radius-lg);
+}
+
+.eksporSuccessIcon {
+  font-size: 16px;
+  color: var(--status-success);
+  font-weight: 700;
+}
+
+.eksporSuccessText {
+  font-size: 13px;
+  color: var(--status-success);
+  line-height: 1.4;
+}
+
+/* ── Confirm reset ────────────────────────────────────────────────────────── */
 
 .confirmBox {
   background: var(--status-danger-bg);
@@ -365,7 +845,15 @@
   padding: var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
+}
+
+.confirmStep {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--status-danger);
 }
 
 .confirmTitle {
@@ -383,6 +871,7 @@
 .confirmActions {
   display: flex;
   gap: var(--space-2);
+  margin-top: var(--space-1);
 }
 
 .confirmCancelBtn {
@@ -416,20 +905,47 @@
 
 /* ── FAQ ──────────────────────────────────────────────────────────────────── */
 
+.faqChips {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.faqChip {
+  font-size: 12px;
+  font-family: var(--font-family);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.faqChipActive {
+  background: #EEEDFE;
+  border-color: #AFA9EC;
+  color: #3C3489;
+}
+
 .faqItem {
   border-bottom: 1px solid var(--border-default);
 }
 
 .faqItem:last-child { border-bottom: none; }
 
-.faqQuestion {
+.faqItemExpanded .faqRow {
+  background: var(--bg-surface-2);
+}
+
+.faqRow {
   width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
+  align-items: flex-start;
+  gap: var(--space-2);
   padding: var(--space-3) var(--card-padding);
-  min-height: 48px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -438,65 +954,117 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.faqQuestionText {
-  font-size: 14px;
+.faqTag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.tagPrivasi { background: #E1F5EE; color: #0F6E56; }
+.tagFitur   { background: #EEEDFE; color: #3C3489; }
+.tagTeknis  { background: #FAEEDA; color: #633806; }
+.tagUmum    { background: var(--bg-surface-2); color: var(--text-secondary); }
+
+.faqQ {
+  flex: 1;
+  font-size: 13px;
   color: var(--text-primary);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .faqChevron {
+  font-size: 12px;
   color: var(--text-tertiary);
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .faqAnswer {
-  padding: 0 var(--card-padding) var(--space-3);
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.6;
+  padding: 0 var(--card-padding) var(--space-3);
+  border-top: 1px solid var(--border-default);
+  padding-top: var(--space-3);
 }
 
 /* ── Support card ─────────────────────────────────────────────────────────── */
 
 .supportCard {
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border: 1px solid #f5c842;
+  background: #111;
+  border: 1px solid #222;
   border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  overflow: hidden;
+  position: relative;
+}
+
+.supportDeco {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 52px;
+  line-height: 1;
+  opacity: 0.15;
+  pointer-events: none;
+  user-select: none;
+}
+
+.supportTop {
+  padding: var(--space-6) var(--space-5) var(--space-4);
+}
+
+.supportTag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: #f5c842;
+  color: #111;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: var(--space-3);
 }
 
 .supportTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: #7a5210;
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.supportBody {
+  padding: 0 var(--space-5) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .supportDesc {
   font-size: 13px;
-  color: #92400e;
-  line-height: 1.5;
+  color: #aaa;
+  line-height: 1.6;
 }
 
-.supportActions {
+.supportBtns {
   display: flex;
   gap: var(--space-2);
 }
 
 .supportBtn {
   flex: 1;
-  padding: var(--space-2) var(--space-3);
+  padding: 11px 0;
+  border-radius: 10px;
   font-size: 13px;
-  font-weight: 500;
-  border-radius: var(--radius-md);
-  border: 1.5px solid #f5c842;
-  background: rgba(255,255,255,0.7);
-  color: #7a5210;
-  cursor: pointer;
+  font-weight: 700;
   font-family: var(--font-family);
-  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  border: none;
   text-align: center;
   text-decoration: none;
   display: flex;
@@ -505,43 +1073,70 @@
   min-height: 44px;
 }
 
-.supportBtn:hover { background: rgba(255,255,255,0.9); }
+.supportBtnPrimary {
+  background: #f5c842;
+  color: #111;
+}
 
-/* ── Developer info ───────────────────────────────────────────────────────── */
+.supportBtnSecondary {
+  background: #222;
+  color: #fff;
+  border: 1px solid #444;
+}
 
-.devInfo {
-  padding: var(--space-6) var(--page-padding-x) var(--space-4);
+.devRow {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid #222;
+}
+
+.devAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f5c842;
+  color: #111;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .devName {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: #888;
+  flex: 1;
 }
 
 .devLinks {
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }
 
 .devLink {
-  color: var(--text-tertiary);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #1a1a1a;
+  color: #888;
+  font-size: 11px;
+  font-weight: 700;
   display: flex;
   align-items: center;
+  justify-content: center;
   text-decoration: none;
-  transition: color var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
 }
 
-.devLink:hover { color: var(--text-secondary); }
-
 .appVersion {
-  font-size: 11px;
-  color: var(--text-tertiary);
+  font-size: 10px;
+  color: #555;
 }
 
 /* ── Toast ────────────────────────────────────────────────────────────────── */
@@ -574,87 +1169,4 @@
 @keyframes toastIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Kategori Section ─────────────────────────────────────────────────────── */
-
-.kategoriTabBar {
-  display: flex;
-  gap: var(--space-2);
-  margin-bottom: var(--space-3);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--border-default);
-}
-
-.kategoriTab {
-  flex: 1;
-  height: 34px;
-  border-radius: var(--radius-md);
-  border: 1.5px solid var(--border-default);
-  background: transparent;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--duration-fast);
-}
-
-.kategoriTabActive {
-  background: var(--accent-subtle);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.kategoriRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--border-default);
-}
-
-.kategoriIcon {
-  font-size: 18px;
-  width: 28px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.kategoriNama {
-  flex: 1;
-  font-size: 14px;
-  color: var(--text-primary);
-}
-
-.kategoriForm {
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--border-default);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.kategoriIconPicker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1);
-}
-
-.kategoriIconOption {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  border: 1.5px solid var(--border-default);
-  background: transparent;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color var(--duration-fast);
-}
-
-.kategoriIconActive {
-  border-color: var(--accent);
-  background: var(--accent-subtle);
 }
