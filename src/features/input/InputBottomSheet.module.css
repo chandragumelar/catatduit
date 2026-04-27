@@ -36,206 +36,265 @@
   to   { transform: translateY(0); }
 }
 
-/* Handle bar */
 .handle {
-  width: 36px;
-  height: 4px;
+  width: 32px;
+  height: 3px;
   background: var(--border-strong);
   border-radius: var(--radius-full);
-  margin: 12px auto 0;
+  margin: 10px auto 0;
   flex-shrink: 0;
 }
 
-/* Tab bar */
+/* ── Tabs ──────────────────────────────────────────────────────────────────── */
+
 .tabs {
   display: flex;
-  gap: var(--space-1);
-  padding: var(--space-4) var(--space-4) 0;
+  gap: 4px;
+  padding: 12px 16px 0;
   flex-shrink: 0;
 }
 
 .tab {
   flex: 1;
-  height: 36px;
+  height: 34px;
   border: none;
   border-radius: var(--radius-md);
   font-family: var(--font-family);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   background: var(--bg-surface-2);
   color: var(--text-secondary);
   transition: background var(--duration-fast), color var(--duration-fast);
+  white-space: nowrap;
+  padding: 0;
 }
 
-.tab:active {
-  opacity: 0.7;
-}
+.tab:active { opacity: 0.8; }
 
-.tabActive {
-  background: var(--accent);
-  color: #ffffff;
-}
+.tabActive { background: #E5484D; color: #ffffff; }
 
-.tabNabung.tabActive {
-  background: var(--status-success);
-}
+/* masuk override */
+.tabMasuk.tabActive { background: #30A46C; }
+/* nabung override */
+.tabNabung.tabActive { background: #3B82F6; }
 
-/* Scrollable form body */
+/* ── Body ──────────────────────────────────────────────────────────────────── */
+
 .body {
   overflow-y: auto;
-  padding: var(--space-4);
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 12px;
   flex: 1;
 }
 
-/* Field group */
-.fieldGroup {
+/* ── Amount block ──────────────────────────────────────────────────────────── */
+
+.amountBlock {
+  border-radius: 12px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 4px;
 }
 
-.label {
-  font-size: 12px;
+.amountBlock_keluar { background: #FFF0F0; }
+.amountBlock_masuk  { background: #EDFAF3; }
+.amountBlock_nabung { background: #EFF6FF; }
+
+.amountLabel {
+  font-size: 11px;
   font-weight: 500;
-  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-family: var(--font-family);
 }
 
-/* Nominal input */
-.nominalWrapper {
+.amountLabel_keluar { color: #A32D2D; }
+.amountLabel_masuk  { color: #27915e; }
+.amountLabel_nabung { color: #185FA5; }
+
+.amountRow {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: var(--bg-surface-2);
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-md);
-  padding: 0 var(--space-4);
-  height: 52px;
-  transition: border-color var(--duration-fast);
+  align-items: baseline;
+  gap: 6px;
 }
 
-.nominalWrapper:focus-within {
-  border-color: var(--border-focus);
-}
-
-.currencySymbol {
-  font-size: 16px;
+.amountSym {
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-secondary);
   flex-shrink: 0;
 }
 
-.nominalInput {
+.amountInput {
   flex: 1;
   border: none;
   background: transparent;
   font-family: var(--font-family);
-  font-size: 20px;
+  font-size: 30px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
   color: var(--text-primary);
   outline: none;
   min-width: 0;
+  width: 100%;
 }
 
-.nominalInput::placeholder {
-  color: var(--text-tertiary);
+.amountInput::placeholder {
+  color: var(--border-strong);
   font-weight: 400;
 }
 
-/* Generic select & input */
-.select,
-.input {
+/* ── Field group ───────────────────────────────────────────────────────────── */
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-family: var(--font-family);
+}
+
+/* ── Wallet select ─────────────────────────────────────────────────────────── */
+
+.walletSelect {
   height: 44px;
   border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-md);
+  border-radius: 10px;
   background: var(--bg-surface-2);
   font-family: var(--font-family);
   font-size: 14px;
+  font-weight: 500;
   color: var(--text-primary);
-  padding: 0 var(--space-4);
+  padding: 0 36px 0 14px;
   width: 100%;
   outline: none;
   appearance: none;
   -webkit-appearance: none;
+  cursor: pointer;
   transition: border-color var(--duration-fast);
 }
 
-.select:focus,
-.input:focus {
-  border-color: var(--border-focus);
-}
+.walletSelect:focus { border-color: var(--border-focus); }
 
-.selectWrapper {
-  position: relative;
-}
+.selectWrapper { position: relative; }
 
 .selectChevron {
   position: absolute;
-  right: var(--space-4);
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
   color: var(--text-secondary);
 }
 
-/* Date input */
-.input[type="date"] {
-  color-scheme: light;
+/* ── Kategori chips ────────────────────────────────────────────────────────── */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-/* Catatan textarea */
-.textarea {
+.chip {
+  height: 32px;
+  padding: 0 11px;
+  border-radius: var(--radius-full);
   border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-md);
+  background: var(--bg-surface-2);
+  color: var(--text-secondary);
+  font-family: var(--font-family);
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: background var(--duration-fast), border-color var(--duration-fast), color var(--duration-fast);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.chip:active { opacity: 0.75; }
+
+.chipIcon { font-size: 14px; flex-shrink: 0; line-height: 1; }
+.chipLabel { white-space: nowrap; }
+
+.chipActive_keluar { background: #E5484D; border-color: #E5484D; color: #ffffff; }
+.chipActive_masuk  { background: #30A46C; border-color: #30A46C; color: #ffffff; }
+.chipActive_nabung { background: #3B82F6; border-color: #3B82F6; color: #ffffff; }
+
+/* ── Date input ────────────────────────────────────────────────────────────── */
+
+.input {
+  height: 44px;
+  border: 1.5px solid var(--border-default);
+  border-radius: 10px;
   background: var(--bg-surface-2);
   font-family: var(--font-family);
   font-size: 14px;
   color: var(--text-primary);
-  padding: var(--space-3) var(--space-4);
+  padding: 0 14px;
+  width: 100%;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color var(--duration-fast);
+  color-scheme: light;
+}
+
+.input:focus { border-color: var(--border-focus); }
+
+/* ── Textarea ──────────────────────────────────────────────────────────────── */
+
+.textarea {
+  border: 1.5px solid var(--border-default);
+  border-radius: 10px;
+  background: var(--bg-surface-2);
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: var(--text-primary);
+  padding: 10px 14px;
   width: 100%;
   outline: none;
   resize: none;
-  min-height: 72px;
+  min-height: 64px;
   transition: border-color var(--duration-fast);
   box-sizing: border-box;
 }
 
-.textarea:focus {
-  border-color: var(--border-focus);
-}
+.textarea:focus { border-color: var(--border-focus); }
+.textarea::placeholder { color: var(--text-tertiary); }
 
-.textarea::placeholder {
-  color: var(--text-tertiary);
-}
+/* ── Flag tabungan ─────────────────────────────────────────────────────────── */
 
-/* Flag tabungan */
 .flagRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: var(--bg-surface-2);
   border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  border-radius: 10px;
+  padding: 10px 14px;
   min-height: 44px;
+  gap: 12px;
 }
 
-.flagLabel {
-  font-size: 14px;
-  color: var(--text-primary);
-}
+.flagLabel { font-size: 14px; color: var(--text-primary); font-family: var(--font-family); }
+.flagSub   { font-size: 12px; color: var(--text-secondary); margin-top: 2px; font-family: var(--font-family); }
 
-.flagSub {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
+/* ── Toggle ────────────────────────────────────────────────────────────────── */
 
-/* Toggle switch */
 .toggle {
   width: 44px;
   height: 26px;
@@ -249,9 +308,7 @@
   transition: background var(--duration-fast);
 }
 
-.toggleActive {
-  background: var(--accent);
-}
+.toggleActive { background: var(--accent); }
 
 .toggleThumb {
   position: absolute;
@@ -265,58 +322,40 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 
-.toggleThumbActive {
-  transform: translateX(18px);
-}
+.toggleThumbActive { transform: translateX(18px); }
 
-/* Empty state */
-.emptyWallet {
-  font-size: 13px;
-  color: var(--text-secondary);
-  text-align: center;
-  padding: var(--space-2) 0;
-}
+/* ── Footer ────────────────────────────────────────────────────────────────── */
 
-/* Footer */
 .footer {
-  padding: var(--space-4);
-  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  padding: 10px 16px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
   flex-shrink: 0;
   border-top: 1px solid var(--border-default);
 }
 
 .submitBtn {
   width: 100%;
-  height: 48px;
+  height: 46px;
   border: none;
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  color: #ffffff;
+  border-radius: 10px;
   font-family: var(--font-family);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--duration-fast), opacity var(--duration-fast);
+  color: #ffffff;
+  white-space: nowrap;
+  transition: opacity var(--duration-fast);
 }
 
-.submitBtn:active {
-  background: var(--accent-hover);
-}
+.submitBtn:active   { opacity: 0.85; }
+.submitBtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.submitBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+.submitBtn_keluar { background: #E5484D; }
+.submitBtn_masuk  { background: #30A46C; }
+.submitBtn_nabung { background: #3B82F6; }
 
-.submitBtnNabung {
-  background: var(--status-success);
-}
+/* ── Reduced motion ────────────────────────────────────────────────────────── */
 
-.submitBtnNabung:active {
-  background: #27915e;
-}
-
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .overlay { animation: none; }
   .sheet   { animation: none; }

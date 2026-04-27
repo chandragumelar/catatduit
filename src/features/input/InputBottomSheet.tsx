@@ -29,8 +29,8 @@ function formatNominalDisplay(raw: string): string {
 // ── Tab config ────────────────────────────────────────────────────────────────
 
 const TABS: { jenis: TransaksiJenis; label: string }[] = [
-  { jenis: 'keluar', label: 'Uang Keluar' },
-  { jenis: 'masuk',  label: 'Uang Masuk'  },
+  { jenis: 'keluar', label: 'Keluar' },
+  { jenis: 'masuk',  label: 'Masuk'  },
   { jenis: 'nabung', label: 'Nabung' },
 ]
 
@@ -146,7 +146,6 @@ export function InputBottomSheet() {
   if (!isOpen) return null
 
   const kategoriList = kategoriMap[jenis] ?? []
-  const isNabung = jenis === 'nabung'
 
   return (
     <>
@@ -174,6 +173,7 @@ export function InputBottomSheet() {
               className={[
                 s.tab,
                 jenis === j ? s.tabActive : '',
+                j === 'masuk'  && jenis === j ? s.tabMasuk  : '',
                 j === 'nabung' && jenis === j ? s.tabNabung : '',
               ].join(' ')}
             >
@@ -185,12 +185,30 @@ export function InputBottomSheet() {
         {/* Form body */}
         <div className={s.body}>
 
-          {/* Wallet — di atas karena menentukan currency symbol */}
+          {/* Nominal — focal point */}
+          <div className={[s.amountBlock, s[`amountBlock_${jenis}`]].join(' ')}>
+            <span className={[s.amountLabel, s[`amountLabel_${jenis}`]].join(' ')}>
+              {jenis === 'keluar' ? 'pengeluaran' : jenis === 'masuk' ? 'pemasukan' : 'tabungan'}
+            </span>
+            <div className={s.amountRow}>
+              <span className={s.amountSym}>{currencySymbol}</span>
+              <input
+                className={s.amountInput}
+                inputMode="numeric"
+                placeholder="0"
+                value={formatNominalDisplay(nominalRaw)}
+                onChange={handleNominalChange}
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {/* Dompet — field bernama, tidak bisa diskip */}
           <div className={s.fieldGroup}>
-            <span className={s.label}>Dompet</span>
+            <span className={s.fieldLabel}>dompet</span>
             <div className={s.selectWrapper}>
               <select
-                className={s.select}
+                className={s.walletSelect}
                 value={walletId}
                 onChange={e => setWalletId(e.target.value)}
               >
@@ -204,44 +222,30 @@ export function InputBottomSheet() {
             </div>
           </div>
 
-          {/* Nominal */}
+          {/* Kategori — chips */}
           <div className={s.fieldGroup}>
-            <span className={s.label}>Nominal</span>
-            <div className={s.nominalWrapper}>
-              <span className={s.currencySymbol}>{currencySymbol}</span>
-              <input
-                className={s.nominalInput}
-                inputMode="numeric"
-                placeholder="0"
-                value={formatNominalDisplay(nominalRaw)}
-                onChange={handleNominalChange}
-                autoFocus
-              />
-            </div>
-          </div>
-
-          {/* Kategori */}
-          <div className={s.fieldGroup}>
-            <span className={s.label}>Kategori</span>
-            <div className={s.selectWrapper}>
-              <select
-                className={s.select}
-                value={kategoriId}
-                onChange={e => setKategoriId(e.target.value)}
-              >
-                {kategoriList.map(k => (
-                  <option key={k.id} value={k.id}>
-                    {k.icon} {k.nama}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={16} className={s.selectChevron} />
+            <span className={s.fieldLabel}>kategori</span>
+            <div className={s.chips}>
+              {kategoriList.map(k => (
+                <button
+                  key={k.id}
+                  type="button"
+                  onClick={() => setKategoriId(k.id)}
+                  className={[
+                    s.chip,
+                    kategoriId === k.id ? s[`chipActive_${jenis}`] : '',
+                  ].join(' ')}
+                >
+                  <span className={s.chipIcon}>{k.icon}</span>
+                  <span className={s.chipLabel}>{k.nama}</span>
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Tanggal */}
           <div className={s.fieldGroup}>
-            <span className={s.label}>Tanggal</span>
+            <span className={s.fieldLabel}>tanggal</span>
             <input
               type="date"
               className={s.input}
@@ -252,10 +256,10 @@ export function InputBottomSheet() {
 
           {/* Catatan */}
           <div className={s.fieldGroup}>
-            <span className={s.label}>Catatan (opsional)</span>
+            <span className={s.fieldLabel}>catatan</span>
             <textarea
               className={s.textarea}
-              placeholder="Tambah catatan..."
+              placeholder="Opsional..."
               value={catatan}
               onChange={e => setCatatan(e.target.value)}
               maxLength={200}
@@ -283,10 +287,10 @@ export function InputBottomSheet() {
               </div>
               {bayarDariTabungan && (
                 <div className={s.fieldGroup}>
-                  <span className={s.label}>Kurangi dari target</span>
+                  <span className={s.fieldLabel}>kurangi dari target</span>
                   <div className={s.selectWrapper}>
                     <select
-                      className={s.select}
+                      className={s.walletSelect}
                       value={selectedGoalId}
                       onChange={e => setSelectedGoalId(e.target.value)}
                     >
@@ -308,11 +312,11 @@ export function InputBottomSheet() {
         {/* Footer */}
         <div className={s.footer}>
           <button
-            className={[s.submitBtn, isNabung ? s.submitBtnNabung : ''].join(' ')}
+            className={[s.submitBtn, s[`submitBtn_${jenis}`]].join(' ')}
             onClick={handleSubmit}
             disabled={!canSubmit}
           >
-            {isNabung ? 'Simpan Tabungan' : 'Simpan'}
+            {jenis === 'keluar' ? 'Simpan pengeluaran' : jenis === 'masuk' ? 'Simpan pemasukan' : 'Simpan tabungan'}
           </button>
         </div>
       </div>

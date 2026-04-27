@@ -2,7 +2,7 @@
 // features/home/HomePage.tsx
 // =============================================================================
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useToast } from '@/hooks/useToast'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -125,6 +125,15 @@ export default function HomePage() {
     return result
   }, [wallets])
   const showCurrencyToggle = uniqueCurrencies.length >= 2
+
+  // Sync toggle ke storage ketika wallet currencies berubah
+  // (misal: user baru update dompet dari IDR → USD di Settings)
+  useEffect(() => {
+    if (!showCurrencyToggle) {
+      setActiveCurrencyToggle('base')
+      saveActiveCurrencyToggle('base')
+    }
+  }, [showCurrencyToggle])
 
   function handleCurrencyToggle(toggle: 'base' | 'secondary') {
     setActiveCurrencyToggle(toggle)
@@ -784,7 +793,12 @@ export default function HomePage() {
             </div>
           ) : (
             <div className={styles.cardEmptyState}>
-              <p className={styles.cardEmptyText}>Belum ada transaksi bulan ini.</p>
+              <p className={styles.cardEmptyText}>
+                <strong>Cashflow</strong> adalah gambaran uang masuk dan keluar kamu setiap bulan — biar kamu bisa tahu apakah kamu lebih banyak menghasilkan atau menghabiskan.
+              </p>
+              <p className={styles.cardEmptyText}>
+                Yuk mulai catat transaksi pertamamu, dan lihat pola keuanganmu terbentuk di sini. 💸
+              </p>
             </div>
           )}
         </div>

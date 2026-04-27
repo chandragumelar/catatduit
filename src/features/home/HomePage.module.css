@@ -237,7 +237,7 @@
 }
 
 .kasProporsiTrack {
-  height: 10px;
+  height: 22px;
   background: var(--bg-surface-2);
   border-radius: var(--radius-full);
   overflow: hidden;

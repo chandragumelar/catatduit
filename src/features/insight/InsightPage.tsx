@@ -29,10 +29,11 @@ interface PeriodBucket {
 
 // ── Format helpers ─────────────────────────────────────────────────────────────
 
-function shortRupiah(v: number): string {
-  if (v >= 1_000_000) return (v / 1_000_000).toFixed(1).replace('.0', '') + ' jt'
-  if (v >= 1_000) return Math.round(v / 1_000) + 'rb'
-  return String(Math.round(v))
+function shortRupiah(v: number, symbol?: string): string {
+  const prefix = symbol ? `${symbol} ` : ''
+  if (v >= 1_000_000) return prefix + (v / 1_000_000).toFixed(1).replace('.0', '') + ' jt'
+  if (v >= 1_000) return prefix + Math.round(v / 1_000) + 'rb'
+  return prefix + String(Math.round(v))
 }
 
 
@@ -104,9 +105,10 @@ interface LineChartProps {
   buckets: PeriodBucket[]
   metric1: MetricKey
   metric2: MetricKey | 'none'
+  symbol?: string
 }
 
-function LineChart({ buckets, metric1, metric2 }: LineChartProps) {
+function LineChart({ buckets, metric1, metric2, symbol }: LineChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -175,7 +177,7 @@ function LineChart({ buckets, metric1, metric2 }: LineChartProps) {
         ctx.fillStyle = color
         ctx.fill()
 
-        const lbl = shortRupiah(v)
+        const lbl = shortRupiah(v, symbol)
         ctx.font = '500 11px Inter, sans-serif'
         ctx.fillStyle = color
         ctx.textAlign = 'center'
@@ -193,7 +195,7 @@ function LineChart({ buckets, metric1, metric2 }: LineChartProps) {
     buckets.forEach((b, i) => {
       ctx.fillText(b.shortLabel, xPos(i), H - 4)
     })
-  }, [buckets, metric1, metric2])
+  }, [buckets, metric1, metric2, symbol])
 
   return (
     <canvas
@@ -207,9 +209,10 @@ function LineChart({ buckets, metric1, metric2 }: LineChartProps) {
 interface BarChartProps {
   buckets: PeriodBucket[]
   metric: MetricKey
+  symbol?: string
 }
 
-function BarChart({ buckets, metric }: BarChartProps) {
+function BarChart({ buckets, metric, symbol }: BarChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -261,7 +264,7 @@ function BarChart({ buckets, metric }: BarChartProps) {
       ctx.fill()
 
       // label
-      const lbl = shortRupiah(v)
+      const lbl = shortRupiah(v, symbol)
       ctx.font = '500 11px Inter, sans-serif'
       ctx.fillStyle = isMax ? color : COLOR_MUTED
       ctx.textAlign = 'center'
@@ -272,7 +275,7 @@ function BarChart({ buckets, metric }: BarChartProps) {
       ctx.fillStyle = COLOR_MUTED
       ctx.fillText(buckets[i].shortLabel, x + barW / 2, H - 4)
     })
-  }, [buckets, metric])
+  }, [buckets, metric, symbol])
 
   return (
     <canvas
@@ -767,7 +770,7 @@ export default function InsightPage() {
               )}
             </div>
             <div className={styles.chartCanvas}>
-              <LineChart buckets={activeBuckets} metric1={metric1} metric2={metric2} />
+              <LineChart buckets={activeBuckets} metric1={metric1} metric2={metric2} symbol={activeCurrencySymbol} />
             </div>
           </div>
 
@@ -802,6 +805,7 @@ export default function InsightPage() {
                 : <BarChart
                     buckets={activeBuckets.map((b, i) => ({ ...b, [metric1]: katBuckets[i]?.total ?? 0 }))}
                     metric={metric1}
+                    symbol={activeCurrencySymbol}
                   />
               }
             </div>
@@ -829,14 +833,14 @@ export default function InsightPage() {
                 <div className={styles.compareLegendDot} style={{ background: COLOR_MUTED, opacity: 0.5 }} />
                 <span className={styles.compareTotalLabel}>{compareData.prevLabel}</span>
               </div>
-              <div className={styles.compareTotalValue}>{shortRupiah(compareData.totalPrev)}</div>
+              <div className={styles.compareTotalValue}>{shortRupiah(compareData.totalPrev, activeCurrencySymbol)}</div>
             </div>
             <div className={styles.compareTotalCell}>
               <div className={styles.compareTotalMonth}>
                 <div className={styles.compareLegendDot} style={{ background: COLOR_KELUAR }} />
                 <span className={styles.compareTotalLabel}>{compareData.currLabel}</span>
               </div>
-              <div className={styles.compareTotalValue}>{shortRupiah(compareData.totalCurr)}</div>
+              <div className={styles.compareTotalValue}>{shortRupiah(compareData.totalCurr, activeCurrencySymbol)}</div>
             </div>
           </div>
 
@@ -859,8 +863,8 @@ export default function InsightPage() {
               {compareData.rows.map(row => {
                 const delta = row.curr - row.prev
                 const deltaLabel = delta >= 0
-                  ? `naik ${shortRupiah(Math.abs(delta))} ${mode === 'bulanan' ? 'bulan' : 'minggu'} ini`
-                  : `turun ${shortRupiah(Math.abs(delta))} ${mode === 'bulanan' ? 'bulan' : 'minggu'} ini`
+                  ? `naik ${shortRupiah(Math.abs(delta), activeCurrencySymbol)} ${mode === 'bulanan' ? 'bulan' : 'minggu'} ini`
+                  : `turun ${shortRupiah(Math.abs(delta), activeCurrencySymbol)} ${mode === 'bulanan' ? 'bulan' : 'minggu'} ini`
                 const isUp = delta >= 0
                 const prevW = Math.round((row.prev / compareMaxVal) * 100)
                 const currW = Math.round((row.curr / compareMaxVal) * 100)
@@ -879,7 +883,7 @@ export default function InsightPage() {
                         <div className={styles.compareBarTrack}>
                           <div className={styles.compareBarFill} style={{ width: `${prevW}%`, background: COLOR_MUTED, opacity: 0.5 }} />
                         </div>
-                        <span className={styles.compareBarValue}>{shortRupiah(row.prev)}</span>
+                        <span className={styles.compareBarValue}>{shortRupiah(row.prev, activeCurrencySymbol)}</span>
                       </div>
                       <div className={styles.compareBarRow}>
                         <span className={styles.compareBarMonth}>{compareData.currLabel.slice(0, 3)}</span>
@@ -887,7 +891,7 @@ export default function InsightPage() {
                           <div className={styles.compareBarFill} style={{ width: `${currW}%`, background: isUp ? COLOR_KELUAR : COLOR_MASUK }} />
                         </div>
                         <span className={styles.compareBarValue} style={{ color: isUp ? '#A32D2D' : 'var(--status-success)' }}>
-                          {shortRupiah(row.curr)}
+                          {shortRupiah(row.curr, activeCurrencySymbol)}
                         </span>
                       </div>
                     </div>
@@ -920,7 +924,7 @@ export default function InsightPage() {
                     <span className={styles.borosCellMonth}>{entry.monthLabel}</span>
                     <div className={styles.borosCellTop}>
                       <span className={styles.borosCellDay}>{entry.day}</span>
-                      <span className={styles.borosCellAmount}>{shortRupiah(entry.total)}</span>
+                      <span className={styles.borosCellAmount}>{shortRupiah(entry.total, activeCurrencySymbol)}</span>
                     </div>
                     <div className={styles.borosCellBar}>
                       <div
