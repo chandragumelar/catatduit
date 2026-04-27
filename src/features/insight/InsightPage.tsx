@@ -8,7 +8,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useTransaksiStore } from '@/store/transaksi.store'
 import { useWalletStore } from '@/store/wallet.store'
-import { getKategori } from '@/storage'
+import { getKategori, getActiveCurrencyToggle } from '@/storage'
+import { CURRENCY_OPTIONS } from '@/constants'
 import { KATEGORI_DEFAULT } from '@/constants'
 
 import styles from './InsightPage.module.css'
@@ -428,8 +429,29 @@ export default function InsightPage() {
     }
   }, [kategoriKeluar, selectedKatId])
 
-  // Relevant wallet ids (semua — insight tidak perlu currency filter karena lintas waktu)
-  const allWalletIds = useMemo(() => new Set(wallets.map(w => w.id)), [wallets])
+  // Currency filter — ikuti toggle aktif dari HomePage
+  const activeCurrencyToggle = getActiveCurrencyToggle()
+  const uniqueCurrencies = useMemo(() => {
+    const seen = new Set<string>()
+    const result: string[] = []
+    for (const w of wallets) {
+      if (!seen.has(w.currency)) { seen.add(w.currency); result.push(w.currency) }
+    }
+    return result
+  }, [wallets])
+  const activeCurrency = useMemo((): string | null => {
+    if (uniqueCurrencies.length < 2) return null
+    return activeCurrencyToggle === 'base' ? uniqueCurrencies[0] : uniqueCurrencies[1]
+  }, [uniqueCurrencies, activeCurrencyToggle])
+  const activeCurrencySymbol = useMemo(() => {
+    const code = activeCurrency ?? uniqueCurrencies[0] ?? 'IDR'
+    return CURRENCY_OPTIONS.find(c => c.code === code)?.symbol ?? 'Rp'
+  }, [activeCurrency, uniqueCurrencies])
+
+  const allWalletIds = useMemo(() => {
+    if (activeCurrency === null) return new Set(wallets.map(w => w.id))
+    return new Set(wallets.filter(w => w.currency === activeCurrency).map(w => w.id))
+  }, [wallets, activeCurrency])
 
   // Filter transaksi yang relevan (exclude transfer)
   const txRelevant = useMemo(() =>

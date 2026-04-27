@@ -1568,3 +1568,56 @@
 .shareModalCloseBtn:hover {
   background: var(--accent-hover);
 }
+
+/* ── Currency Toggle — option C: card tile ───────────────────────────────────── */
+
+.currencyToggleWrap {
+  display: flex;
+  gap: 6px;
+  padding: 0;
+  background: var(--bg-surface-2);
+  border-radius: 10px;
+  padding: 4px;
+  width: fit-content;
+}
+
+.currencyToggleBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 24px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--duration-normal) ease;
+  font-family: var(--font-family);
+  min-width: 72px;
+}
+
+.currencyToggleBtnActive {
+  background: var(--bg-surface);
+  border: 0.5px solid var(--border-default);
+}
+
+.currencyToggleCode {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color var(--duration-normal) ease;
+}
+
+.currencyToggleBtnActive .currencyToggleCode {
+  color: var(--accent);
+}
+
+.currencyToggleSub {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+  transition: color var(--duration-normal) ease;
+}
+
+.currencyToggleBtnActive .currencyToggleSub {
+  color: var(--accent);
+}

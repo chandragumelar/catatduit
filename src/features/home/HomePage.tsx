@@ -31,10 +31,10 @@ import {
   saveSupportBannerDismissedAt,
   getCardCollapsed,
   saveCardCollapsed,
-  getMulticurrencyEnabled,
   getActiveCurrencyToggle,
+  saveActiveCurrencyToggle,
 } from '@/storage'
-import { SUPPORT_BANNER_COOLDOWN_DAYS, KATEGORI_DEFAULT } from '@/constants'
+import { SUPPORT_BANNER_COOLDOWN_DAYS, KATEGORI_DEFAULT, CURRENCY_OPTIONS } from '@/constants'
 import { formatRupiah, getCurrentMonthKey } from '@/lib/format'
 
 import styles from './HomePage.module.css'
@@ -98,7 +98,6 @@ export default function HomePage() {
   const currentMonth = getCurrentMonthKey()
   const tagihan = useMemo(() => getTagihan(), [])
   const budgets = useMemo(() => getBudgets(), [])
-  const goals = useMemo(() => getGoals(), [transaksi])
   const kategoriMap = useMemo(() => getKategori() ?? KATEGORI_DEFAULT, [])
 
   const allKategori = useMemo(() => [
@@ -109,19 +108,41 @@ export default function HomePage() {
 
   const activeWalletId = useWalletStore(s => s.activeWalletId)
   const activeWallet = wallets.find(w => w.id === activeWalletId) ?? wallets[0]
-
-  // Currency context — filter semua data by currency aktif kalau multicurrency enabled
-  const multicurrencyEnabled = useMemo(() => getMulticurrencyEnabled(), [])
-  const activeCurrencyToggle = useMemo(() => getActiveCurrencyToggle(), [])
   const baseCurrency = activeWallet?.currency ?? 'IDR'
 
-  // Currency yang sedang aktif (null = semua, untuk kasus single currency)
+  // Currency context
+  const [activeCurrencyToggle, setActiveCurrencyToggle] = useState<'base' | 'secondary'>(() => getActiveCurrencyToggle())
+
+  const uniqueCurrencies = useMemo(() => {
+    const seen = new Set<string>()
+    const result: string[] = []
+    for (const w of wallets) {
+      if (!seen.has(w.currency)) {
+        seen.add(w.currency)
+        result.push(w.currency)
+      }
+    }
+    return result
+  }, [wallets])
+  const showCurrencyToggle = uniqueCurrencies.length >= 2
+
+  function handleCurrencyToggle(toggle: 'base' | 'secondary') {
+    setActiveCurrencyToggle(toggle)
+    saveActiveCurrencyToggle(toggle)
+  }
+
+  // Currency yang sedang aktif (null = single currency)
   const activeCurrency = useMemo((): string | null => {
-    if (!multicurrencyEnabled) return null
-    if (activeCurrencyToggle === 'base') return baseCurrency
-    const secondary = wallets.find(w => w.currency !== baseCurrency)
-    return secondary?.currency ?? baseCurrency
-  }, [multicurrencyEnabled, activeCurrencyToggle, baseCurrency, wallets])
+    if (uniqueCurrencies.length < 2) return null
+    return activeCurrencyToggle === 'base' ? uniqueCurrencies[0] : uniqueCurrencies[1]
+  }, [uniqueCurrencies, activeCurrencyToggle])
+
+  // goals difilter by currency aktif — harus setelah activeCurrency
+  const goals = useMemo(() => {
+    const all = getGoals()
+    const currency = activeCurrency ?? baseCurrency
+    return all.filter(g => (g.currency ?? baseCurrency) === currency)
+  }, [transaksi, activeCurrency, baseCurrency])
 
   // Wallet yang relevan sesuai currency aktif
   const relevantWallets = useMemo(() => {
@@ -281,8 +302,13 @@ export default function HomePage() {
     setSupportVisible(false)
   }
 
+  const activeCurrencySymbol = useMemo(() => {
+    const code = activeCurrency ?? baseCurrency
+    return CURRENCY_OPTIONS.find(c => c.code === code)?.symbol ?? 'Rp'
+  }, [activeCurrency, baseCurrency])
+
   function fmt(n: number) {
-    return formatRupiah(n)
+    return formatRupiah(n, activeCurrencySymbol)
   }
 
   function getKategoriInfo(id: string) {
@@ -299,7 +325,7 @@ export default function HomePage() {
     return transaksi
       .filter(tx => tx.jenis === 'nabung' && relevantWalletIds.has(tx.wallet_id))
       .reduce((s, tx) => s + tx.nominal, 0)
-  }, [])
+  }, [transaksi, relevantWalletIds])
   const hasTagihan = tagihanBulanIni > 0
   const hasMasuk = totalMasukFiltered > 0
   const hasKeluar = totalKeluarFiltered > 0
@@ -547,6 +573,28 @@ export default function HomePage() {
                 </a>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Currency Toggle — option C: card tile dengan sub-label */}
+        {showCurrencyToggle && (
+          <div className={styles.currencyToggleWrap}>
+            {uniqueCurrencies.slice(0, 2).map((currency, i) => {
+              const isActive = i === 0
+                ? activeCurrencyToggle === 'base'
+                : activeCurrencyToggle === 'secondary'
+              const walletCount = wallets.filter(w => w.currency === currency).length
+              return (
+                <button
+                  key={currency}
+                  className={[styles.currencyToggleBtn, isActive ? styles.currencyToggleBtnActive : ''].join(' ')}
+                  onClick={() => handleCurrencyToggle(i === 0 ? 'base' : 'secondary')}
+                >
+                  <span className={styles.currencyToggleCode}>{currency}</span>
+                  <span className={styles.currencyToggleSub}>{walletCount} dompet</span>
+                </button>
+              )
+            })}
           </div>
         )}
 

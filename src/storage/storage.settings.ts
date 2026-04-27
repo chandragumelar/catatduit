@@ -42,6 +42,10 @@ export function getActiveCurrencyToggle(): CurrencyToggle {
   return getData<CurrencyToggle>(STORAGE_KEYS.ACTIVE_CURRENCY_TOGGLE, 'base')
 }
 
+export function saveActiveCurrencyToggle(toggle: CurrencyToggle): boolean {
+  return setData(STORAGE_KEYS.ACTIVE_CURRENCY_TOGGLE, toggle)
+}
+
 export function getCardCollapsed(): string[] {
   return getData<string[]>(STORAGE_KEYS.CARD_COLLAPSED, [])
 }

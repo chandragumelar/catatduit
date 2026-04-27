@@ -784,14 +784,26 @@ function TabTabungan() {
     "📷",
   ];
 
+  const wallets = useWalletStore(s => s.wallets)
+  const uniqueCurrencies = useMemo(() => {
+    const seen = new Set<string>()
+    const result: string[] = []
+    for (const w of wallets) {
+      if (!seen.has(w.currency)) { seen.add(w.currency); result.push(w.currency) }
+    }
+    return result
+  }, [wallets])
+
   const [formNama, setFormNama] = useState("");
   const [formTarget, setFormTarget] = useState("");
   const [formIcon, setFormIcon] = useState("🎯");
+  const [formCurrency, setFormCurrency] = useState(() => uniqueCurrencies[0] ?? "IDR");
 
   function resetForm() {
     setFormNama("");
     setFormTarget("");
     setFormIcon("🎯");
+    setFormCurrency(uniqueCurrencies[0] ?? "IDR");
     setEditingGoal(null);
     setShowForm(false);
   }
@@ -801,6 +813,7 @@ function TabTabungan() {
     setFormNama("");
     setFormTarget("");
     setFormIcon("🎯");
+    setFormCurrency(uniqueCurrencies[0] ?? "IDR");
     setShowForm(true);
   }
 
@@ -809,6 +822,7 @@ function TabTabungan() {
     setFormNama(g.nama);
     setFormTarget(g.target.toLocaleString("id-ID"));
     setFormIcon(g.icon ?? "🎯");
+    setFormCurrency(g.currency ?? uniqueCurrencies[0] ?? "IDR");
     setShowForm(true);
   }
 
@@ -819,7 +833,7 @@ function TabTabungan() {
     if (editingGoal) {
       next = goals.map((g) =>
         g.id === editingGoal.id
-          ? { ...g, nama: formNama.trim(), target, icon: formIcon }
+          ? { ...g, nama: formNama.trim(), target, icon: formIcon, currency: formCurrency }
           : g,
       );
       showToast("Target diperbarui");
@@ -834,6 +848,7 @@ function TabTabungan() {
           id: generateId(),
           nama: formNama.trim(),
           target,
+          currency: formCurrency,
           terkumpul: 0,
           icon: formIcon,
         },
@@ -888,7 +903,7 @@ function TabTabungan() {
                 <span className={styles.goalIcon}>{goal.icon ?? "🎯"}</span>
                 <div className={styles.goalInfo}>
                   <div className={styles.goalNama}>{goal.nama}</div>
-                  <div className={styles.goalTarget}>{fmt(goal.target)}</div>
+                  <div className={styles.goalTarget}>{fmt(goal.target, goal.currency ?? 'IDR')} <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 400 }}>{goal.currency ?? 'IDR'}</span></div>
                 </div>
                 <div className={styles.goalActions}>
                   <button
@@ -954,6 +969,21 @@ function TabTabungan() {
                   maxLength={50}
                   autoFocus
                 />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>Mata uang target</label>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {uniqueCurrencies.map(c => (
+                    <button
+                      key={c}
+                      type="button"
+                      className={[styles.currencyTab, formCurrency === c ? styles.currencyTabActive : ''].join(' ')}
+                      onClick={() => setFormCurrency(c)}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className={styles.field}>
                 <label className={styles.fieldLabel}>Target nominal</label>

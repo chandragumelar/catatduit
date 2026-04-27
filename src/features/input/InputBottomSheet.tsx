@@ -9,7 +9,6 @@ import type { TransaksiJenis, Goal } from '@/types'
 import { useInputStore } from '@/store/input.store'
 import { useTransaksiStore } from '@/store/transaksi.store'
 import { useWalletStore } from '@/store/wallet.store'
-import { getRelevantWalletIds } from '@/store/computed.store'
 import { getKategori, getGoals, saveGoals } from '@/storage'
 import { generateId, getTodayString } from '@/lib/format'
 import { MAX_NOMINAL, CURRENCY_OPTIONS } from '@/constants'
@@ -64,9 +63,7 @@ export function InputBottomSheet() {
 
   const kategoriMap = getKategori()
 
-  // Hanya tampilkan wallet yang currency-nya match dengan toggle aktif
-  const relevantWalletIds = getRelevantWalletIds(wallets)
-  const relevantWallets = wallets.filter(w => relevantWalletIds.has(w.id))
+  // Tampilkan semua wallet — symbol mengikuti wallet yang dipilih user
 
   // Reset form setiap kali sheet dibuka
   useEffect(() => {
@@ -102,7 +99,7 @@ export function InputBottomSheet() {
   }
 
   // ── Wallet currency ─────────────────────────────────────────────────────────
-  const selectedWallet = relevantWallets.find(w => w.id === walletId) ?? relevantWallets[0]
+  const selectedWallet = wallets.find(w => w.id === walletId) ?? wallets[0]
   const currencySymbol = selectedWallet
     ? getCurrencySymbol(selectedWallet.currency)
     : 'Rp'
@@ -191,24 +188,20 @@ export function InputBottomSheet() {
           {/* Wallet — di atas karena menentukan currency symbol */}
           <div className={s.fieldGroup}>
             <span className={s.label}>Dompet</span>
-            {relevantWallets.length === 0 ? (
-              <p className={s.emptyWallet}>Belum ada dompet untuk mata uang ini.</p>
-            ) : (
-              <div className={s.selectWrapper}>
-                <select
-                  className={s.select}
-                  value={walletId}
-                  onChange={e => setWalletId(e.target.value)}
-                >
-                  {relevantWallets.map(w => (
-                    <option key={w.id} value={w.id}>
-                      {w.icon} {w.nama}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown size={16} className={s.selectChevron} />
-              </div>
-            )}
+            <div className={s.selectWrapper}>
+              <select
+                className={s.select}
+                value={walletId}
+                onChange={e => setWalletId(e.target.value)}
+              >
+                {wallets.map(w => (
+                  <option key={w.id} value={w.id}>
+                    {w.icon} {w.nama} · {w.currency}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={16} className={s.selectChevron} />
+            </div>
           </div>
 
           {/* Nominal */}
