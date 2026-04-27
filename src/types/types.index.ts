@@ -45,10 +45,10 @@ export interface Goal {
   id: string
   nama: string
   target: number
-  currency: string
   terkumpul: number          // update manual, tidak relasi ke tx nabung
   deadline?: string          // "YYYY-MM-DD"
   icon?: string
+  currency?: string          // optional, default IDR
 }
 
 export interface KategoriItem {
