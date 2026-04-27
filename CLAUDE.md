@@ -500,3 +500,140 @@ Health score · Cerita bulan ini · Dark mode · i18n / English mode · Readonly
 - [ ] Apakah export CSV masih valid? Field baru perlu masuk ke header CSV?
 - [ ] Apakah import CSV bisa membaca data lama dengan benar?
 - [ ] Apakah ada test untuk migration baru di `src/storage/migration/`?
+
+---
+
+## Component Inventory
+
+> Jangan buat komponen baru sebelum cek daftar ini.
+
+### `src/components/ui/`
+
+**`PriorityBanner`** — Banner notifikasi di atas halaman. Tidak dismissible.
+Props: `message: string`, `onClick?: () => void`, `variant?: 'update' | 'warning'`
+
+**`ChecklistCard`** — Card checklist post-onboarding. Self-contained, tidak ada props.
+Item IDs: `catat_pertama` · `tambah_dompet` · `tambah_tagihan` · `buat_target`
+
+### `src/components/layout/`
+
+**`PageLayout`** — Shell utama. Render PriorityBanner, `<Outlet />`, BottomNav, InputBottomSheet, TransferBottomSheet.
+Satu-satunya tempat sheet global di-render — jangan render InputBottomSheet/TransferBottomSheet di tempat lain.
+
+**`BottomNav`** — 3 tab (Home / Planning / Insight) + FAB. Tidak boleh ditambah tab.
+
+**`FAB`** — Trigger `useInputStore.open('keluar')`. Tap animation via inline style (bukan CSS).
+
+---
+
+## Store Registry
+
+> Derived value → taruh di `computed.store.ts`, bukan store baru.
+
+**`useInputStore`** — `src/store/input.store.ts`
+State: `isOpen`, `initialJenis`. Actions: `open(jenis?)`, `close()`
+
+**`useTransferStore`** — `src/store/transfer.store.ts`
+State: `isOpen`. Actions: `open()`, `close()`
+
+**`useTransaksiStore`** — `src/store/transaksi.store.ts`
+State: `transaksi[]`. Actions: `hydrate()`, `add()`, `addPair()`, `update()`, `remove()`
+
+**`useWalletStore`** — `src/store/wallet.store.ts`
+State: `wallets[]`, `activeWalletId`. Actions: `hydrate()`, `setActiveWallet()`, `save()`
+
+**`useComputed`** — `src/store/computed.store.ts` — custom hook (bukan Zustand).
+Returns: `ComputedKeuangan` — `{ totalSaldo, totalMasuk, totalKeluar, totalTagihan, totalNabung, uangBebas }`
+Helper export: `getRelevantWalletIds(wallets)`
+
+---
+
+## Code Rules
+
+```
+6. SIZE RULE
+   ❌ File komponen > 200 baris
+   ❌ File store / storage > 100 baris
+   ✅ Split ke subkomponen atau custom hook kalau melebihi batas
+   Catatan: HomePage, PlanningPage, InsightPage sudah melanggar — jangan tambah baris,
+   targetkan refactor saat sprint terkait.
+
+7. PATTERN RULE
+   ❌ useEffect untuk derived state — pakai useMemo
+   ❌ Nested ternary lebih dari 1 level
+   ❌ Prop drilling lebih dari 2 level — angkat ke store
+   ❌ Inline style kecuali dynamic value (width %, transform)
+   ✅ Early return untuk guard condition
+   ✅ Named function di JSX event handler
+
+8. IMPORT RULE
+   ❌ Import storage function langsung di komponen — lewat store
+   ✅ Komponen hanya boleh import dari: store/, components/, hooks/, lib/, types/, constants/
+   Pengecualian: fitur settings boleh import storage langsung
+```
+
+---
+
+## Sprint State
+
+> Update tiap sprint selesai.
+
+### ✅ DONE — jangan tulis ulang
+
+| File | Status |
+|------|--------|
+| `src/storage/storage.base.ts` | Final. |
+| `src/storage/storage.transaksi.ts` | Final. |
+| `src/storage/storage.wallet.ts` | Final. |
+| `src/storage/storage.tagihan.ts` | Final. |
+| `src/storage/storage.goals.ts` | Final. Backward compat `terkumpul ?? 0`. |
+| `src/storage/storage.budget.ts` | Final. |
+| `src/storage/storage.kategori.ts` | Final. |
+| `src/storage/storage.settings.ts` | Done. Tambah `saveActiveCurrencyToggle`. |
+| `src/storage/migration/` (v3–v6) | Final. Jangan ubah. |
+| `src/storage/migration/migration.v7.ts` | Done. Default `currency` ke baseCurrency untuk goal lama. |
+| `src/store/input.store.ts` | Final. |
+| `src/store/transfer.store.ts` | Final. |
+| `src/store/transaksi.store.ts` | Final. |
+| `src/store/wallet.store.ts` | Final. |
+| `src/store/computed.store.ts` | Final. |
+| `src/hooks/useToast.ts` | Final. |
+| `src/hooks/useUpdateAvailable.ts` | Final. |
+| `src/lib/format.ts` | Final. `formatRupiah(n, currencySymbol?)` support optional symbol. |
+| `src/components/ui/PriorityBanner.tsx` | Final. |
+| `src/components/ui/ChecklistCard.tsx` | Final. |
+| `src/components/layout/BottomNav.tsx` | Final. |
+| `src/components/layout/FAB.tsx` | Final. |
+| `src/components/layout/PageLayout.tsx` | Final. |
+| `src/components/MigrationErrorPage.tsx` | Final. |
+| `src/features/settings/SettingsPage.tsx` | Done. Full redesign. |
+| `src/features/home/HomePage.tsx` | Done sprint ini. Currency toggle C-style, activeCurrency tidak bergantung multicurrencyEnabled. |
+| `src/features/home/HomePage.module.css` | Done sprint ini. CSS toggle option C. |
+| `src/features/insight/InsightPage.tsx` | Done sprint ini. Filter wallet by currency aktif. |
+| `src/features/budget/PlanningPage.tsx` | Done sprint ini. Form goal + currency picker. |
+| `public/` (PWA icons + manifest) | Done. SW aktif di production. |
+
+### ⚠️ BELUM MASUK KE CODEBASE — apply manual
+
+| File | Yang perlu dilakukan |
+|------|---------------------|
+| ~~`src/types/index.ts`~~ | ✅ Done — `currency: string` sudah ada di Goal |
+| ~~`src/constants/index.ts`~~ | ✅ Done — `CURRENT_SCHEMA_VERSION = 7` |
+| ~~`src/storage/migration/runner.ts`~~ | ✅ Done — migrateV7 sudah terdaftar |
+| ~~`src/features/input/InputBottomSheet.tsx`~~ | ✅ Done — sudah pakai semua wallet |
+
+### 🚧 WIP / PERLU REFACTOR
+
+| File | Catatan |
+|------|---------|
+| `src/features/home/HomePage.tsx` | 1158+ baris — split sprint berikutnya. |
+| `src/features/budget/PlanningPage.tsx` | 1049+ baris — split sprint berikutnya. |
+| `src/features/insight/InsightPage.tsx` | 938+ baris — split sprint berikutnya. |
+
+### ❌ BELUM ADA
+
+| Yang belum ada | Catatan |
+|----------------|---------|
+| `src/hooks/usePWA.ts` | Disebutkan tapi belum exist. |
+| `src/hooks/useStorageSize.ts` | Disebutkan tapi belum exist. |
+| Transfer constraint kurs | `TransferBottomSheet.tsx` ada tapi constraint kurs belum diimplementasi. |
