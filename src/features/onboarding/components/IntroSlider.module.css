@@ -1,0 +1,84 @@
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-4);
+  min-height: 100dvh;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-5);
+}
+
+.icon {
+  color: var(--color-brand-primary);
+}
+
+.title {
+  font: var(--text-heading-1);
+  color: var(--color-text-primary);
+}
+
+.desc {
+  font: var(--text-body);
+  color: var(--color-text-secondary);
+  max-width: 300px;
+  line-height: 1.6;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding-bottom: var(--space-8);
+}
+
+.dots {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dot,
+.dotActive {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.dot {
+  background: var(--color-bg-overlay);
+}
+
+.dotActive {
+  background: var(--color-brand-primary);
+  width: 24px;
+}
+
+.btnNext {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+  font: var(--text-body-medium);
+  cursor: pointer;
+  border: none;
+}
+
+.btnSkip {
+  font: var(--text-body);
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
