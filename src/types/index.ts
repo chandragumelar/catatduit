@@ -48,6 +48,7 @@ export interface Goal {
   terkumpul: number          // update manual, tidak relasi ke tx nabung
   deadline?: string          // "YYYY-MM-DD"
   icon?: string
+  currency?: string          // optional, default IDR
 }
 
 export interface KategoriItem {
