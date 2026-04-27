@@ -299,6 +299,7 @@ function TabBudget() {
       )}
     </div>
   )
+}
 
 function TabTagihan() {
   const wallets = useWalletStore((s) => s.wallets);
