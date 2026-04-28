@@ -1,0 +1,89 @@
+.card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.label {
+  font: var(--text-micro);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.empty {
+  font: var(--text-body);
+  color: var(--color-text-disabled);
+  line-height: 1.5;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.barLabel {
+  font: var(--text-caption);
+  color: var(--color-text-secondary);
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.barTrack {
+  flex: 1;
+  height: 8px;
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.barFillIncome {
+  height: 100%;
+  background: var(--color-success);
+  border-radius: var(--radius-full);
+  transition: width 400ms ease-out;
+}
+
+.barFillExpense {
+  height: 100%;
+  background: var(--color-danger);
+  border-radius: var(--radius-full);
+  transition: width 400ms ease-out;
+}
+
+.barAmt {
+  font: var(--text-caption-medium);
+  width: 72px;
+  text-align: right;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.netRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.netLabel {
+  font: var(--text-caption);
+  color: var(--color-text-secondary);
+}
+
+.netAmt {
+  font: var(--text-body-medium);
+  font-variant-numeric: tabular-nums;
+}

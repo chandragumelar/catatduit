@@ -1,23 +1,39 @@
 import { NavLink } from 'react-router-dom'
 import { House, CalendarBlank, ChartBar } from '@phosphor-icons/react'
+import FAB from '@/components/FAB/FAB'
 import styles from './BottomNav.module.css'
 
 export default function BottomNav() {
   return (
     <nav className={styles.nav}>
-      <NavLink to="/" end className={({ isActive }) => isActive ? styles.itemActive : styles.item}>
+      <NavLink
+        to="/"
+        end
+        className={({ isActive }) => [styles.item, isActive ? styles.itemActive : ''].join(' ')}
+        aria-label="Beranda"
+      >
         <House size={24} />
-        <span>Beranda</span>
       </NavLink>
-      <NavLink to="/planning" className={({ isActive }) => isActive ? styles.itemActive : styles.item}>
+
+      <NavLink
+        to="/planning"
+        className={({ isActive }) => [styles.item, isActive ? styles.itemActive : ''].join(' ')}
+        aria-label="Perencanaan"
+      >
         <CalendarBlank size={24} />
-        <span>Rencana</span>
       </NavLink>
-      <NavLink to="/insight" className={({ isActive }) => isActive ? styles.itemActive : styles.item}>
+
+      <NavLink
+        to="/insight"
+        className={({ isActive }) => [styles.item, isActive ? styles.itemActive : ''].join(' ')}
+        aria-label="Insight"
+      >
         <ChartBar size={24} />
-        <span>Insight</span>
       </NavLink>
-      <div className={styles.fabPlaceholder} />
+
+      <div className={styles.fabSlot}>
+        <FAB />
+      </div>
     </nav>
   )
 }

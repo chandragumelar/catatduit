@@ -1,0 +1,71 @@
+.card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.label {
+  font: var(--text-micro);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.empty {
+  font: var(--text-body);
+  color: var(--color-text-disabled);
+  line-height: 1.5;
+}
+
+.cta {
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-4);
+  font: var(--text-body-medium);
+  color: var(--color-brand-primary);
+  background: rgba(79, 142, 247, 0.1);
+  border-radius: var(--radius-md);
+  min-height: 40px;
+}
+
+.stampGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stamp {
+  width: 72px;
+  border: 1.5px dashed var(--color-border-default);
+  border-radius: var(--radius-sm);
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.stampIcon {
+  font-size: 20px;
+}
+
+.stampName {
+  font: var(--text-micro);
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  text-align: center;
+}
+
+.stampTarget {
+  font-size: 9px;
+  color: var(--color-text-disabled);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}

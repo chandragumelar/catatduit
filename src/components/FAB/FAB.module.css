@@ -1,0 +1,18 @@
+.fab {
+  width: var(--fab-size);
+  height: var(--fab-size);
+  border-radius: var(--radius-full);
+  background: var(--color-brand-gradient);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(79, 142, 247, 0.4);
+  flex-shrink: 0;
+  transition: transform 150ms ease;
+}
+
+.fab:active {
+  transform: scale(0.92);
+}

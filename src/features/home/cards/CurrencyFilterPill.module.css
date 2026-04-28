@@ -1,0 +1,27 @@
+.wrap {
+  display: flex;
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  width: fit-content;
+  gap: 2px;
+}
+
+.pill,
+.pillActive {
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font: var(--text-caption-medium);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.pill {
+  background: transparent;
+  color: var(--color-text-disabled);
+}
+
+.pillActive {
+  background: var(--color-bg-overlay);
+  color: var(--color-text-primary);
+}
